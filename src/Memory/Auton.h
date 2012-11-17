@@ -201,6 +201,7 @@ namespace _AutonPrivate
     /// Selects another Implementation by name
     /*! This function can be called from the running code at any time (using the macro
         \ref AUTON_FORCE) to re-select the Implementation.<br>
+        <br>
         The following actions will be taken:
         - If an Implementation has already been instantiated, it will be deleted.
         - No new Implementation will be instantiated until the next use of the pointer.
@@ -264,7 +265,7 @@ namespace _AutonPrivate
 /// Overrides the elected Implementation by the given name
 /*! Calling this macro removes the current Implementation and selects another one by
     the given name.<br>
-    \see    AutonInterface::_ForceImplementation() for other details.
+    \see    \ref _AutonPrivate::AutonInterface::_ForceImplementation() for other details.
     \param  I       The Interface class to be implemented
     \param  name    The name (in 'const char *' type) of the class to be used as the
                     Implementation for Interface 'I'
