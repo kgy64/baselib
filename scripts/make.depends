@@ -1,0 +1,28 @@
+#
+#
+
+.PHONY: all
+all: _depends
+
+%.depend: %.cpp
+	@echo "    Depending $< ..."; \
+	rm -f "$@"; \
+	_objfile="$(<:.cpp=.o)"; \
+	_depfile="$(<:.cpp=.dep)"; \
+	$(CXX) $(CXXFLAGS) -M -MF "$@" -MT "$$_objfile" $< || exit 1; \
+	cat "$@" | sed -e "s%$<%%" -e "s%$$_objfile%$@%" >$$_depfile;
+
+%.o: %.depend FORCED
+	@echo "  Building $@ ..."; \
+	$(MAKE) -r -f $< $@
+
+.PHONY: FORCED
+FORCED:
+
+.PHONY: _depends
+_depends: $(DEPENDS)
+
+ifneq ($(DEPFILES), "")
+include $(DEPFILES)
+endif
+

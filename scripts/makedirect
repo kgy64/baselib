@@ -1,0 +1,9 @@
+
+%.o: %.c
+	@echo "    o CC $< ..."
+	@$(CC) $(CFLAGS) -o $@ -c $<
+
+%.o: %.cpp
+	@echo "    o C++ $< ..."
+	@$(CXX) $(CXXFLAGS) -o $@ -c $<
+

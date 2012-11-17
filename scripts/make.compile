@@ -1,0 +1,12 @@
+#
+#
+
+.PHONY: all
+all: $(OBJECTS)
+
+include $(SCRIPTDIR)/makedirect
+
+ifneq ($(DEPENDS), "")
+include $(DEPENDS)
+endif
+

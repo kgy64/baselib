@@ -1,0 +1,52 @@
+#
+#
+
+include $(SCRIPTDIR)/makerules
+
+.PHONY: _pre_phase
+_pre_phase:
+	@echo "  ***** Pre-Compilation Phase *****"
+
+.PHONY: pre_compilation
+pre_compilation: _pre_phase
+
+.PHONY: _depend_phase
+_depend_phase:
+	@echo "  ***** Dependency Phase:     *****"
+
+.PHONY: do_depend
+do_depend: _depend_phase
+
+.PHONY: _compile_phase
+_compile_phase:
+	@echo "  ***** Compilation Phase:    *****"
+
+.PHONY: do_compile
+do_compile: _compile_phase
+
+.PHONY: _link_phase
+_link_phase:
+	@echo "  ***** Linking Phase:        *****"
+
+.PHONY: do_link
+do_link: _link_phase
+
+basic_test: _first_message
+_first_message:
+	@echo "========== Building '$(NAME)' =========="
+
+# Note: the headers generated from yacc source must be built before dependency phase:
+pre_compilation: $(Y_HEADERS)
+
+do_depend:
+	@$(MAKE) DEPFILES="$(DEPFILES)" DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.depends
+
+do_compile:
+	@$(MAKE) OBJECTS="$(OBJECTS)" DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.compile
+
+do_link_lib: $(A_LIB_PATH) $(SO_LIB_PATH)
+
+.PHONY: _everything
+_everything: basic_test pre_compilation do_depend do_compile do_link
+	@echo "Ready."
+

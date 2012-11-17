@@ -1,0 +1,53 @@
+#ifndef __MAINCONFIG_H__
+#define __MAINCONFIG_H__
+
+#include <Config/ConfigDriver.h>
+#include <Threads/Threads.h>
+#include <Debug/Debug.h>
+
+class MainConfig
+{
+ public:
+    static MainConfig & Get(void)
+    {
+        if (!myself) {
+            ICThread::Lock _l;
+            if (!myself) {
+                myself = new MainConfig();
+            }
+        }
+        return *myself;
+    }
+
+    /// Prints the whole config (for debug purpose)
+    void List(void) const
+    {
+        theConfig.List();
+    }
+
+    static const ConfigValue GetConfig(const std::string & key)
+    {
+        return Get().theConfig.GetConfig(key);
+    }
+
+    static const std::string & GetConfig(const std::string & key, const std::string & def_val);
+    static int GetConfig(const std::string & key, int def_val);
+    static float GetConfig(const std::string & key, float def_val);
+    static double GetConfig(const std::string & key, double def_val);
+
+ protected:
+    MainConfig(void);
+
+    static MainConfig * myself;
+
+    static const char configName[];
+
+ private:
+    SYS_DEFINE_CLASS_NAME("MainConfig");
+
+    ConfigStore theConfig;
+};
+
+#endif /* __MAINCONFIG_H__ */
+
+/* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
