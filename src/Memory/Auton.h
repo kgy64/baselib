@@ -342,7 +342,89 @@ class Auton
     an interface.<br>
     Let's see an example:<br>
     <br>
-
+    - <b>Using the Interface:</b><br>
+    You can use any kind of class as Interface here, but of course, it is necessary
+    to have some virtual functions to act as an Interface:
+    \code
+ class MyInterface
+ {
+    public:
+        virtual ~MyInterface() {}
+        virtual int Value() =0;
+ }
+    \endcode
+    It is also necessary to declare the Interface for the \ref Auton usage:
+    \code
+ AUTON_INTERFACE(MyInterface);
+    \endcode
+    Put this declaration in one of the cpp sources. It can be anywhere in the code, it is
+    not necessary to be visible for the \ref Auton pointer implementations.<br>
+    That's enough, you can use the \ref Auton for this Interface like this:
+    \code
+ Auton<MyInterface> something;
+ int i = something->Value();
+    \endcode
+    In this example, the variable \a i will be assigned according to the Implementation. The
+    Implementation is not visible in this code, so currently we don't know the result. :-)
+    Let's see the following paragraph to see the Implementation.<br>
+    <br>
+    - <b>The Implementation:</b><br>
+    In the another part of the source, you can define at least one Implementation for that
+    Interface. The Implementation can be in a different object, it is enough for they to meet
+    only at linking time.<br>
+    Let's see the exmaple Implementation:
+    \code
+ class MyImplementation: public MyInterface
+ {
+     virtual int Value() { return 3; }
+ }
+    \endcode
+    The Implementation classes are also necessary to be declared for the \ref Auton usage:
+    \code
+ AUTON_IMPLEMENT(MyImplementation, MyInterface);
+    \endcode
+    Put it in one of the cpp files. It also can be in another part of the source, it is not
+    necessary to be visible for the \ref Auton pointers nor for the Implementation class.<br>
+    If you use this Implementation, you will get \a 3 as result in the above example.<br>
+    <br>
+    - <b>Declare more Implementations:</b><br>
+    It is possible to have more Implementations at a time, the \ref Auton will select one of
+    them according to their \a priority. To do this, use the following macro:
+    \code
+ AUTON_IMPLEMENT_PRIO(MyOtherTry, MyInterface, 1);
+    \endcode
+    Note that in the previous example, the class \a MyImplementation was declared with
+    \a priority=0 as a default used by the macro \ref AUTON_IMPLEMENT. So, the \a priority=1
+    here will override the other Implementation.<br>
+    <br>
+    <b>Warning:</b> Do \a not declare more classes with the same priority, because in this
+    case the selection between them is defined by the initialization order of the
+    corresponding static instances, so it is practically unknown.<br>
+    <br>
+    - <b>Selecting the Implementation by name:</b><br>
+    Let's see the following example:
+    \code
+ Auton<MyInterface> something;
+ int i = something->Value();
+ AUTON_FORCE(MyInterface, "MyImplementation");
+ int j = something->Value();
+    \endcode
+    Assuming that we have the two Implementations mentioned above, the variable \a i will have
+    value from class \a MyOtherTry, while \a j will have \a 3, from class \a MyImplementation.<br>
+    See the details in the source documentation. Note that the forced selection itself needs
+    linear time (according to the number of implementations), while the running time is not
+    affected at all.<br>
+    <br>
+    - <b>The Internals:</b><br>
+     - <b>Independency</b><br>
+     All part of the code (the Interface, the Implementations, and all the declaration-like
+     macros) can be put in different parts of the source. They must only meet at linking time.
+     - <b>Optimization</b><br>
+     The code is optimized for speed. The election of the highest priority Implementation is
+     done in static initialization time, it does not need running time at all. Except the
+     selection by name: doing this (and also the static initialization) needs linear time,
+     so practically you can use unlimited number of Implementations. Note that selecting by
+     name does not bother the \ref Auton pointer behavior, so it has no speed impact at all.
 */
 
 #endif /* __AUTON_H__ */
