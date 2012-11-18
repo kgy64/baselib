@@ -23,14 +23,21 @@ namespace _AutonPrivate
         Such an instance will handle the Implementation requests via its function
         AutonInterface::_SelectImplementation()<br>
         This class creates the corresponding Interface implementation on demand: the
-        first access to the Interface will create the corresponding Implementation.<br>
+        first access to the Interface will instantiate the corresponding Implementation.<br>
         This class has a reference counter and deletes the Implementation if the last
         referenced pointer (\ref Auton) is deleted.
+        \note   This class has only static members.
      */
     template <class I>
     class AutonInterface
     {
+        /*! The class \ref AutonBase accesses its \ref head and \ref _SelectImplementation()
+            members during static initialization time.
+         */
         friend class AutonBase<I>;
+
+        /*! The class \ref Auton has right to access its member functions during runtime.
+         */
         friend class Auton<I>;
 
      public:
@@ -61,7 +68,7 @@ namespace _AutonPrivate
         static inline void Destroy(void)
         {
             delete myInterface;
-            myInterface = 0;
+            myInterface = (I*)0;
         }
 
         /// Checks if the Implementation is instantiated or not
@@ -79,7 +86,7 @@ namespace _AutonPrivate
         }
 
         /// Decrements the reference counter
-        /*! Deletes the Implementation if it was the last usage.
+        /*! Also deletes the Implementation if it was the last usage.
             \see AutonInterface::references
          */
         static inline void Drop(void)
@@ -90,7 +97,7 @@ namespace _AutonPrivate
         }
 
         /// Returns the Implementation
-        /*! The Implementation will be created on-demand.
+        /*! The Implementation will be created here on-demand.
          */
         static inline I * Implementation(void)
         {
@@ -99,13 +106,17 @@ namespace _AutonPrivate
         }
 
         /// Head of the list of Implementation heplers
-        /*! This is a chained list, used in the case of new Implementation is selected by name.
-            \see \ref AutonBase::Chain()
-            \see \ref AutonInterface::_ForceImplementation()
+        /*! This is a chained list, used in the case if new Implementation is selected by name.
+            \see \ref AutonBase::Chain() - on how the chain is built
+            \see \ref AutonInterface::_ForceImplementation() - on how the selection by name works
          */
         static AutonBase<I> * head;
 
-        /// The helper class for the current Implementation
+        /// The current Implementation helper
+        /*! Points to the helper class of the currently elected Implementation. This is an important
+            part of the algorythm: the smart pointer \ref Auton can use it immediately without
+            thinking, and therefore it can be as fast as possible.
+         */
         static AutonBase<I> * implementation;
 
         /// This is the current Implementation
@@ -114,6 +125,9 @@ namespace _AutonPrivate
         static I * myInterface;
 
         /// Reference counter for the Interface
+        /*! \see AutonInterface::Drop()
+            \see AutonInterface::Use()
+         */
         static int references;
 
         /// Registers an Implementation
@@ -124,6 +138,8 @@ namespace _AutonPrivate
     };
 
     /// Generic, Implementation-independent base of class \ref AutonHandler
+    /*! This is only an accessor class, to satisfy the access rights to members.
+     */
     template <class I>
     class AutonBase
     {
@@ -132,32 +148,35 @@ namespace _AutonPrivate
         virtual I * Create(void) =0;
 
      protected:
-        AutonBase(const char * name, int prio):
+        inline AutonBase(const char * name, int prio):
             typeName(name),
             priority(prio)
         {
+            Chain(AutonInterface<I>::head);
+            AutonInterface<I>::_SelectImplementation(this);
         }
 
         virtual ~AutonBase()
         {
         }
 
-        void _SelectImplementation(AutonBase<I> * impl)
-        {
-            AutonInterface<I>::_SelectImplementation(impl);
-        }
-
-        /// Chains itself to the given 'head'
-        void Chain(AutonBase<I> *& head)
+        /// Chains itself to the list of Implementations
+        /*! Note that the order within the list is not important (and parctically unknown), so
+            it is put into its head, because this is the fastest way and runs in constant time.
+         */
+        inline void Chain(AutonBase<I> *& head)
         {
             next = head;
             head = this;
         }
 
+        /// The next element of the Implementation List
         AutonBase<I> * next;
 
+        /// The name of the Implementation
         const char * typeName;
 
+        /// The priority of the Implementation
         int priority;
     };
 
@@ -169,10 +188,10 @@ namespace _AutonPrivate
         AutonHandler(const char * name, int prio):
             AutonBase<I>(name, prio)
         {
-            AutonBase<I>::_SelectImplementation(this);
         }
 
      private:
+        /// Returns a new instance of the Implementation
         virtual I * Create(void)
         {
             return new C;
@@ -186,8 +205,6 @@ namespace _AutonPrivate
     template <class I>
     void AutonInterface<I>::_SelectImplementation(AutonBase<I> * impl)
     {
-        impl->Chain(head);
-
         if (!implementation) {
             implementation = impl; // The very first one
         } else if (impl->priority > implementation->priority) {
@@ -203,9 +220,14 @@ namespace _AutonPrivate
         \ref AUTON_FORCE) to re-select the Implementation.<br>
         <br>
         The following actions will be taken:
-        - If an Implementation has already been instantiated, it will be deleted.
-        - No new Implementation will be instantiated until the next use of the pointer.
-        - Nothing happens at all if the current Implementation is selected again.
+         - If an Implementation has already been instantiated, it will be deleted.
+         - No new Implementation will be instantiated until the next use of the pointer.
+         - Nothing happens at all if the current Implementation is selected again.
+
+        \note   The running time is linear, according to the number of implementations. The
+                destructor is also can be executed here on demand. The running time of the
+                smart pointer \ref Auton is not affected, except the constructor which may
+                also be executed on demand there.
      */
     template <class I>
     bool AutonInterface<I>::_ForceImplementation(const char * typeName)
@@ -236,24 +258,24 @@ namespace _AutonPrivate
     \param  I       The Interface to be implemented
     \param  prio    This is the priority. It is an integer value, higher value means
                     higher priority. Do not use implementations with the same priority
-                    because the result is undefined in this case. No other restrictions.
-    \note   Some variables are declared in anonymous namespace.
+                    because the result may be undefined in this case. No other restrictions.<br>
+                    Note that the default priority used in macro \ref AUTON_IMPLEMENT is zero.
+    \note   This macro generates definitions.
  */
 #define AUTON_IMPLEMENT_PRIO(C, I, prio) \
-    class C; \
-    class I; \
     namespace { _AutonPrivate::AutonHandler<C, I> __my_auton_handler_##C##_##prio(#C, prio); }
 
 /// Implements 'I' using class 'C' with default (0) priority
 /*! \see ::AUTON_IMPLEMENT_PRIO for details
+    \note   This macro generates definitions.
  */
 #define AUTON_IMPLEMENT(C, I) \
     AUTON_IMPLEMENT_PRIO(C, I, 0)
 
-/// Declares the class 'I' as an Interface
+/// Defines the class 'I' as an Interface
 /*! This macro must be used once for each Interface class. Any class can be used as an interface,
     no restrictions and no precautions.
-    \note   Some variables are declared in anonymous namespace.
+    \note   This macro generates definitions.
  */
 #define AUTON_INTERFACE(I) \
     namespace { template<> _AutonPrivate::AutonInterface<I> __my_auton_interface_##I; } \
@@ -265,10 +287,12 @@ namespace _AutonPrivate
 /// Overrides the elected Implementation by the given name
 /*! Calling this macro removes the current Implementation and selects another one by
     the given name.<br>
-    \see    \ref _AutonPrivate::AutonInterface::_ForceImplementation() for other details.
     \param  I       The Interface class to be implemented
     \param  name    The name (in 'const char *' type) of the class to be used as the
                     Implementation for Interface 'I'
+    \note   This macro generates executable code.
+            The function \ref _AutonPrivate::AutonInterface::_ForceImplementation is called, see it
+            for more details.
  */
 #define AUTON_FORCE(I, name) \
     _AutonPrivate::AutonInterface<I>::_ForceImplementation(name)
@@ -337,33 +361,33 @@ class Auton
 };
 
 /*!
-\page   UseAuton   Using smat pointer \ref Auton
-    The class ::Auton can be used to implement one of the given singletons through
-    an interface.<br>
-    Let's see an example:<br>
+\page   UseAuton   Auton: smart pointer for singleton implementations
+The class ::Auton can be used to implement one of the given singletons through an
+    interface.<br>
     <br>
-    - <b>Using the Interface:</b><br>
+    Let's see an example:<br>
+    - <b>The Interface:</b><br>
     You can use any kind of class as Interface here, but of course, it is necessary
     to have some virtual functions to act as an Interface:
-    \code
+\code
  class MyInterface
  {
     public:
         virtual ~MyInterface() {}
         virtual int Value() =0;
  }
-    \endcode
-    It is also necessary to declare the Interface for the \ref Auton usage:
-    \code
+\endcode
+    It is also necessary to define the Interface for the \ref Auton usage:
+\code
  AUTON_INTERFACE(MyInterface);
     \endcode
-    Put this declaration in one of the cpp sources. It can be anywhere in the code, it is
+    Put this definition in one of the cpp sources. It can be anywhere in the code, it is
     not necessary to be visible for the \ref Auton pointer implementations.<br>
     That's enough, you can use the \ref Auton for this Interface like this:
-    \code
+\code
  Auton<MyInterface> something;
  int i = something->Value();
-    \endcode
+\endcode
     In this example, the variable \a i will be assigned according to the Implementation. The
     Implementation is not visible in this code, so currently we don't know the result. :-)
     Let's see the following paragraph to see the Implementation.<br>
@@ -373,58 +397,90 @@ class Auton
     Interface. The Implementation can be in a different object, it is enough for they to meet
     only at linking time.<br>
     Let's see the exmaple Implementation:
-    \code
+\code
  class MyImplementation: public MyInterface
  {
      virtual int Value() { return 3; }
  }
-    \endcode
-    The Implementation classes are also necessary to be declared for the \ref Auton usage:
-    \code
+\endcode
+    The Implementation classes are also necessary to be defined for the \ref Auton usage:
+\code
  AUTON_IMPLEMENT(MyImplementation, MyInterface);
-    \endcode
+\endcode
     Put it in one of the cpp files. It also can be in another part of the source, it is not
     necessary to be visible for the \ref Auton pointers nor for the Implementation class.<br>
     If you use this Implementation, you will get \a 3 as result in the above example.<br>
     <br>
-    - <b>Declare more Implementations:</b><br>
+    - <b>Define more Implementations:</b><br>
     It is possible to have more Implementations at a time, the \ref Auton will select one of
     them according to their \a priority. To do this, use the following macro:
-    \code
+\code
  AUTON_IMPLEMENT_PRIO(MyOtherTry, MyInterface, 1);
-    \endcode
-    Note that in the previous example, the class \a MyImplementation was declared with
+\endcode
+    Note that in the previous example, the class \a MyImplementation was defined with
     \a priority=0 as a default used by the macro \ref AUTON_IMPLEMENT. So, the \a priority=1
     here will override the other Implementation.<br>
     <br>
-    <b>Warning:</b> Do \a not declare more classes with the same priority, because in this
+    <b>Warning:</b> Do \a not define more classes with the same priority, because in this
     case the selection between them is defined by the initialization order of the
     corresponding static instances, so it is practically unknown.<br>
     <br>
     - <b>Selecting the Implementation by name:</b><br>
     Let's see the following example:
-    \code
+\code
  Auton<MyInterface> something;
  int i = something->Value();
  AUTON_FORCE(MyInterface, "MyImplementation");
  int j = something->Value();
-    \endcode
+\endcode
     Assuming that we have the two Implementations mentioned above, the variable \a i will have
     value from class \a MyOtherTry, while \a j will have \a 3, from class \a MyImplementation.<br>
-    See the details in the source documentation. Note that the forced selection itself needs
-    linear time (according to the number of implementations), while the running time is not
-    affected at all.<br>
+    See the details in the source documentation.<br>
+    <b>Notes:</b>
+     - The forced selection itself needs linear time (according to the number of implementations), while
+     the running time of the pointers is not affected at all.
+     - If the \ref AUTON_FORCE is called before the first construction of the corresponding \ref Auton
+     instance, then the original Implementation is not instantiated at all.<br>
     <br>
-    - <b>The Internals:</b><br>
+    - <b>The Internals:</b>
      - <b>Independency</b><br>
-     All part of the code (the Interface, the Implementations, and all the declaration-like
-     macros) can be put in different parts of the source. They must only meet at linking time.
+      All parts of the code (the Interface, the Implementations, and all the definition-like
+      macros) can be put in different parts of the source. They must only meet at linking time.<br>
+      <br>
      - <b>Optimization</b><br>
-     The code is optimized for speed. The election of the highest priority Implementation is
-     done in static initialization time, it does not need running time at all. Except the
-     selection by name: doing this (and also the static initialization) needs linear time,
-     so practically you can use unlimited number of Implementations. Note that selecting by
-     name does not bother the \ref Auton pointer behavior, so it has no speed impact at all.
+      The code is optimized for speed. The election of the highest priority Implementation is
+      done in static initialization time, it does not need running time at all. Except the
+      selection by name: doing this (and also the static initialization) needs linear time,
+      so practically you can use unlimited number of Implementations. Note that selecting by
+      name does not bother the \ref Auton pointer behavior, so it has no speed impact at all.<br>
+      <br>
+     - <b>How does it work:</b>
+      - <b>The Interface side:</b><br>
+       The macro \ref AUTON_INTERFACE instantiates a template class \ref _AutonPrivate::AutonInterface
+       in the anonymous namespace. This is a very small helper class, having only some static members
+       (which are also defined by the macro). See the source documentation for more details.<br>
+       Its main job is to keep a pointer to the currently elected Implementation helper class (see below).<br>
+       <br>
+      - <b>The Implementation side:</b><br>
+       The macros \ref AUTON_IMPLEMENT and \ref AUTON_IMPLEMENT_PRIO instantiate a template class
+       \ref _AutonPrivate::AutonHandler in the anonymous namespace. This is also a very small helper
+       class. However, it has static and non-static members, the access to these instances is not necessary,
+       because it registers itself into the corresponding Interface helper class (_AutonPrivate::AutonInterface)
+       and accessed through its static functions. The registration phase also elects the highest priority
+       one in constant time (see \ref _AutonPrivate::AutonInterface::_SelectImplementation()) and all this
+       is done during static initialization. This procedure guarantees fast execution.<br>
+       <br>
+      - <b>The Smart Pointer \ref Auton</b><br>
+       An instance of \ref Auton uses only the corresponding Interface helper class (see \ref
+       _AutonPrivate::AutonInterface) through its static member functions.<br>
+       Its operation is <b>optimized for speed</b>: the instance of the Implementation is accessed by a pointer
+       of the helper class directly. It is also done exactly the same way after a name-based forced election.<br>
+       It is <b>reference-counted</b> by the helper class.<br>
+       The name-based <b>forced election</b> takes linear time, according to the number of Implementations.
+       The speed of all further operations is not affected at all.
+
+<hr>
+Download the source from <b>git.teledigit.eu:/git/lib/base.git</b>, see the file <b>src/Memory/Auton.h</b><br>
 */
 
 #endif /* __AUTON_H__ */
