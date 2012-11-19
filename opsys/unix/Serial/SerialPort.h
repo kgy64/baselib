@@ -3,6 +3,7 @@
 
 #include <Debug/Debug.h>
 
+#include <stdint.h>
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
@@ -17,7 +18,7 @@ namespace SYS
 
         bool Open(const char * DeviceName, int baud = 9600);
 
-        void Wait(useconds_t time) const;
+        void Wait(uint32_t time) const;
 
         void Close(void)
         {

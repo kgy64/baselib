@@ -124,7 +124,7 @@ bool SerialPort::Open(const char * DeviceName, int baud)
  return false;
 }
 
-void SerialPort::Wait(useconds_t time) const
+void SerialPort::Wait(uint32_t time) const
 {
  SYS_DEBUG_MEMBER(DM_SERIAL);
  if (is_device)
