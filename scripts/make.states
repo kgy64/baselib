@@ -36,9 +36,7 @@ _first_message:
 	@echo "========== Building '$(NAME)' =========="
 
 # Note: the headers generated from yacc source must be built before dependency phase:
-pre_compilation: $(Y_HEADERS)
-
-do_depend:
+do_depend: $(Y_HEADERS)
 	@$(MAKE) DEPFILES="$(DEPFILES)" DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.depends
 
 do_compile:

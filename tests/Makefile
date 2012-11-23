@@ -26,7 +26,7 @@ test: _everything
 
 .PHONY: clean
 clean:
-	@rm -f $(OBJECTS) $(BINDIR)/$(NAME)
+	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
 
 .PHONY: $(BINDIR)
 $(BINDIR):

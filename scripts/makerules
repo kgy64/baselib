@@ -1,9 +1,13 @@
 #
 #
 
+ifneq ("$(SUBPROJECT_PATH)", "")
+CXXFLAGS += -I$(SUBPROJECT_PATH)/include/private
+endif
+
+export CXXFLAGS
 export CFLAGS
 export LFLAGS
-export CXXFLAGS
 
 .PHONY: basic_test
 basic_test:
@@ -30,4 +34,8 @@ basic_test:
 %.cpp: %.y
 	@echo "    YACC $< ..."; \
 	$(BISON) -o $@ $<
+
+.PHONY: doc
+doc:
+	@doxygen doxyfile
 

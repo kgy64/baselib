@@ -17,6 +17,7 @@ using namespace std;
 map<pthread_t, _DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH _DebugPrint::levels;
 
 
+/// Mutex for Debug Output
 /*! */
 Glib::Mutex INITIALIZE_PRIORITY_HIGH _DebugPrintLock::debugMutex;
 

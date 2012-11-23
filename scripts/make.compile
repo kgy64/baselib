@@ -6,7 +6,7 @@ all: $(OBJECTS)
 
 include $(SCRIPTDIR)/makedirect
 
-ifneq ($(DEPENDS), "")
+ifneq ("$(DEPENDS)", "")
 include $(DEPENDS)
 endif
 
