@@ -7,6 +7,8 @@ VERS_MINOR           =  1
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+export SCRIPTDIR    ?=  $(PWD)/scripts
+
 .PHONY: all
 all:
 	@(cd opsys/unix && $(MAKE) -s)
@@ -21,3 +23,8 @@ clean:
 	@(cd src && $(MAKE) -s clean)
 	@(cd opsys/unix && $(MAKE) -s clean)
 	@(cd tests && $(MAKE) -s clean)
+
+.PHONY: doc
+doc:
+	@(cd src && $(MAKE) -s doc)
+
