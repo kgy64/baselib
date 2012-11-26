@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Name:        ICExceptions.h
- * Purpose:     Navi-specific exceptions
+ * Purpose:     General purpose exceptions
  * Author:      Kövesdi György  (kgy@teledigit.eu)
  * Modified by:
  * Created:     2012-06-10
@@ -38,7 +38,7 @@ namespace EX {
     };
 
     /// Fatal exception
-    /*! Throwing this class anywhere in the program the whole Navi system exits. This is the
+    /*! Throwing this class anywhere in the program the whole system exits. This is the
      *  possible highest level of exceptions.
      *  */
     class Fatal: public BaseException
@@ -51,7 +51,7 @@ namespace EX {
     };
 
     /// Uncorrectable error occured
-    /*! Throwing this class closes the current operation but does not exit the Navi program.
+    /*! Throwing this class closes the current operation but does not exit the program.
      *  */
     class Error: public Fatal
     {
