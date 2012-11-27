@@ -9,7 +9,7 @@ VERS_MINOR           =  1
 
 BINDIR               =  $(PWD)/bin
 
-OBJECTS_AND_LIBS     =  $(OBJECTS)
+OBJECTS_AND_LIBS     =  $(OBJECTS) ../bin/Basic.a
 
 .PHONY: all
 all:
@@ -19,6 +19,9 @@ all:
 include $(SCRIPTDIR)/makesource
 include $(SCRIPTDIR)/make.states
 
+export CXXFLAGS     +=  -DSYS_DEBUG_ON=1
+export LFLAGS       +=  $(MY_PROJECT_LIBS)
+
 .PHONY: test
 test: _everything
 	@echo "Running test:"
@@ -26,6 +29,7 @@ test: _everything
 
 .PHONY: clean
 clean:
+	@echo " - Cleanincs tests..."
 	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
 
 .PHONY: $(BINDIR)
@@ -36,5 +40,5 @@ do_link: $(BINDIR) $(BINDIR)/$(NAME)
 
 $(BINDIR)/$(NAME): $(OBJECTS_AND_LIBS)
 	@echo " o Linking executable '$(NAME)'..."
-	$(CXX) -o "$@" $(OBJECTS_AND_LIBS) $(LFLAGS)
+	@$(CXX) -o "$@" $(OBJECTS_AND_LIBS) $(LFLAGS)
 

@@ -1,6 +1,8 @@
 #
 #
 
+CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS)
+
 ifneq ("$(SUBPROJECT_PATH)", "")
 CXXFLAGS += -I$(SUBPROJECT_PATH)/include/private
 endif
@@ -20,7 +22,7 @@ basic_test:
 			echo "**************************"; \
 			exit 1; \
 		fi; \
-		if test ! "$(MY_CLUTTER_FLAGS)" -o ! "$(MY_CLUTTER_LIBS)"; then \
+		if test ! "$(MY_PROJECT_FLAGS)" -o ! "$(MY_PROJECT_LIBS)"; then \
 			echo; \
 			echo "**************************"; \
 			echo "* ERROR:"; \

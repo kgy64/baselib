@@ -1,8 +1,8 @@
 #ifndef __THREADS_H__
 #define __THREADS_H__
 
-#include <clutter/clutter.h>
-#include <glibmm/threads.h>
+//#include <clutter/clutter.h>
+#include <glibmm/thread.h>
 
 class ICThread
 {
@@ -20,27 +20,9 @@ class ICThread
         return toBeFinished;
     }
 
-    /// Thread-level lock
-    /*! This class uses the clutter thread lock (see clutter_threads_enter() and
-        clutter_threads_leave() for details) to be able to lock against clutter
-        threads too. */
-    class Lock
-    {
-     public:
-        Lock(void)
-        {
-            clutter_threads_enter();
-        }
-
-        ~Lock(void)
-        {
-            clutter_threads_leave();
-        }
-    };
-
     static void yield(void)
     {
-        Glib::Threads::Thread::yield();
+        Glib::Thread::yield();
     }
 
  private:
@@ -55,7 +37,7 @@ class ICThread
 
     bool toBeFinished;
 
-    Glib::Threads::Thread* myThread;
+    Glib::Thread* myThread;
 };
 
 #endif /* __THREADS_H__ */

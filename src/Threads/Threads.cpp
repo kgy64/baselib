@@ -22,7 +22,7 @@ void ICThread::Kill(void)
 
 void ICThread::Start(void)
 {
- myThread = Glib::Threads::Thread::create(sigc::mem_fun(*this, &ICThread::_main));
+ myThread = Glib::Thread::create(sigc::mem_fun(*this, &ICThread::_main), true);
 }
 
 void ICThread::_main(void)

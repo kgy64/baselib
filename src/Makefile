@@ -8,7 +8,7 @@ VERS_MINOR           =  1
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 SRCDIR               =  .
-BINDIR               =  bin
+BINDIR               =  $(PROJECT_ROOT)/bin
 
 export SUBPROJECT_PATH = $(PWD)/..
 
@@ -17,7 +17,7 @@ all: _everything
 
 include $(SCRIPTDIR)/makelib
 
-export LFLAGS       +=  $(MY_CLUTTER_LIBS)
+export LFLAGS       +=  $(MY_PROJECT_LIBS)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

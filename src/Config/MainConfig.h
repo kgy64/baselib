@@ -11,7 +11,7 @@ class MainConfig
     static MainConfig & Get(void)
     {
         if (!myself) {
-            ICThread::Lock _l;
+            //ICThread::Lock _l;
             if (!myself) {
                 myself = new MainConfig();
             }

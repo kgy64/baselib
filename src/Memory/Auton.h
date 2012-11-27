@@ -7,6 +7,7 @@
 
 // Predeclarations:
 template <class I> class Auton;
+template <class I> class AutoImp;
 
 /// Specific namespace for \ref Auton and related things
 /*! This namespace contains everything related to \ref Auton to prevent any interference
@@ -36,6 +37,10 @@ namespace _AutonPrivate
          */
         friend class AutonBase<I>;
 
+        /*! The class \ref AutoImp has right to access its member functions during runtime.
+         */
+        friend class AutoImp<I>;
+
         /*! The class \ref Auton has right to access its member functions during runtime.
          */
         friend class Auton<I>;
@@ -62,16 +67,8 @@ namespace _AutonPrivate
             return implementation->Create();
         }
 
-        /// Creates the Implementation on demand
-        /*! If it has already been instantiated, nothing happens.
-            \note It is useful for class \ref Auton
-         */
-        static inline void Create(void)
-        {
-            if (!myInterface) {
-                myInterface = CreateImplementation();
-            }
-        }
+        // Commented below
+        static inline void Create(void);
 
         /// Deletes the Implementation if any
         static inline void Destroy(void)
@@ -407,6 +404,29 @@ class AutoImp
  private:
     I * myself;
 };
+
+class AutonLock
+{
+ public:
+    virtual ~AutonLock()
+    {
+    }
+};
+
+namespace _AutonPrivate
+{
+    /// Creates the Implementation on demand
+    /*! If it has already been instantiated, nothing happens.
+        \note It is useful for class \ref Auton
+     */
+    template <class I> void AutonInterface<I>::Create(void)
+    {
+        if (myInterface) return;
+        AutoImp<AutonLock> _lock;
+        if (myInterface) return;
+        myInterface = CreateImplementation();
+    }
+}
 
 /*!
 \page   UseInterfaces   How to define Implementations for \ref Auton and \ref AutoImp

@@ -1,8 +1,12 @@
+#include <Debug/Debug.h>
 #include <iostream>
 #include "memory-test.h"
 
 int main(int argc, char ** argv)
 {
+ g_thread_init(NULL);
+ SYS_DEBUGLEVEL(0xffffffff);
+
  std::cout << "* Started ------------------ " << std::endl;
  {
     Auton<I1> interface;

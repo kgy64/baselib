@@ -1,8 +1,8 @@
 # Makefile for my basic library
 #
 
-NAME                 =  Unix Sources
-SRCDIR               =  .
+export NAME                 =  Unix Sources
+export SRCDIR              ?=  .
 
 .PHONY: all
 all: _everything
