@@ -421,9 +421,9 @@ namespace _AutonPrivate
      */
     template <class I> void AutonInterface<I>::Create(void)
     {
-        if (myInterface) return;
+        if (myInterface) return; // It is already created, nothing to do
         AutoImp<AutonLock> _lock;
-        if (myInterface) return;
+        if (myInterface) return; // Somebody else has just created it
         myInterface = CreateImplementation();
     }
 }
@@ -450,7 +450,7 @@ To use the corresponding Implementation, see \ref Auton for a singleton instance
     It is also necessary to define the Interface for the \ref Auton usage:
 \code
  AUTON_INTERFACE(MyInterface);
-    \endcode
+\endcode
     Put this definition in one of the cpp sources. It can be anywhere in the code, it is
     not necessary to be visible for the \ref Auton pointer implementations.<br>
     That's enough, you can use the \ref Auton for this Interface like this:

@@ -5,7 +5,6 @@
 int main(int argc, char ** argv)
 {
  g_thread_init(NULL);
- SYS_DEBUGLEVEL(0xffffffff);
 
  std::cout << "* Started ------------------ " << std::endl;
  {

@@ -13,16 +13,11 @@ class AutonDefaultLock: public AutonLock
  public:
     AutonDefaultLock()
     {
-        //SYS_DEBUG_MEMBER(0xffffffff);
     }
 
     ~AutonDefaultLock()
     {
-        //SYS_DEBUG_MEMBER(0xffffffff);
     }
-
- private:
-    SYS_DEFINE_CLASS_NAME("AutonDefaultLock");
 };
 
 AUTON_IMPLEMENT(AutonDefaultLock, AutonLock);
