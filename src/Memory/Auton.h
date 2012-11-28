@@ -303,6 +303,15 @@ namespace _AutonPrivate
 #define AUTON_FORCE(I, name) \
     _AutonPrivate::AutonInterface<I>::_ForceImplementation(name)
 
+/// Declares friend(s) necessary for Interface classes
+/*! Adding this definition to a class allows to be all members private, making higher reliability of the source.<br>
+    It is not necessary to use (just recommended), but at least the constructor must be public without it.
+    \param      C       The Implementation class
+    \param      I       The Interface class
+ */
+#define MAKE_AUTON_FRIEND(C, I) \
+    friend class _AutonPrivate::AutonHandler<C, I>
+
 /// Singleton smart pointer for the given Interface
 /*! \see \ref UseAuton for more details.
     \see \ref AutoImp for a non-singleton variant of this class
