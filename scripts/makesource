@@ -1,9 +1,6 @@
 #
 #
 
-export PROJECT_ROOT
-export SCRIPTDIR
-
 CPPSOURCES	=	$(shell find $(SRCDIR) -name "*.cpp")
 CSOURCES	=	$(shell find $(SRCDIR) -name "*.c")
 YSOURCES	=	$(shell find $(SRCDIR) -name "*.y")

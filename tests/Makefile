@@ -7,9 +7,10 @@ VERS_MINOR           =  1
 
 # ---------------------------------------------
 
-BINDIR               =  $(PWD)/bin
+OBJECTS_AND_LIBS     =  $(OBJECTS) $(PROJECT_ROOT)/bin/Basic.a
 
-OBJECTS_AND_LIBS     =  $(OBJECTS) ../bin/Basic.a
+export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
+export LFLAGS       +=  $(MY_PROJECT_LIBS)
 
 .PHONY: all
 all:
@@ -19,11 +20,12 @@ all:
 include $(SCRIPTDIR)/makesource
 include $(SCRIPTDIR)/make.states
 
-export CXXFLAGS     +=  -DSYS_DEBUG_ON=1
-export LFLAGS       +=  $(MY_PROJECT_LIBS)
+.PHONY: _baselib
+_baselib:
+	@(cd ../ && make all)
 
 .PHONY: test
-test: _everything
+test: _baselib _everything
 	@echo "Running test:"
 	@$(BINDIR)/$(NAME)
 

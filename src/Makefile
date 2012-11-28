@@ -7,8 +7,7 @@ VERS_MINOR           =  1
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-SRCDIR               =  .
-BINDIR               =  $(PROJECT_ROOT)/bin
+export SRCDIR        =  . ../opsys/unix
 
 export SUBPROJECT_PATH = $(PWD)/..
 

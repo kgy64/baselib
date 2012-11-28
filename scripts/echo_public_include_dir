@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+
+DIR="$1"
+
+test -d "$DIR/public" || exit
+
+echo "-I$DIR/public"
+

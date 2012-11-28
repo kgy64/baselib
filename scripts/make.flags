@@ -1,10 +1,13 @@
 #
 #
 
-PUBLIC_INCLUDE_DIRS      =  $(shell find -L $(PROJECT_ROOT) -name include -exec ls -d {}/public 2>/dev/null \;)
-export PUBLIC_INCLUDES   =  $(PUBLIC_INCLUDE_DIRS:%=-I%)
+export PROJECT_ROOT     ?=  $(PWD)
+export BINDIR           ?=  $(PROJECT_ROOT)/bin
+export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
 
-export PKGCONFIG         =  $(shell which pkg-config 2>/dev/null)
+export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \;)
+
+export PKGCONFIG        ?=  $(shell which pkg-config 2>/dev/null)
 export MY_PROJECT_FLAGS  =  $(shell test "$(BASE_LIBRARIES)" && "$(PKGCONFIG)" --cflags $(BASE_LIBRARIES) 2>/dev/null)
 export MY_PROJECT_LIBS   =  $(shell test "$(BASE_LIBRARIES)" && "$(PKGCONFIG)" --libs $(BASE_LIBRARIES) 2>/dev/null)
 
