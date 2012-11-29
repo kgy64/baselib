@@ -15,5 +15,5 @@ include $(SCRIPTDIR)/make.states
 .PHONY: clean
 clean:
 	@echo " - Cleaning Unix objects..."
-	@rm -f $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS) $(DEPFILES)
+	@rm -f $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
 

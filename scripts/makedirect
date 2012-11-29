@@ -1,3 +1,11 @@
+#
+#
+
+%.depend: %.cpp
+	@echo "    Depending $< ..."; \
+	rm -f "$@"; \
+	_objfile="$(<:.cpp=.o)"; \
+	$(CXX) $(CXXFLAGS) -M -MF "$@" -MT "$$_objfile $@" $< || exit 1; \
 
 %.o: %.c
 	@echo "    o CC $< ..."

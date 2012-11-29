@@ -1,28 +1,18 @@
 #
 #
 
+# Use only the actually existing dependency files:
+MY_DEPENDS       =  $(shell find $(SRCDIR) -name "*.depend")
+
 .PHONY: all
 all: _depends
 
-%.depend: %.cpp
-	@echo "    Depending $< ..."; \
-	rm -f "$@"; \
-	_objfile="$(<:.cpp=.o)"; \
-	_depfile="$(<:.cpp=.dep)"; \
-	$(CXX) $(CXXFLAGS) -M -MF "$@" -MT "$$_objfile" $< || exit 1; \
-	cat "$@" | sed -e "s%$<%%" -e "s%$$_objfile%$@%" >$$_depfile;
-
-%.o: %.depend FORCED
-	@echo "  Building $@ ..."; \
-	$(MAKE) -r -f $< $@
-
-.PHONY: FORCED
-FORCED:
+include $(SCRIPTDIR)/makedirect
 
 .PHONY: _depends
 _depends: $(DEPENDS)
 
-ifneq ($(DEPFILES), "")
-include $(DEPFILES)
+ifneq ($(MY_DEPENDS), "")
+include $(MY_DEPENDS)
 endif
 

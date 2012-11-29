@@ -7,7 +7,8 @@ VERS_MINOR           =  1
 
 # ---------------------------------------------
 
-OBJECTS_AND_LIBS     =  $(OBJECTS) $(PROJECT_ROOT)/bin/Basic.a
+MY_BASIC_LIB         =  $(PROJECT_ROOT)/bin/Basic.a
+OBJECTS_AND_LIBS     =  $(OBJECTS) $(MY_BASIC_LIB)
 
 export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
 export LFLAGS       +=  $(MY_PROJECT_LIBS)
@@ -20,27 +21,29 @@ all:
 include $(SCRIPTDIR)/makesource
 include $(SCRIPTDIR)/make.states
 
-.PHONY: _baselib
-_baselib:
-	@(cd ../ && make all)
+$(MY_BASIC_LIB): _basic
+
+.PHONY: _basic
+_basic:
+	@(cd ../ && $(MAKE) all)
 
 .PHONY: test
-test: _baselib _everything
+test: _everything
 	@echo "Running test:"
 	@$(BINDIR)/$(NAME)
 
 .PHONY: clean
 clean:
 	@echo " - Cleanincs tests..."
-	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS) $(DEPFILES)
+	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
 
 .PHONY: $(BINDIR)
 $(BINDIR):
 	@test -d "$@" || mkdir "$@"
 
-do_link: $(BINDIR) $(BINDIR)/$(NAME)
-
-$(BINDIR)/$(NAME): $(OBJECTS_AND_LIBS)
+$(BINDIR)/$(NAME): $(BINDIR) $(OBJECTS_AND_LIBS)
 	@echo " o Linking executable '$(NAME)'..."
 	@$(CXX) -o "$@" $(OBJECTS_AND_LIBS) $(LFLAGS)
+
+_everything: $(BINDIR)/$(NAME)
 

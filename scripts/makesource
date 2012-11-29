@@ -1,26 +1,15 @@
 #
 #
 
-CPPSOURCES	=	$(shell find $(SRCDIR) -name "*.cpp")
-CSOURCES	=	$(shell find $(SRCDIR) -name "*.c")
-YSOURCES	=	$(shell find $(SRCDIR) -name "*.y")
-Y_CPPFILES	=	$(YSOURCES:.y=.cpp)
-Y_HEADERS	=	$(YSOURCES:.y=.hpp)
-Y_OBJECTS	=	$(YSOURCES:.y=.o)
+BISON       =   $(shell which bison 2>/dev/null)
 
-C_OBJECTS	=	$(CSOURCES:.c=.o) $(CPPSOURCES:.cpp=.o)
-
-OBJECTS		=	$(Y_OBJECTS) $(C_OBJECTS)
-
-DEPENDS		=	$(OBJECTS:.o=.depend)
-
-BISON		=	$(shell which bison 2>/dev/null)
-
-$(Y_HEADERS): $(Y_CPPFILES)
-
-$(DEPENDS): $(Y_OBJECTS)
-
-.PRECIOUS: $(DEPENDS)
-
-DEPFILES	=	$(shell find -name "*.dep")
+CPPSOURCES  =   $(shell find $(SRCDIR) -name "*.cpp")
+CSOURCES    =   $(shell find $(SRCDIR) -name "*.c")
+YSOURCES    =   $(shell find $(SRCDIR) -name "*.y")
+Y_CPPFILES  =   $(YSOURCES:.y=.cpp)
+Y_HEADERS   =   $(YSOURCES:.y=.hpp)
+Y_OBJECTS   =   $(YSOURCES:.y=.o)
+C_OBJECTS   =   $(CSOURCES:.c=.o) $(CPPSOURCES:.cpp=.o)
+OBJECTS     =   $(Y_OBJECTS) $(C_OBJECTS)
+DEPENDS     =   $(OBJECTS:.o=.depend)
 
