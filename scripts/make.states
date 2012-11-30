@@ -43,7 +43,6 @@ do_link_lib: $(A_LIB_PATH) $(SO_LIB_PATH)
 do_link: _link_phase
 
 _everything: basic_test do_pre_compile do_depend do_compile do_link
-	@echo "Ready."
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

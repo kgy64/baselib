@@ -21,7 +21,7 @@ $(A_LIB_PATH): $(C_OBJECTS)
 	@echo "    Creating library $@ ..."; \
 	mkdir -p $(BINDIR); \
 	rm -f $@; \
-	$(AR) r $@ $(C_OBJECTS)
+	$(AR) rc $@ $(C_OBJECTS)
 
 $(SO_LIB_PATH): $(C_OBJECTS)
 	@echo "    Creating library $@ ..."; \

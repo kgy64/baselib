@@ -1,12 +1,6 @@
 # Makefile for my basic library
 #
 
-NAME                 =  basic
-VERS_MAJOR           =  0
-VERS_MINOR           =  1
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 export BASE_LIBRARIES    =  glibmm-2.4
 
 include scripts/make.flags
