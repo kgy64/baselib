@@ -17,16 +17,16 @@ SO_LIB_PATH         =   $(BINDIR)/$(LIBRARY_SO_2)
 include $(SCRIPTDIR)/makesource
 include $(SCRIPTDIR)/make.states
 
-$(A_LIB_PATH): $(C_OBJECTS)
+$(A_LIB_PATH): $(OBJECTS)
 	@echo "    Creating library $@ ..."; \
 	mkdir -p $(BINDIR); \
 	rm -f $@; \
-	$(AR) rc $@ $(C_OBJECTS)
+	$(AR) rc $@ $(OBJECTS)
 
-$(SO_LIB_PATH): $(C_OBJECTS)
+$(SO_LIB_PATH): $(OBJECTS)
 	@echo "    Creating library $@ ..."; \
 	mkdir -p $(BINDIR); \
-	$(CXX) -shared -Wl,-soname,$(LIBRARY_SO_1) -o $@ $(C_OBJECTS); \
+	$(CXX) -shared -Wl,-soname,$(LIBRARY_SO_1) -o $@ $(OBJECTS); \
 	( \
 		cd $(BINDIR) && \
 		ln -sf $(LIBRARY_SO_2) $(LIBRARY_SO_1); \
