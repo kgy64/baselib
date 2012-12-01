@@ -7,6 +7,8 @@ VERS_MINOR           =  1
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+BASE_LIBRARIES       =  glibmm-2.4
+
 export SRCDIR        =  . ../opsys/unix
 
 export SUBPROJECT_PATH = $(PWD)/..

@@ -1,8 +1,6 @@
 # Makefile for my basic library
 #
 
-export BASE_LIBRARIES    =  glibmm-2.4
-
 include scripts/make.flags
 
 .PHONY: all
