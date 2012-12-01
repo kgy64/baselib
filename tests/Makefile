@@ -8,18 +8,23 @@ VERS_MINOR           =  1
 # ---------------------------------------------
 
 MY_BASIC_LIB         =  $(PROJECT_ROOT)/bin/Basic.a
-OBJECTS_AND_LIBS     =  $(OBJECTS) $(MY_BASIC_LIB)
+OBJECTS_AND_LIBS     =  $(OBJECTS) $(MY_BASIC_LIB) $(MY_PROJECT_LIBS)
 
-export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
-export LFLAGS       +=  $(MY_PROJECT_LIBS)
+export BASE_LIBRARIES    =  glibmm-2.4
 
 .PHONY: all
 all:
 	@echo "Don't use this make directly, call it from the root of this project."
 	@exit 1
 
+ifneq ($(wildcard $(SCRIPTDIR)/makesource),)
+include $(SCRIPTDIR)/make.flags
 include $(SCRIPTDIR)/makesource
 include $(SCRIPTDIR)/make.states
+endif
+
+export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
+export LFLAGS       +=  $(MY_PROJECT_LIBS)
 
 $(MY_BASIC_LIB): _basic
 

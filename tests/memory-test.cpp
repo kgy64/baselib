@@ -4,8 +4,6 @@
 
 int main(int argc, char ** argv)
 {
- g_thread_init(NULL);
-
  std::cout << "* Started ------------------ " << std::endl;
  {
     Auton<I1> interface;
