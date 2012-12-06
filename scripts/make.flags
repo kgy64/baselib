@@ -1,13 +1,6 @@
 #
 #
 
-export PROJECT_ROOT     ?=  $(PWD)
-export BINDIR           ?=  $(PROJECT_ROOT)/bin
-export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
-
-export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \;)
-
-export PKGCONFIG        ?=  $(shell which pkg-config 2>/dev/null)
-export MY_PROJECT_FLAGS  =  $(shell test "$(BASE_LIBRARIES)" && test "$(PKGCONFIG)" && "$(PKGCONFIG)" --cflags $(BASE_LIBRARIES) 2>/dev/null)
-export MY_PROJECT_LIBS   =  $(shell test "$(BASE_LIBRARIES)" && test "$(PKGCONFIG)" && "$(PKGCONFIG)" --libs $(BASE_LIBRARIES) 2>/dev/null)
+export MY_PROJECT_FLAGS  =  $(shell test "$(BASE_LIBRARIES)" && $(SCRIPTDIR)/find-flags --cflags $(BASE_LIBRARIES))
+export MY_PROJECT_LIBS   =  $(shell test "$(BASE_LIBRARIES)" && $(SCRIPTDIR)/find-flags --libs $(BASE_LIBRARIES))
 

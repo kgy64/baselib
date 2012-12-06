@@ -1,37 +1,17 @@
 #
 #
 
-CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS)
+export PROJECT_ROOT     ?=  $(PWD)
+export BINDIR           ?=  $(PROJECT_ROOT)/bin
+export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
 
-ifneq ("$(SUBPROJECT_PATH)", "")
-CXXFLAGS += -I$(SUBPROJECT_PATH)/include/private
-endif
+export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \;)
+
+CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS) -I$(PWD)/../include/private
 
 export CXXFLAGS
 export CFLAGS
 export LFLAGS
-
-.PHONY: basic_test
-basic_test:
-	@if test "$(BASE_LIBRARIES)"; then \
-		if test ! "$(PKGCONFIG)"; then \
-			echo; \
-			echo "**************************"; \
-			echo "* ERROR:"; \
-			echo "* The package manager 'pkg-config' is not installed!"; \
-			echo "**************************"; \
-			exit 1; \
-		fi; \
-		if test ! "$(MY_PROJECT_FLAGS)" -o ! "$(MY_PROJECT_LIBS)"; then \
-			echo; \
-			echo "**************************"; \
-			echo "* ERROR:"; \
-			echo "* The following libraries are not installed correctly:"; \
-			echo "* $(BASE_LIBRARIES)"; \
-			echo "**************************"; \
-			exit 1; \
-		fi; \
-	fi
 
 %.cpp: %.y
 	@echo "    YACC $< ..."; \

@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+
+PKGCONFIG="`which pkg-config`"
+
+if test ! "$PKGCONFIG"; then
+    echo "Error: pkg-config is not installed!" >&2
+    exit 1
+fi
+
+mode="$1"
+shift
+
+for package in $*
+do
+    pkg-config $mode $package 2>/dev/null || {
+        echo "Error: package '$package' is not installed!" >&2
+        error=1
+    }
+done
+
+exit $error
+

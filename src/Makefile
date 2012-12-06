@@ -9,8 +9,6 @@ VERS_MINOR           =  1
 
 export SRCDIR        =  . ../opsys/unix
 
-export SUBPROJECT_PATH = $(PWD)/..
-
 .PHONY: all
 all: _everything
 
