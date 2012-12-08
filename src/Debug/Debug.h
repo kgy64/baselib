@@ -10,9 +10,9 @@
 #ifndef _DEBUGPRINT_H_
 #define _DEBUGPRINT_H_
 
+#include <Memory/SPtr.h>
 #include <iostream>
 #include <sstream>
-#include <memory>
 #include <map>
 #include <glibmm/thread.h>
 #include <string.h>
@@ -133,11 +133,11 @@ private:
     void header(void);
 
     /*! This variable stores the copy of the function name. */
-    std::auto_ptr<char> my_name;
+    SPtr<char> my_name;
 
     /*! If the caller function is a class member, this is the copy of the
         class name. */
-    std::auto_ptr<char> my_class;
+    SPtr<char> my_class;
 
     /*! If the caller function is a class member, this is the class pointer
         (this). */
@@ -145,7 +145,7 @@ private:
 
 #ifdef __GNUC__
     /*! */
-    std::auto_ptr<char> my_filename;
+    SPtr<char> my_filename;
 
     /*! */
     int my_lineno;
