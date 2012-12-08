@@ -11,82 +11,79 @@
 #define _SYS_EXC_NAVI_H_
 
 #include <Debug/Debug.h>
-#include <glibmm/exception.h>
+#include <exception>
+
+#define DEFINE_EXCEPTION(NAME, MSG, BASE)   \
+    class NAME: public BASE                 \
+    {                                       \
+     public:                                \
+        NAME(const char * msg = MSG " Exception", int line = -1): \
+            BASE(msg, line)                 \
+        {                                   \
+        }                                   \
+                                            \
+        virtual ~NAME() throw()             \
+        {                                   \
+        }                                   \
+                                            \
+        template <typename T>               \
+        inline NAME & operator<<(const T & value)  \
+        {                                   \
+            static_cast<BASE &>(*this) << value;   \
+            return *this;                   \
+        }                                   \
+                                            \
+     private:                               \
+        SYS_DEFINE_CLASS_NAME("EX::" MSG "Exception"); \
+    };
 
 namespace EX {
-    class BaseException: public Glib::Exception
+    class BaseException: public std::exception
     {
-        public:
-            BaseException(const char * msg):
-                message(msg)
-            {
-            }
+     public:
+        BaseException(const char * msg = "Generic Exception", int line = -1);
+        virtual ~BaseException() throw();
 
-            virtual ~BaseException() throw()
-            {
-            }
+        virtual const char * what(void) const throw()
+        {
+            return os.c_str();
+        }
 
-            virtual Glib::ustring what(void) const
-            {
-                return message;
-            }
+        template <typename T>
+        inline BaseException & operator<<(const T & value)
+        {
+            os += value;
+            return *this;
+        }
 
-        private:
-            SYS_DEFINE_CLASS_NAME("EX::BaseException");
+     private:
+        SYS_DEFINE_CLASS_NAME("EX::BaseException");
 
-            const char * message;
+        std::string os;
     };
 
     /// Fatal exception
     /*! Throwing this class anywhere in the program the whole system exits. This is the
      *  possible highest level of exceptions.
      *  */
-    class Fatal: public BaseException
-    {
-        public:
-            Fatal(const char * message): BaseException(message) { }
-
-        private:
-            SYS_DEFINE_CLASS_NAME("EX::Fatal");
-    };
+    DEFINE_EXCEPTION(Fatal, "Fatal", BaseException);
 
     /// Uncorrectable error occured
     /*! Throwing this class closes the current operation but does not exit the program.
      *  */
-    class Error: public Fatal
-    {
-        public:
-            Error(const char * message): Fatal(message) { }
-
-        private:
-            SYS_DEFINE_CLASS_NAME("EX::Error");
-    };
+    DEFINE_EXCEPTION(Error, "Error", Fatal);
 
     /// Problem during processing
     /*! Throwing this class exits the current operation in progress, but does
      *  not stop the current project.
      *  */
-    class Problem: public Error
-    {
-        public:
-            Problem(const char * message): Error(message) { }
-
-        private:
-            SYS_DEFINE_CLASS_NAME("EX::Problem");
-    };
+    DEFINE_EXCEPTION(Problem, "Problem", Error);
 
     /// Correctable problem during processing
     /*! Throwing this class means that some correctable error occured during processing, but it is
      *  not necessary to stop.
      *  */
-    class Continue: public Problem
-    {
-        public:
-            Continue(const char * message): Problem(message) { }
-
-        private:
-            SYS_DEFINE_CLASS_NAME("EX::Continue");
-    };
+    DEFINE_EXCEPTION(Continue, "Continue", Problem);
 }
 
 #endif // _SYS_EXC_NAVI_H_
