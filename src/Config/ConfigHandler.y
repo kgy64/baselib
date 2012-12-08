@@ -16,7 +16,7 @@ static int yylex(yy::ConfParser::semantic_type * yylval, yy::ConfParser::locatio
 %union {
     ConfAssign * assign;
     AssignmentSet * body;
-    ConfExpression * name;
+    ConfigValue * name;
     ConfigLevel * level;
 }
 
@@ -51,11 +51,11 @@ BODY:
     ;
 
 DECLARATION:
-      NAME '{' BODY '}'             { $$ = new ConfigLevel($1, $3); }
+      NAME '{' BODY '}'             { $$ = new ConfigLevel(*$1, $3); }
     ;
 
 ASSIGN:
-      NAME '=' EXP close            { $$ = $1->Assign($3); }
+      NAME '=' EXP close            { $$ = new ConfAssign(*$1, *$3); }
     ;
 
 close: ';'  /* mandatory */

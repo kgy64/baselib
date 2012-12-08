@@ -107,7 +107,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
         ++column;
     }
     SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a number");
-    yylval.name = new ConfExpression(st);
+    yylval.name = new ConfigValue(new ConfExpression(st));
     return yy::ConfParser::token::NAME;
  } else switch (ch) {
     case '"':
@@ -138,7 +138,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
             st.append(1, (char)ch);
         }
         SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a quoted string");
-        yylval.name = new ConfExpression(st);
+        yylval.name = new ConfigValue(new ConfExpression(st));
         return yy::ConfParser::token::NAME;
     break;
 
@@ -190,7 +190,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
  }
 
  SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a string");
- yylval.name = new ConfExpression(st);
+ yylval.name = new ConfigValue(new ConfExpression(st));
  return yy::ConfParser::token::NAME;
 }
 
@@ -219,16 +219,11 @@ ConfExpression::~ConfExpression()
  SYS_DEBUG_MEMBER(DM_CONFIG);
 }
 
-ConfAssign * ConfExpression::Assign(ConfExpression * value)
-{
- return new ConfAssign(this, value);
-}
-
 AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_CONFIG, "Appended " << *assignment);
- assigns[assignment->GetName().GetString()] = Glib::RefPtr<ConfExpression>(assignment->ReleaseValue());
+ assigns[assignment->GetName()->GetString()] = assignment->GetValue();
  delete assignment; // due to bison's stupidity :-)
  return this;
 }
