@@ -151,4 +151,27 @@ do_again:;
  }
 }
 
+bool FileHandler::Remove(void)
+{
+ std::string full_path(GetFullPath());
+ struct stat st;
+ int result = stat(full_path.c_str(), &st);
+ if (result < 0) {
+    switch (errno) {
+        case ENOENT:
+            // Does not exist: not an error here
+            return false;
+        break;
+    }
+    throw EX::File_Error() << "Could not stat() '" << full_path << "'";
+ }
+
+ result = unlink(full_path.c_str());
+ if (result < 0) {
+    throw EX::File_Error() << "Could not unlink() '" << full_path << "'";
+ }
+
+ return true;
+}
+
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

@@ -74,6 +74,7 @@ namespace FILES
         void Open(FileMode flag = READ_ONLY);
 
         void Write(const void * p_data, size_t p_length);
+        bool Remove(void);
 
         template <typename T>
         inline void Write(const T & p_data)

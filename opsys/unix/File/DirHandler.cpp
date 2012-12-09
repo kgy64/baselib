@@ -88,7 +88,7 @@ bool DirHandler::IsDirectory(const char * path)
  struct stat st;
  int result = stat(path, &st);
  if (result < 0) {
-    return false;
+    throw EX::DIR_Exception() << "Could not stat(): '" << path << "'";
  }
  return S_ISDIR(st.st_mode);
 }
