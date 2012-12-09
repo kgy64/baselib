@@ -20,12 +20,12 @@
 using namespace FILES;
 
 FileHandler::FileHandler(DirPtr & p_dir, const char * p_filename):
-    myDir(p_dir),
-    myName(p_filename),
-    mode(DEFAULT_MODE),
-    fNo(-1)
+    FileHandler()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ myDir = p_dir;
+ myName = p_filename;
 
  if (myName.empty()) {
     throw EX::File_Error() << "No filename given";
@@ -33,12 +33,12 @@ FileHandler::FileHandler(DirPtr & p_dir, const char * p_filename):
 }
 
 FileHandler::FileHandler(const char * p_path, const char * p_name):
-    myDir(new FILES::DirHandler(p_path)),
-    myName(p_name),
-    mode(DEFAULT_MODE),
-    fNo(-1)
+    FileHandler()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ myDir.reset(new FILES::DirHandler(p_path));
+ myName = p_name;
 
  if (myName.empty()) {
     throw EX::File_Error() << "No filename given";
@@ -46,8 +46,7 @@ FileHandler::FileHandler(const char * p_path, const char * p_name):
 }
 
 FileHandler::FileHandler(const char * p_full_path):
-    mode(DEFAULT_MODE),
-    fNo(-1)
+    FileHandler()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
@@ -79,7 +78,7 @@ FileHandler::~FileHandler()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- if (fNo >= 0) {
+ if (fNo > 2) {
     if (close(fNo) < 0) {
         throw EX::File_Error() << "Could not close file number " << fNo;
     }
@@ -126,6 +125,10 @@ void FileHandler::Write(const void * p_data, size_t p_length)
 
  if (fNo < 0) {
     throw EX::File_Error() << "File not opened to write " << p_length << " bytes";
+ }
+
+ if (fNo == 0) {
+    throw EX::File_Error() << "Write to standard input";
  }
 
  if (!p_length) {

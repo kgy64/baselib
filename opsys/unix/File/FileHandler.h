@@ -86,6 +86,12 @@ namespace FILES
         };
 
      protected:
+        inline FileHandler(void):
+            mode(DEFAULT_MODE),
+            fNo(-1)
+        {
+        }
+
         DirPtr myDir;
 
         std::string myName;
@@ -98,6 +104,33 @@ namespace FILES
         SYS_DEFINE_CLASS_NAME("FILES::FileHandler");
 
         virtual void BlockedIo(void) {}
+    };
+
+    class StdInput: public FileHandler
+    {
+        inline StdInput(void):
+            FileHandler()
+        {
+            fNo = 0;
+        }
+    };
+
+    class StdOutput: public FileHandler
+    {
+        inline StdOutput(void):
+            FileHandler()
+        {
+            fNo = 1;
+        }
+    };
+
+    class StdError: public FileHandler
+    {
+        inline StdError(void):
+            FileHandler()
+        {
+            fNo = 2;
+        }
     };
 }
 
