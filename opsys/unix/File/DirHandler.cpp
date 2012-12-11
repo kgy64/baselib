@@ -44,7 +44,7 @@ bool DirHandler::Create(bool recursive)
 
  SYS_DEBUG(DL_FILE, "To be created: '" << path << "'");
 
- if (IsDirectory(path)) {
+ if (IsExist(path) && IsDirectory(path)) {
     SYS_DEBUG(DL_FILE, path << " - already exists");
     return false; // not created
  }
@@ -83,12 +83,25 @@ bool DirHandler::Create(const char * sub_path, bool recursive)
  subdir.Create(recursive);
 }
 
+bool DirHandler::IsExist(const char * path)
+{
+ struct stat st;
+ int result = stat(path, &st);
+ if (result < 0) {
+    if (errno == ENOENT) {
+        return false;
+    }
+    throw EX::DIR_Exception() << "Could not stat() '" << path << "': " << strerror(errno);
+ }
+ return true;
+}
+
 bool DirHandler::IsDirectory(const char * path)
 {
  struct stat st;
  int result = stat(path, &st);
  if (result < 0) {
-    throw EX::DIR_Exception() << "Could not stat(): '" << path << "'";
+    throw EX::DIR_Exception() << "Could not stat() '" << path << "': " << strerror(errno);
  }
  return S_ISDIR(st.st_mode);
 }

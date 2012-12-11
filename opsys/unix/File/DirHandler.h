@@ -64,6 +64,13 @@ namespace FILES
             return path;
         }
 
+        static bool IsExist(const char * path);
+
+        static inline bool IsExist(const std::string & path)
+        {
+            return IsExist(path.c_str());
+        }
+
         static bool IsDirectory(const char * path);
 
         static inline bool IsDirectory(const std::string & path)

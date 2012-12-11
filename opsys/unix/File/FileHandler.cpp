@@ -91,12 +91,14 @@ void FileHandler::Open(FILES::FileMode flag)
 
  if (fNo >= 0) {
     // Already opened:
-    return;
+    throw EX::File_Error() << "Trying to re-open file, fd=" << fNo;
  }
 
  int open_flags = O_RDONLY;
+
  switch (flag) {
     case READ_ONLY:
+        // Nothing to do here
     break;
 
     case READ_WRITE:
@@ -124,7 +126,7 @@ void FileHandler::Write(const void * p_data, size_t p_length)
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (fNo < 0) {
-    throw EX::File_Error() << "File not opened to write " << p_length << " bytes";
+    throw EX::File_Error() << "File not opened to write";
  }
 
  if (fNo == 0) {
