@@ -17,7 +17,3 @@ export LFLAGS
 	@echo "    YACC $< ..."; \
 	$(BISON) -o $@ $<
 
-.PHONY: doc
-doc:
-	@doxygen doxyfile
-
