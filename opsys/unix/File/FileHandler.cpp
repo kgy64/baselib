@@ -139,7 +139,7 @@ void FileHandler::Write(const void * p_data, size_t p_length)
 
 do_again:;
  ssize_t result = write(fNo, p_data, p_length);
- if (result == EAGAIN) {
+ if (result == -1 && errno == EAGAIN) {
     BlockedIo();
     goto do_again;
  }
