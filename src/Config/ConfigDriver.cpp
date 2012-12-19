@@ -4,12 +4,14 @@
 #include <ctype.h>
 #include <iostream>
 
+SYS_DEFINE_MODULE(DM_CONFIG);
+
 const ConfigValue ConfigStore::GetConfig(const std::string & key) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Finding key '" << key << "' from root...");
+ SYS_DEBUG(DL_INFO1, "Finding key '" << key << "' from root...");
  if (!theConfig) {
-    SYS_DEBUG(DL_CONFIG, "No root config, nothing found.");
+    SYS_DEBUG(DL_INFO1, "No root config, nothing found.");
     return ConfigValue(); // NULL
  }
  return theConfig->GetConfig(key);
@@ -33,13 +35,13 @@ ConfDriver::ConfDriver(FileMap_char & p_file, ConfigStore & store):
 void ConfDriver::AddError(void)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Error somewhere before line " << lineNo << " column " << column);
+ SYS_DEBUG(DL_INFO1, "Error somewhere before line " << lineNo << " column " << column);
 }
 
 void ConfDriver::error(const yy::location & loc, const std::string & message)
 {
  SYS_DEBUG_STATIC(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Error at " << loc.begin << "-" << loc.end << ": " << message);
+ SYS_DEBUG(DL_INFO1, "Error at " << loc.begin << "-" << loc.end << ": " << message);
 }
 
 int ConfDriver::parse(void)
@@ -90,7 +92,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
  int ch = file.ChrGet();
 
  if (ch < 0) {
-    SYS_DEBUG(DL_CONFIG, "End-of-file detected at line " << lineNo);
+    SYS_DEBUG(DL_INFO1, "End-of-file detected at line " << lineNo);
     return ch;
  }
 
@@ -106,7 +108,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
         }
         ++column;
     }
-    SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a number");
+    SYS_DEBUG(DL_INFO1, "NAME(" << st << ") is returned as a number");
     yylval.name = new ConfigValue(new ConfExpression(st));
     return yy::ConfParser::token::NAME;
  } else switch (ch) {
@@ -137,7 +139,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
             }
             st.append(1, (char)ch);
         }
-        SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a quoted string");
+        SYS_DEBUG(DL_INFO1, "NAME(" << st << ") is returned as a quoted string");
         yylval.name = new ConfigValue(new ConfExpression(st));
         return yy::ConfParser::token::NAME;
     break;
@@ -170,7 +172,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
     case '%':
     case ';':
     case ':':
-         SYS_DEBUG(DL_CONFIG, "Returning single character: " << ch << ", ch: " << (char)ch);
+         SYS_DEBUG(DL_INFO1, "Returning single character: " << ch << ", ch: " << (char)ch);
          return ch;
     break;
  }
@@ -189,7 +191,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
     ++column;
  }
 
- SYS_DEBUG(DL_CONFIG, "NAME(" << st << ") is returned as a string");
+ SYS_DEBUG(DL_INFO1, "NAME(" << st << ") is returned as a string");
  yylval.name = new ConfigValue(new ConfExpression(st));
  return yy::ConfParser::token::NAME;
 }
@@ -222,7 +224,7 @@ ConfExpression::~ConfExpression()
 AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Appended " << *assignment);
+ SYS_DEBUG(DL_INFO1, "Appended " << *assignment);
  assigns[assignment->GetName()->GetString()] = assignment->GetValue();
  delete assignment; // due to bison's stupidity :-)
  return this;
@@ -231,7 +233,7 @@ AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 AssignmentSet * AssignmentSet::Append(ConfigLevel * conf)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Appended " << *conf);
+ SYS_DEBUG(DL_INFO1, "Appended " << *conf);
  subConfigs[conf->GetName()] = Glib::RefPtr<ConfigLevel>(conf);
  return this;
 }
@@ -239,7 +241,7 @@ AssignmentSet * AssignmentSet::Append(ConfigLevel * conf)
 AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Appended " << *other);
+ SYS_DEBUG(DL_INFO1, "Appended " << *other);
  for (AssignContainer::iterator i = other->assigns.begin(); i != other->assigns.end(); ++i) {
     assigns[i->first] = i->second;
  }
@@ -298,7 +300,7 @@ void AssignmentSet::List(int level) const
 const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
- SYS_DEBUG(DL_CONFIG, "Finding key '" << key << "' at " << levelName << " ...");
+ SYS_DEBUG(DL_INFO1, "Finding key '" << key << "' at " << levelName << " ...");
 
  return GetAssignments().GetConfig(key);
 }

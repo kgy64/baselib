@@ -5,6 +5,8 @@
 #include <Base/Linked.h>
 #include <Debug/Debug.h>
 
+SYS_DECLARE_MODULE(DM_FILTER);
+
 namespace Filter
 {
     class Group;
@@ -106,14 +108,14 @@ namespace Filter
         {
             SYS_DEBUG_MEMBER(DM_FILTER);
             state->time += elapsed;
-            SYS_DEBUG(DL_FILTER, "Step(" << elapsed << ") to " << state->time);
+            SYS_DEBUG(DL_INFO1, "Step(" << elapsed << ") to " << state->time);
         }
 
         virtual void At(filter_time_t time)
         {
             SYS_DEBUG_MEMBER(DM_FILTER);
             state->time = time;
-            SYS_DEBUG(DL_FILTER, "At(" << state->time << ")");
+            SYS_DEBUG(DL_INFO1, "At(" << state->time << ")");
         }
 
         /// The result (output of the filter)

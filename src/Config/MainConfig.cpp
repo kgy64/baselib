@@ -1,6 +1,8 @@
 #include "MainConfig.h"
 #include <Exceptions/ICExceptions.h>
 
+SYS_DEFINE_MODULE(DM_MAIN);
+
 MainConfig * MainConfig::myself = NULL;
 
 MainConfig::MainConfig(void)
@@ -9,15 +11,15 @@ MainConfig::MainConfig(void)
 
  FileMap_char configFile(configName);
 
- SYS_DEBUG(DL_CONFIG, "Main config file: size=" << configFile.GetSize());
+ SYS_DEBUG(DL_INFO1, "Main config file: size=" << configFile.GetSize());
 
  ConfDriver parser(configFile, theConfig);
 
  if (parser.parse() != 0) {
-    SYS_DEBUG(DL_CONFIG, "Error parsing config file " << configName << ", some settings may be incorrect.");
+    SYS_DEBUG(DL_INFO1, "Error parsing config file " << configName << ", some settings may be incorrect.");
  }
 
- SYS_DEBUG(DL_CONFIG, "Config file " << configName << " parsed.");
+ SYS_DEBUG(DL_INFO1, "Config file " << configName << " parsed.");
 }
 
 const std::string & MainConfig::GetConfig(const std::string & key, const std::string & def_val)

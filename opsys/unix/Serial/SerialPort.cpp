@@ -8,6 +8,8 @@
 
 #include <string>
 
+SYS_DEFINE_MODULE(DM_SERIAL);
+
 using namespace SYS;
 
 SerialPort::SerialPort(void)
@@ -30,12 +32,12 @@ bool SerialPort::Open(const char * DeviceName, int baud)
     struct stat file_stat;
 
     if (lstat(name.c_str(), &file_stat) < 0) {
-        SYS_DEBUG(DL_SERIAL, "Cannot stat() file '" << name << "'");
+        SYS_DEBUG(DL_INFO1, "Cannot stat() file '" << name << "'");
         return false;
     }
 
     if (S_ISDIR(file_stat.st_mode)) {
-        SYS_DEBUG(DL_SERIAL, "The given file '" << name << "' is a directory.");
+        SYS_DEBUG(DL_INFO1, "The given file '" << name << "' is a directory.");
         return false;
     }
 
@@ -43,13 +45,13 @@ bool SerialPort::Open(const char * DeviceName, int baud)
         is_device = S_ISCHR(file_stat.st_mode);
         fd = open(name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
         if (fd < 0) {
-            SYS_DEBUG(DL_SERIAL, "Error opening serial port (or file) '" << name << "'");
+            SYS_DEBUG(DL_INFO1, "Error opening serial port (or file) '" << name << "'");
             return false;
         }
         if (is_device) {
             struct termios termio;
             if (tcgetattr(fd, &termio) < 0) {
-                SYS_DEBUG(DL_SERIAL, "tcgetattr() failed on '" << name << "'");
+                SYS_DEBUG(DL_INFO1, "tcgetattr() failed on '" << name << "'");
                 Close();
                 return false;
             }
@@ -96,7 +98,7 @@ bool SerialPort::Open(const char * DeviceName, int baud)
             tcsetattr(fd, TCSANOW, &termio);
         }
 
-        SYS_DEBUG(DL_SERIAL, (is_device ? "Device '" : "Input file '") << name << "' is opened.");
+        SYS_DEBUG(DL_INFO1, (is_device ? "Device '" : "Input file '") << name << "' is opened.");
         return true;
     }
 
@@ -104,21 +106,21 @@ bool SerialPort::Open(const char * DeviceName, int baud)
     char * newname = (char*)alloca(file_stat.st_size+1);
     ssize_t r = readlink(name.c_str(), newname, file_stat.st_size+1);
     if (r < 0) {
-        SYS_DEBUG(DL_SERIAL, "Cannot follow symbolic link '" << name << "'");
+        SYS_DEBUG(DL_INFO1, "Cannot follow symbolic link '" << name << "'");
         return false;
     }
 
     if (r > file_stat.st_size) {
-        SYS_DEBUG(DL_SERIAL, "Symbolic link is changed during operation.");
+        SYS_DEBUG(DL_INFO1, "Symbolic link is changed during operation.");
         return false;
     }
 
     newname[r] = '\0';
-    SYS_DEBUG(DL_SERIAL, "Following symbolic link: " << name << " -> " << newname);
+    SYS_DEBUG(DL_INFO1, "Following symbolic link: " << name << " -> " << newname);
     name = newname;
  }
 
- SYS_DEBUG(DL_SERIAL, "Symbolic link is too deep (>100)");
+ SYS_DEBUG(DL_INFO1, "Symbolic link is too deep (>100)");
 
  return false;
 }
@@ -128,7 +130,7 @@ void SerialPort::Wait(uint32_t time) const
  SYS_DEBUG_MEMBER(DM_SERIAL);
  if (is_device)
     return;
- SYS_DEBUG(DL_SERIAL, "Sleeping for " << time << " ms...");
+ SYS_DEBUG(DL_INFO1, "Sleeping for " << time << " ms...");
  usleep(time*1000);
 }
 

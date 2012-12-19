@@ -15,6 +15,8 @@
 
 #include "DirHandler.h"
 
+SYS_DECLARE_MODULE(DM_FILE); // Note: defined in FileHandler.cpp
+
 using namespace FILES;
 
 DirHandler::DirHandler(const char * p_path):
@@ -42,10 +44,10 @@ bool DirHandler::Create(bool recursive)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- SYS_DEBUG(DL_FILE, "To be created: '" << path << "'");
+ SYS_DEBUG(DL_INFO1, "To be created: '" << path << "'");
 
  if (IsExist(path) && IsDirectory(path)) {
-    SYS_DEBUG(DL_FILE, path << " - already exists");
+    SYS_DEBUG(DL_INFO1, path << " - already exists");
     return false; // not created
  }
 
@@ -54,7 +56,7 @@ bool DirHandler::Create(bool recursive)
     if (slash != std::string::npos) {
         while (path[slash] == DIR_SEPARATOR) {
             if (!slash) {
-                SYS_DEBUG(DL_FILE, " - at root");
+                SYS_DEBUG(DL_INFO1, " - at root");
                 return false; // do not create root
             }
             --slash;
@@ -65,13 +67,13 @@ bool DirHandler::Create(bool recursive)
     }
  }
 
- SYS_DEBUG(DL_FILE, "Creating '" << path << "'...");
+ SYS_DEBUG(DL_INFO1, "Creating '" << path << "'...");
 
  if (mkdir(path.c_str(), mode) != 0) {
     throw EX::DIR_Exception() << "'" << path << "' could not be created: " << strerror(errno);
  }
 
- SYS_DEBUG(DL_FILE, "Ok.");
+ SYS_DEBUG(DL_INFO1, "Ok.");
 
  return true; // created
 }

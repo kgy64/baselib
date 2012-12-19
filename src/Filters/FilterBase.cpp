@@ -1,5 +1,7 @@
 #include "FilterBase.h"
 
+SYS_DEFINE_MODULE(DM_FILTER);
+
 Filter::FilterBase::FilterBase(Group & group):
     myGroup(group)
 {

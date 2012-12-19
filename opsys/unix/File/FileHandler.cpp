@@ -17,6 +17,8 @@
 
 #include "FileHandler.h"
 
+SYS_DECLARE_MODULE(DM_FILE);
+
 using namespace FILES;
 
 FileHandler::FileHandler(DirPtr & p_dir, const char * p_filename):

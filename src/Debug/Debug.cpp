@@ -12,48 +12,45 @@
 #include <iomanip>
 
 using namespace std;
+using namespace _Debug_Info_;
+
+_Debug_Module_ * _All_Modules_::first = (_Debug_Module_*)0;
+
+void _All_Modules_::SetMode(bool mode)
+{
+ for (_Debug_Module_ * mod = first; mod; mod=mod->next) {
+    mod->SetMode(mode);
+ }
+}
+
+void _All_Modules_::SetDebuglevel(unsigned int level)
+{
+ for (_Debug_Module_ * mod = first; mod; mod=mod->next) {
+    mod->SetDebuglevel(level);
+ }
+}
 
 /*! */
-map<pthread_t, _DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH _DebugPrint::levels;
-
+map<pthread_t, DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH DebugPrint::levels;
 
 /// Mutex for Debug Output
 /*! */
-Glib::Mutex INITIALIZE_PRIORITY_HIGH _DebugPrintLock::debugMutex;
+Glib::Mutex INITIALIZE_PRIORITY_HIGH PrintLock::debugMutex;
 
-
-/*! This is the current debuglevel. This value can be overwritten calling
-    the _DebugPrint::set_level() function.
-    \note   The list of levels must be defined by the parent project.
-    \note   It is recommended to set it to zero here, while all the debuglevels can be switched
-            on by using '-d' commandline option. */
-uint32_t _DebugPrint::debuglevel = 0;
-
-/*! This is the current list of modules switched on. This value can be overwritten calling
-    the _DebugPrint::set_modules() function.
-    \note   The list of modules must be defined by the parent project.
-    \note   It is recommended to set it to zero here, while all the modules can be switched
-            on by using '-m' commandline option. */
-uint32_t _DebugPrint::debugmodules = 0;
-
-
-/*! The _DebugPrint::entering() function starts the new message with
+/*! The DebugPrint::entering() function starts the new message with
     this string. */
-const char _DebugPrint::fill_1_begin[] = ",-{ ";
+const char DebugPrint::fill_1_begin[] = ",-{ ";
 
-
-/*! The _DebugPrint::leaving() function starts the message with
+/*! The DebugPrint::leaving() function starts the message with
     this string. */
-const char _DebugPrint::fill_1_end[] = "`-} ";
-
+const char DebugPrint::fill_1_end[] = "`-} ";
 
 /*! This is the separator string for each tabulation level. */
-const char _DebugPrint::fill_2[] = "| ";
+const char DebugPrint::fill_2[] = "| ";
 
-const char _DebugPrint::fill_right[] = " \\";
+const char DebugPrint::fill_right[] = " \\";
 
-const char _DebugPrint::fill_left[] = " /";
-
+const char DebugPrint::fill_left[] = " /";
 
 /*! This constructor can be used from C or static C++ functions. The class name and 'this'
     pointer are not used.
@@ -65,16 +62,16 @@ const char _DebugPrint::fill_left[] = " /";
 #endif // __GNUC__
 /*! \warning    Do <b>not</b> use this constructor directly, use the macro
                 ::SYS_DEBUG_STATIC instead. */
-_DebugPrint::_DebugPrint(const char *name,
+DebugPrint::DebugPrint(const char *name,
 #ifdef __GNUC__
-                                const char *fname, int lineno,
+        const char *fname, int lineno,
 #endif // __GNUC__
-                                uint32_t module)
+        ::_Debug_Info_::_Debug_Module_ & p_module):
+    info((TabInfo*)0),
+    myModule(p_module)
 {
- moduleIsOn = module & get_modules();
-
- if (!moduleIsOn) {
-    // Do not initialize anything: this class will do nothing (as few as possible)
+ if (!myModule.IsOn()) {
+    // Do not initialize anything: this class will do nothing (or at least as few as possible)
     return;
  }
 
@@ -104,17 +101,16 @@ _DebugPrint::_DebugPrint(const char *name,
 #endif // __GNUC__
 /*! \warning    Do <b>not</b> use this constructor deirectly, use the macro
                 ::SYS_DEBUG_MEMBER instead. */
-_DebugPrint::_DebugPrint(const void *thisptr, const char *classptr,
+DebugPrint::DebugPrint(const void *thisptr, const char *classptr,
                                      const char *name,
 #ifdef __GNUC__
                                     const char *fname, int lineno,
 #endif // __GNUC__
-                                    uint32_t module)
+                                    ::_Debug_Info_::_Debug_Module_ & p_module):
+    myModule(p_module)
 {
- moduleIsOn = module & get_modules();
-
- if (!moduleIsOn) {
-    // Do not initialize anything: this class will do nothing (as few as possible)
+ if (!myModule.IsOn()) {
+    // Do not initialize anything: this class will do nothing (or at least as few as possible)
     return;
  }
 
@@ -130,9 +126,10 @@ _DebugPrint::_DebugPrint(const void *thisptr, const char *classptr,
 
 
 /*! The destructor prints a leaving message for the actual function. */
-_DebugPrint::~_DebugPrint()
+DebugPrint::~DebugPrint()
 {
- if (!moduleIsOn) {
+ if (!myModule.IsOn()) {
+    // The class has not initial;ized: do nothing here
     return;
  }
 
@@ -141,59 +138,61 @@ _DebugPrint::~_DebugPrint()
 
 
 /*! This function prints a message for entering into a new function. */
-void _DebugPrint::entering(void)
+void DebugPrint::entering(void)
 {
  DEBUG_CRITICAL_SECTION;
 
- actual_thread = pthread_self();
- info = &levels[actual_thread];
+ info = &levels[pthread_self()];
+
+ if (!level_is_on(DL_CALLS)) {
+    return;
+ }
 
  shift_right();
- if (debug_print(DL_CALLS)) {
-    draw_left();
-    info->tablevel++;
-    cerr << fill_1_begin;
-    if (my_this != NULL) {
-        cerr << &*my_class << "::" << &*my_name << "(): this=" << my_this << ", ";
-    } else {
-        cerr << &*my_name << "(): ";
-    }
-    cerr << &*my_filename << ":" << my_lineno << endl;
+ draw_left();
+ cerr << fill_1_begin;
+
+ if (my_this != NULL) {
+    cerr << &*my_class << "::" << &*my_name << "(): this=" << my_this << ", ";
  } else {
-    info->tablevel++;
+    cerr << &*my_name << "(): ";
  }
+
+ cerr << &*my_filename << ":" << my_lineno << endl;
+
+ info->tablevel++;
 }
 
 
 /*! This function prints a message for leaving the current function. */
-void _DebugPrint::leaving(void)
+void DebugPrint::leaving(void)
 {
+ if (!level_is_on(DL_CALLS)) {
+    return;
+ }
+
  DEBUG_CRITICAL_SECTION;
 
- actual_thread = pthread_self();
- info = &levels[actual_thread];
+ info = &levels[pthread_self()];
 
  shift_left();
- if (debug_print(DL_CALLS)) {
-    draw_left();
-    cerr << fill_1_end;
-    if (my_this != NULL)
-        cerr << &*my_class << "::";
-    cerr << &*my_name << "()" << endl;
+ draw_left();
+ cerr << fill_1_end;
+
+ if (my_this != NULL) {
+    cerr << &*my_class << "::";
  }
+
+ cerr << &*my_name << "()" << endl;
 }
 
 
-void _DebugPrint::shift_right(void)
+void DebugPrint::shift_right(void)
 {
  if (info->tablevel > 20) {
-    if (debug_print(DL_CALLS)) {
-#if 0
-        cerr << "----<----<----<------- Nesting too deep, shifting left 10 positions "
-            "----<----<----<----<---\n";
-#else
+    if (level_is_on(DL_CALLS)) {
         for (int j = 0; j < 10; j++) {
-            info->tablevel--;
+            --info->tablevel;
             header();
             cerr << "/";
             for (int i = 0; i<info->tablevel; i++) cerr << fill_left;
@@ -202,22 +201,17 @@ void _DebugPrint::shift_right(void)
             for (int i = 0; i<info->tablevel; i++) cerr << fill_left;
             cerr << endl;
         }
-#endif
     }
     info->tabshift++;
  }
 }
 
 
-void _DebugPrint::shift_left(void)
+void DebugPrint::shift_left(void)
 {
  --info->tablevel;
  if (info->tabshift > 0 && info->tablevel <= 5) {
-    if (debug_print(DL_CALLS)) {
-#if 0
-        cerr << "---->---->---->---- Nesting gets shallow, shifting right 10 positions "
-            "-->---->---->---->----\n";
-#else
+    if (level_is_on(DL_CALLS)) {
         for (int j = 0; j < 10; j++) {
             header();
             cerr << "\\";
@@ -226,9 +220,8 @@ void _DebugPrint::shift_left(void)
             header();
             for (int i = -1; i<info->tablevel; i++) cerr << fill_right;
             cerr << endl;
-            info->tablevel++;
+            ++info->tablevel;
         }
-#endif
     }
     --info->tabshift;
  }
@@ -236,36 +229,43 @@ void _DebugPrint::shift_left(void)
 
 
 /*! This function prints the separator string (stored in the
-    _DebugPrint::fill_2) TabInfo::tablevel times. */
-void _DebugPrint::draw_left(void)
+    DebugPrint::fill_2) TabInfo::tablevel times. */
+void DebugPrint::draw_left(void)
 {
  header();
- if (debug_print(DL_CALLS)) for (int i=0; i<info->tablevel; i++) cerr << fill_2;
+ if (level_is_on(DL_CALLS)) {
+    for (int i=0; i<info->tablevel; i++) {
+        cerr << fill_2;
+    }
+ }
 }
 
 
-void _DebugPrint::header(void)
+void DebugPrint::header(void)
 {
  cerr << setw(3) << info->id << ": ";
 }
 
 
-_DebugPrint& _DebugPrint::operator<<(const std::ostringstream& p_string)
+DebugPrint& DebugPrint::operator<<(const std::ostringstream& p_string)
 {
  cerr << p_string.str();
  return *this;
 }
 
 
-void _DebugPrint::endline(void)
+void DebugPrint::endline(void)
 {
  cerr << endl;
 }
 
 
-int _DebugPrint::TabInfo::next_id = 0;
+int DebugPrint::TabInfo::next_id = 0;
 
-_DebugPrint::TabInfo::TabInfo(void): tablevel(0), tabshift(0), id(next_id++)
+DebugPrint::TabInfo::TabInfo(void):
+    tablevel(0),
+    tabshift(0),
+    id(next_id++)
 {
 }
 
