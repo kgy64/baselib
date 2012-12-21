@@ -12,6 +12,8 @@
 
 #include <Debug/Debug.h>
 #include <exception>
+#include <iostream>
+#include <sstream>
 
 #define DEFINE_EXCEPTION(NAME, MSG, BASE)   \
     class NAME: public BASE                 \
@@ -52,7 +54,9 @@ namespace EX {
         template <typename T>
         inline BaseException & operator<<(const T & value)
         {
-            os += value;
+            std::ostringstream s;
+            s << value;
+            os += s.str();
             return *this;
         }
 
@@ -67,6 +71,9 @@ namespace EX {
      *  possible highest level of exceptions.
      *  */
     DEFINE_EXCEPTION(Fatal, "Fatal", BaseException);
+
+    /// Assert failed
+    DEFINE_EXCEPTION(Assert, "Assert", BaseException);
 
     /// Uncorrectable error occured
     /*! Throwing this class closes the current operation but does not exit the program.
@@ -85,6 +92,8 @@ namespace EX {
      *  */
     DEFINE_EXCEPTION(Continue, "Continue", Problem);
 }
+
+#define ASSERT(cond)    if (!(cond)) throw ::EX::Assert() << "'" << #cond << "' failed"
 
 #endif // _SYS_EXC_NAVI_H_
 
