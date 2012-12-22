@@ -82,7 +82,7 @@ bool DirHandler::Create(const char * sub_path, bool recursive)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
  DirHandler subdir(SubDir(sub_path));
- subdir.Create(recursive);
+ return subdir.Create(recursive);
 }
 
 bool DirHandler::IsExist(const char * path)

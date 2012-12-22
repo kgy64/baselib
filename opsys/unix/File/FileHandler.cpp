@@ -150,7 +150,7 @@ do_again:;
     throw EX::File_Error() << "Error writing " << p_length << " bytes, fd=" << fNo << "; " << strerror(errno);
  }
 
- if (result != p_length) {
+ if (result != (int)p_length) {
     throw EX::File_Error() << "Written " << result << " bytes instead of " << p_length << " to fd " << fNo;
  }
 }

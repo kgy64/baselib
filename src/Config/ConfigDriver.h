@@ -130,7 +130,7 @@ class ConfExpression
     int reference_counter;
 };
 
-static std::ostream & operator<<(std::ostream & os, const ConfExpression & ex)
+static inline std::ostream & operator<<(std::ostream & os, const ConfExpression & ex)
 {
  os << ex.myValue;
  return os;
@@ -187,7 +187,7 @@ class ConfAssign
     ConfigValue myValue;
 };
 
-static std::ostream & operator<<(std::ostream & os, const ConfAssign & as)
+static inline std::ostream & operator<<(std::ostream & os, const ConfAssign & as)
 {
  os << "Assign(" << as.myName << "=" << as.myValue << ")";
  return os;
@@ -264,7 +264,7 @@ class AssignmentSet
     int reference_counter;
 };
 
-static std::ostream & operator<<(std::ostream & os, const AssignmentSet & body)
+static inline std::ostream & operator<<(std::ostream & os, const AssignmentSet & body)
 {
  os << "AssignmentSet(" << body.assigns.size() << "/" << body.subConfigs.size() << ")";
  return os;
@@ -326,7 +326,7 @@ class ConfigLevel
     int reference_counter;
 };
 
-static std::ostream & operator<<(std::ostream & os, const ConfigLevel & conf)
+static inline std::ostream & operator<<(std::ostream & os, const ConfigLevel & conf)
 {
  os << conf.GetName() << "(" << conf.GetAssignments().noOfAssignments() << "/"
                              << conf.GetAssignments().noOfSubconfigs() << ")";
