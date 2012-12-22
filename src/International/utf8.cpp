@@ -123,7 +123,7 @@ FromWstring::FromWstring(const WChar * p_str):
     GetChar(*p_str++, ch);
  }
 
- ASSERT(ch == myStr.get() + myLength) << ": UTF8 string length calculation problem";
+ ASSERT(ch == myStr.get() + myLength, "UTF8 string length calculation problem");
 
  *ch = '\0';
 }
