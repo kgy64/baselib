@@ -41,11 +41,6 @@ namespace UTF8
      public:
         ToWstring(const char * p_str);
 
-        inline const WChar * ToWChar(void) const
-        {
-            return myStr.get();
-        }
-
         inline size_t length(void) const
         {
             return myLength;
@@ -56,9 +51,20 @@ namespace UTF8
             return myLength == 0;
         }
 
-        std::wstring ToString(void) const
+        inline const WChar * ToWChar(size_t p_start = 0) const
         {
-            return ToWChar();
+            ASSERT(p_start < length()) << ": Wrong wstring position requested";
+            return myStr.get() + p_start;
+        }
+
+        std::wstring ToString(size_t p_start = 0) const
+        {
+            return ToWChar(p_start);
+        }
+
+        inline WChar operator[](size_t p_index) const
+        {
+            return *ToWChar(p_index);
         }
 
      private:
@@ -82,6 +88,7 @@ namespace UTF8
         {
         }
 
+        /// Returns the length of the UTF8 representation of a Unicode character
         inline static size_t CalculateLength(WChar p_char)
         {
             if ((p_char & ~ONE_BYTE_MASK) == 0)
@@ -95,16 +102,12 @@ namespace UTF8
             throw UTF8_Conversion() << "Invalid wide character value: " << std::hex << (int)p_char;
         }
 
+        /// Returns the string length in UTF8 representation
         inline static size_t CalculateLength(const WChar * p_char)
         {
             size_t result = 0;
             while (*p_char) result += CalculateLength(*p_char++);
             return result;
-        }
-
-        inline const char * ToChar(void) const
-        {
-            return myStr.get();
         }
 
         inline size_t length(void) const
@@ -117,9 +120,21 @@ namespace UTF8
             return myLength == 0;
         }
 
-        std::string ToString(void) const
+        inline const char * ToChar(size_t p_start = 0) const
         {
-            return ToChar();
+            ASSERT(p_start >= 0);
+            ASSERT(p_start < length()) << ": Wrong string position requested";
+            return myStr.get() + p_start;
+        }
+
+        inline std::string ToString(size_t p_start = 0) const
+        {
+            return ToChar(p_start);
+        }
+
+        inline char operator[](size_t p_index) const
+        {
+            return *ToChar(p_index);
         }
 
      private:

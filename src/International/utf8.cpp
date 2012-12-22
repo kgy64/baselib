@@ -20,6 +20,7 @@ using namespace UTF8;
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/// Convert a UTF8 string to Unicode
 ToWstring::ToWstring(const char * p_str):
     myLength(strlen(p_str)),
     myStr(new WChar[myLength]) // Note: it can be more than necessary
@@ -34,6 +35,7 @@ ToWstring::ToWstring(const char * p_str):
  myStr.get()[(myLength = i)] = 0;
 }
 
+/// Reads a continuation character within the UTF8 sequence
 WChar ToWstring::GetContinuationChar(const char *& p_str)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
@@ -45,6 +47,7 @@ WChar ToWstring::GetContinuationChar(const char *& p_str)
  return continuation & 0x3f;
 }
 
+/// Convert one UTF8 character to Unicode
 WChar ToWstring::GetChar(const char *& p_str)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
@@ -108,6 +111,7 @@ WChar ToWstring::GetChar(const char *& p_str)
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/// Convert a Unicode string to UTF8
 FromWstring::FromWstring(const WChar * p_str):
     myLength(CalculateLength(p_str)),
     myStr(new char[myLength+1])
@@ -124,6 +128,7 @@ FromWstring::FromWstring(const WChar * p_str):
  *ch = '\0';
 }
 
+/// Convert one Unicode character to UTF8
 void FromWstring::GetChar(WChar p_char, char *& p_result)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
