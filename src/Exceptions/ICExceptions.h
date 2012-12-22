@@ -91,9 +91,15 @@ namespace EX {
      *  not necessary to stop.
      *  */
     DEFINE_EXCEPTION(Continue, "Continue", Problem);
+
+    class _Assert
+    {
+     public:
+        _Assert(bool p_condition, const char * message);
+    };
 }
 
-#define ASSERT(cond)    if (!(cond)) throw ::EX::Assert() << "'" << #cond << "' failed"
+#define ASSERT(cond, message)   { if (!(cond)) throw ::EX::Assert() << "'" << #cond << "' failed: " << message; }
 
 #endif // _SYS_EXC_NAVI_H_
 
