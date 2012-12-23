@@ -23,16 +23,15 @@ using namespace UTF8;
 /// Convert a UTF8 string to Unicode
 ToWstring::ToWstring(const char * p_str):
     myLength(strlen(p_str)),
-    myStr(new WChar[myLength]) // Note: it can be more than necessary
+    myStr(new WChar[myLength+1]) // Note: it can be more than necessary
 {
  SYS_DEBUG_MEMBER(DM_UTF8);
 
- WChar wc;
  size_t i;
- for (i = 0; (wc = GetChar(p_str)) != 0; ++i) {
-    myStr.get()[i] = wc;
- }
- myStr.get()[(myLength = i)] = 0;
+ for (i = 0; (myStr.get()[i] = GetChar(p_str)) != 0; ++i) ;
+
+ SYS_DEBUG(DL_INFO1, "String length set to " << i << ", was " << myLength);
+ myLength = i;
 }
 
 /// Reads a continuation character within the UTF8 sequence
