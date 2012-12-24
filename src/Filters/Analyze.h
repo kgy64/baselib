@@ -2,7 +2,7 @@
 #define __ANALYZE_H__
 
 #include <Filters/FilterBase.h>
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <iostream>
 
 namespace Filter
@@ -134,7 +134,7 @@ namespace Filter
             }
         }
 
-        std::auto_ptr<Analyze<T> > next;
+        boost::shared_ptr<Analyze<T> > next;
 
         T state;
 

@@ -73,30 +73,21 @@ namespace EX {
     DEFINE_EXCEPTION(Fatal, "Fatal", BaseException);
 
     /// Assert failed
+    /*! This exception is tied to boost assertion, if BOOST_ENABLE_ASSERT_HANDLER is defined.
+     *  Basically it is a fatal exception but can be caught in some special cases.
+     *  */
     DEFINE_EXCEPTION(Assert, "Assert", BaseException);
 
     /// Uncorrectable error occured
-    /*! Throwing this class closes the current operation but does not exit the program.
+    /*! Throwing this class closes the current operation but it can continue if possible.
      *  */
     DEFINE_EXCEPTION(Error, "Error", Fatal);
-
-    /// Problem during processing
-    /*! Throwing this class exits the current operation in progress, but does
-     *  not stop the current project.
-     *  */
-    DEFINE_EXCEPTION(Problem, "Problem", Error);
 
     /// Correctable problem during processing
     /*! Throwing this class means that some correctable error occured during processing, but it is
      *  not necessary to stop.
      *  */
-    DEFINE_EXCEPTION(Continue, "Continue", Problem);
-
-    class _Assert
-    {
-     public:
-        _Assert(bool p_condition, const char * message);
-    };
+    DEFINE_EXCEPTION(Continue, "Continue", Error);
 }
 
 #define ASSERT(cond, message)   { if (!(cond)) throw ::EX::Assert() << "'" << #cond << "' failed: " << message; }

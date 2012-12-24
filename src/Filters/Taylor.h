@@ -2,7 +2,7 @@
 #define __TAYLOR_H__
 
 #include <Filters/FilterBase.h>
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 
 namespace Filter
 {
@@ -84,7 +84,7 @@ namespace Filter
         }
 
         /// Next order of the filter
-        std::auto_ptr<I_Filter<T> > filter;
+        boost::shared_ptr<I_Filter<T> > filter;
 
         T constant;
     };

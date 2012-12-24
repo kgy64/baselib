@@ -11,7 +11,7 @@
 #ifndef __SRC_INTERNATIONAL_UTF8_H_INCLUDED__
 #define __SRC_INTERNATIONAL_UTF8_H_INCLUDED__
 
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <string>
 
 #include <Exceptions/ICExceptions.h>
@@ -141,7 +141,7 @@ namespace UTF8
 
         size_t myLength;
 
-        const std::auto_ptr<char> myStr;
+        const boost::scoped_ptr<char> myStr;
 
         static void GetChar(WChar p_char, char *& p_result);
     };

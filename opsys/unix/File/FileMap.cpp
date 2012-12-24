@@ -28,26 +28,24 @@ FileMap::FileMap(const char * name, OpenMode mode)
         map_prot = PROT_READ | PROT_WRITE;
     break;
  }
+
  fd = open(name, open_mode);
- if (fd < 0) {
-    SYS_DEBUG(DL_INFO1, "File '" << name << "' could not be opened.");
-    throw EX::Problem(_I("File cannot be opened"));
- }
+ ASSERT(fd >= 0, "File '" << name << "' could not be opened.");
+
  struct stat sb;
- if (fstat(fd, &sb) < 0) {
-    SYS_DEBUG(DL_INFO1, "Stat error on file '" << name << "'");
-    throw EX::Problem(_I("File 'stat()' error"));
+ {
+    int result = fstat(fd, &sb);
+    ASSERT(result == 0, "Stat error on file '" << name << "'");
  }
+
  size = sb.st_size;
  if (size == 0) {
     mapped = NULL;
  } else {
     mapped = mmap(NULL, size, map_prot, MAP_PRIVATE, fd, 0);
-    if (mapped == MAP_FAILED) {
-        SYS_DEBUG(DL_INFO1, "File '" << name << "' could not be mapped.");
-        throw EX::Problem(_I("mmap() error"));
-    }
+    ASSERT(mapped != MAP_FAILED, "File '" << name << "' could not be mapped.");
  }
+
  ende = (void*)((char*)mapped + size);
 }
 
