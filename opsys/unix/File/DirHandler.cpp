@@ -10,14 +10,24 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
+#include <string.h>
 #include <unistd.h>
 #include <string.h>
 
 #include "DirHandler.h"
+#include <File/FileMap.h>
+#include <File/FileHandler.h>
 
 SYS_DECLARE_MODULE(DM_FILE); // Note: defined in FileHandler.cpp
 
 using namespace FILES;
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class DirHandler:                                                                 *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 DirHandler::DirHandler(const char * p_path):
     path(p_path),
@@ -102,10 +112,95 @@ bool DirHandler::IsDirectory(const char * path)
 {
  struct stat st;
  int result = stat(path, &st);
- if (result < 0) {
-    throw EX::DIR_Exception() << "Could not stat() '" << path << "': " << strerror(errno);
- }
+ ASSERT(result==0, "Could not stat() '" << path << "': " << strerror(errno));
+
  return S_ISDIR(st.st_mode);
+}
+
+bool DirHandler::IsFile(const char * path, bool p_any)
+{
+ struct stat st;
+ int result = stat(path, &st);
+ ASSERT(result==0, "Could not stat() '" << path << "': " << strerror(errno));
+
+ if (S_ISREG(st.st_mode)) {
+    return true;
+ }
+
+ if (!p_any) {
+    return false;
+ }
+
+ return S_ISLNK(st.st_mode) || S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode) || S_ISFIFO(st.st_mode) || S_ISSOCK(st.st_mode);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class DirHandler::iterator:                                                       *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+DirHandler::iterator::iterator(const char * p_parent):
+    myPath(p_parent),
+    myDir(opendir(myPath.c_str())),
+    actualEntry(NULL)
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ ASSERT(myDir, "Could not open '" << myPath << "' for iteration: " << strerror(errno));
+ ++*this; // Step to the first entry
+}
+
+DirHandler::iterator::~iterator()
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ if (myDir) {
+    ASSERT(!closedir(myDir), "Could not close directory iterator");
+ }
+}
+
+std::string DirHandler::iterator::Name(void) const
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ if (!actualEntry) {
+    return "";
+ }
+
+ return actualEntry->d_name;
+}
+
+std::string DirHandler::iterator::Pathname(void) const
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ if (!actualEntry) {
+    return "";
+ }
+
+ return myPath + DIR_SEPARATOR_STR + actualEntry->d_name;
+}
+
+DirHandler::iterator & DirHandler::iterator::operator++()
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ do {
+    int result = readdir_r(myDir, &myEntry, &actualEntry);
+    ASSERT(!result, "Could not iterate on '" << myPath << "': " << strerror(result));
+ } while (actualEntry && actualEntry->d_name[0] == '.'); // Skip '.' '..' and hidden files
+
+ SYS_DEBUG(DL_INFO1, "Current entry: '" << (actualEntry ? actualEntry->d_name : "") << "'");
+
+ return *this;
+}
+
+DirHandler::iterator DirHandler::iterator::operator*() const
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ return DirHandler::iterator(Pathname());
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

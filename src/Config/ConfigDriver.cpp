@@ -24,7 +24,7 @@ void ConfigStore::List(void) const
     theConfig->List(0);
 }
 
-ConfDriver::ConfDriver(FileMap_char & p_file, ConfigStore & store):
+ConfDriver::ConfDriver(FILES::FileMap_char & p_file, ConfigStore & store):
     file(p_file),
     lineNo(1),
     column(1),

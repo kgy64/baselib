@@ -44,7 +44,7 @@ class ConfigStore
 class ConfDriver
 {
  public:
-    ConfDriver(FileMap_char & file_2_parse, ConfigStore & store);
+    ConfDriver(FILES::FileMap_char & file_2_parse, ConfigStore & store);
 
     int parse();
     void error(const yy::location & loc, const std::string & message);
@@ -60,7 +60,7 @@ class ConfDriver
  private:
     SYS_DEFINE_CLASS_NAME("ConfDriver");
 
-    FileMap_char & file;
+    FILES::FileMap_char & file;
 
     int lineNo;
     int column;

@@ -31,9 +31,9 @@ namespace FILES
     class FileHandler
     {
      public:
-        FileHandler(DirPtr & p_dir, const char * p_filename);
+        FileHandler(const DirHandler & p_dir, const char * p_filename);
 
-        inline FileHandler(DirPtr & p_dir, const std::string & p_filename):
+        inline FileHandler(const DirHandler & p_dir, const std::string & p_filename):
             FileHandler(p_dir, p_filename.c_str())
         {
         }
@@ -51,6 +51,11 @@ namespace FILES
         {
         }
 
+        inline FileHandler(const DirHandler::iterator & p_it):
+            FileHandler(p_it.Pathname())
+        {
+        }
+
         ~FileHandler();
 
         inline void SetMode(mode_t p_mode)
@@ -58,14 +63,19 @@ namespace FILES
             mode = p_mode;
         }
 
-        inline DirPtr & GetDirHandler(void)
+        inline const std::string & GetDir(void) const
         {
             return myDir;
         }
 
-        inline std::string GetFullPath(void)
+        inline DirPtr GetDirHandler(void) const
         {
-            std::string full_path(myDir->GetPath());
+            return DirPtr(new DirHandler(GetDir()));
+        }
+
+        inline std::string GetFullPath(void) const
+        {
+            std::string full_path(myDir);
             full_path += DIR_SEPARATOR_STR;
             full_path += myName;
             return full_path;
@@ -93,7 +103,7 @@ namespace FILES
         {
         }
 
-        DirPtr myDir;
+        std::string myDir;
 
         std::string myName;
 

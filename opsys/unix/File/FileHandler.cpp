@@ -21,12 +21,12 @@ SYS_DECLARE_MODULE(DM_FILE);
 
 using namespace FILES;
 
-FileHandler::FileHandler(DirPtr & p_dir, const char * p_filename):
+FileHandler::FileHandler(const DirHandler & p_dir, const char * p_filename):
     FileHandler()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- myDir = p_dir;
+ myDir = p_dir.GetPath();
  myName = p_filename;
 
  if (myName.empty()) {
@@ -39,7 +39,7 @@ FileHandler::FileHandler(const char * p_path, const char * p_name):
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- myDir.reset(new FILES::DirHandler(p_path));
+ myDir = p_path;
  myName = p_name;
 
  if (myName.empty()) {
@@ -58,7 +58,7 @@ FileHandler::FileHandler(const char * p_full_path):
  if (slash == std::string::npos) {
     // Filename without path is given; use the current directory:
     myName = path;
-    myDir.reset(new DirHandler("."));
+    myDir = ".";
     return;
  }
 
@@ -73,7 +73,7 @@ FileHandler::FileHandler(const char * p_full_path):
     --slash;
  }
 
- myDir.reset(new DirHandler(path.substr(0, slash)));
+ myDir = path.substr(0, slash);
 }
 
 FileHandler::~FileHandler()
@@ -105,12 +105,12 @@ void FileHandler::Open(FILES::FileMode flag)
 
     case READ_WRITE:
         open_flags = O_RDWR | O_CREAT;
-        myDir->Create(true);
+        GetDirHandler()->Create(true);
     break;
 
     case APPEND_WRITE:
         open_flags = O_RDWR | O_APPEND | O_CREAT;
-        myDir->Create(true);
+        GetDirHandler()->Create(true);
     break;
  }
 

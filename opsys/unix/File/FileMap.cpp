@@ -9,6 +9,8 @@
 
 SYS_DEFINE_MODULE(DM_FILE);
 
+using namespace FILES;
+
 FileMap::FileMap(const char * name, OpenMode mode)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
