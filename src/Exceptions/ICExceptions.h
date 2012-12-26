@@ -7,8 +7,8 @@
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef _SYS_EXC_NAVI_H_
-#define _SYS_EXC_NAVI_H_
+#ifndef _EXCEPTIONS_EXCEPTIONS_H_
+#define _EXCEPTIONS_EXCEPTIONS_H_
 
 #include <Debug/Debug.h>
 #include <exception>
@@ -74,7 +74,8 @@ namespace EX {
 
     /// Assert failed
     /*! This exception is tied to boost assertion, if BOOST_ENABLE_ASSERT_HANDLER is defined.
-     *  Basically it is a fatal exception but can be caught in some special cases.
+     *  Basically it is a fatal exception but can be caught in some special cases.<br>
+     *  Also thrown by the macros \ref ASSERT and \ref ASSERT_DBG
      *  */
     DEFINE_EXCEPTION(Assert, "Assert", BaseException);
 
@@ -90,8 +91,19 @@ namespace EX {
     DEFINE_EXCEPTION(Continue, "Continue", Error);
 }
 
-#define ASSERT(cond, message)   { if (!(cond)) throw ::EX::Assert() << "'" << #cond << "' failed: " << message; }
+#define __DO_ASSERT(cond, message)  \
+    throw ::EX::Assert() << "In file '" __FILE__ "', line " << __LINE__ << ": '" #cond "' failed: " << message
 
-#endif // _SYS_EXC_NAVI_H_
+#define ASSERT(cond, message)   { if (!(cond)) { __DO_ASSERT(cond, message); } }
+
+#define ASSERT_DBG(cond, message) \
+    { \
+        if (!(cond)) { \
+            SYS_DEBUG(DL_ASSERT, "Line " << __LINE__ << ": Assert '" #cond "' is failed here"); \
+            __DO_ASSERT(cond, message); \
+        } \
+    }
+
+#endif // _EXCEPTIONS_EXCEPTIONS_H_
 
 /* ------------------------- End - of - file --------------------------- */
