@@ -73,7 +73,7 @@ FileHandler::FileHandler(const char * p_full_path):
     --slash;
  }
 
- myDir = path.substr(0, slash);
+ myDir = path.substr(0, slash+1);
 }
 
 FileHandler::~FileHandler()
