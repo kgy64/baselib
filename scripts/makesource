@@ -3,9 +3,9 @@
 
 BISON       =   $(shell which bison 2>/dev/null)
 
-CPPSOURCES  =   $(shell find $(SRCDIR) -name "*.cpp")
-CSOURCES    =   $(shell find $(SRCDIR) -name "*.c")
-YSOURCES    =   $(shell find $(SRCDIR) -name "*.y")
+CPPSOURCES  =   $(shell find -L $(SRCDIR) -name "*.cpp")
+CSOURCES    =   $(shell find -L $(SRCDIR) -name "*.c")
+YSOURCES    =   $(shell find -L $(SRCDIR) -name "*.y")
 Y_CPPFILES  =   $(YSOURCES:.y=.cpp)
 Y_HEADERS   =   $(YSOURCES:.y=.hpp)
 Y_OBJECTS   =   $(YSOURCES:.y=.o)
