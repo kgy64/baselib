@@ -13,6 +13,7 @@
 
 #include <string>
 
+#include <File/FileFunctions.h>
 #include <File/DirHandler.h>
 
 namespace EX
@@ -82,9 +83,26 @@ namespace FILES
         }
 
         void Open(FileMode flag = READ_ONLY);
-
         void Write(const void * p_data, size_t p_length);
-        bool Remove(void);
+
+        inline off_t Tell(void) const
+        {
+            off_t result = lseek(fNo, 0, SEEK_CUR);
+            ASSERT(result != (off_t)-1, "Cannot seek");
+            return result;
+        }
+
+        inline off_t Seek(off_t p_seek, int p_whence = SEEK_SET) const
+        {
+            off_t result = lseek(fNo, p_seek, p_whence);
+            ASSERT(result != (off_t)-1, "Cannot seek");
+            return result;
+        }
+
+        inline bool Remove(void)
+        {
+            return FILES::Remove(GetFullPath().c_str());
+        }
 
         template <typename T>
         inline void Write(const T & p_data)
