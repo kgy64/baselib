@@ -83,7 +83,7 @@ namespace FILES
         }
 
         void Open(FileMode flag = READ_ONLY);
-        void Write(const void * p_data, size_t p_length);
+        size_t Write(const void * p_data, size_t p_length);
 
         inline off_t Tell(void) const
         {
@@ -105,9 +105,9 @@ namespace FILES
         }
 
         template <typename T>
-        inline void Write(const T & p_data)
+        inline size_t Write(const T & p_data)
         {
-            Write((const void *)&p_data, sizeof(T));
+            return Write((const void *)&p_data, sizeof(T));
         }
 
         enum {

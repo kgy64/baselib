@@ -120,7 +120,7 @@ void FileHandler::Open(FILES::FileMode flag)
  }
 }
 
-void FileHandler::Write(const void * p_data, size_t p_length)
+size_t FileHandler::Write(const void * p_data, size_t p_length)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
@@ -133,7 +133,7 @@ void FileHandler::Write(const void * p_data, size_t p_length)
  }
 
  if (!p_length) {
-    return;
+    return 0;
  }
 
 do_again:;
@@ -150,6 +150,8 @@ do_again:;
  if (result != (int)p_length) {
     throw EX::File_Error() << "Written " << result << " bytes instead of " << p_length << " to fd " << fNo;
  }
+
+ return result;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
