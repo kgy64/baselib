@@ -53,7 +53,7 @@ namespace UTF8
 
         inline const WChar * ToWChar(size_t p_start = 0) const
         {
-            ASSERT(p_start < length(), "Wrong wstring position requested");
+            ASSERT(p_start <= length(), "Wrong wstring position requested");
             return myStr.get() + p_start;
         }
 
@@ -122,7 +122,7 @@ namespace UTF8
 
         inline const char * ToChar(size_t p_start = 0) const
         {
-            ASSERT(p_start < length(), "Wrong string position requested");
+            ASSERT(p_start <= length(), "Wrong string position requested");
             return myStr.get() + p_start;
         }
 
