@@ -19,6 +19,31 @@
 namespace EX
 {
     DEFINE_EXCEPTION(File_Error, "File", Error);
+
+    class File_EOF: public File_Error
+    {
+     public:
+        File_EOF(size_t p_bytes_read):
+            File_Error("EOF Exception"),
+            myBytes(p_bytes_read)
+        {
+        }
+
+        inline size_t GetBytes(void)
+        {
+            return myBytes;
+        }
+
+        template <typename T>
+        inline File_EOF & operator<<(const T & value)
+        {
+            static_cast<File_Error &>(*this) << value;
+            return *this;
+        }
+
+     protected:
+        size_t myBytes;
+    };
 }
 
 namespace FILES
@@ -83,7 +108,9 @@ namespace FILES
         }
 
         void Open(FileMode flag = READ_ONLY);
+        void OpenSpecial(FileMode flag);
         size_t Write(const void * p_data, size_t p_length);
+        bool Read(void * p_data, size_t p_length);
 
         inline off_t Tell(void) const
         {
@@ -108,6 +135,12 @@ namespace FILES
         inline size_t Write(const T & p_data)
         {
             return Write((const void *)&p_data, sizeof(T));
+        }
+
+        template <typename T>
+        inline bool Read(T & p_data)
+        {
+            return Read((void *)&p_data, sizeof(T));
         }
 
         enum {

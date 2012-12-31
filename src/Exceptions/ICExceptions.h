@@ -104,6 +104,8 @@ namespace EX {
         } \
     }
 
+#define ASSERT_STD(cond)    if (!(cond)) __DO_ASSERT(cond, strerror(errno))
+
 #endif // _EXCEPTIONS_EXCEPTIONS_H_
 
 /* ------------------------- End - of - file --------------------------- */

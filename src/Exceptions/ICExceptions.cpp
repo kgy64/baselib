@@ -14,12 +14,12 @@ using namespace EX;
 
 BaseException::BaseException(const char * msg, int line)
 {
- os += msg;
+ *this << msg;
  if (line > 0) {
-    os += " at line ";
-    os += line;
+    *this << " at line ";
+    *this << line;
  }
- os += ": ";
+ *this << ": ";
 }
 
 BaseException::~BaseException() throw()

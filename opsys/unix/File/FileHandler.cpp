@@ -78,9 +78,7 @@ FileHandler::~FileHandler()
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (fNo > 2) {
-    if (close(fNo) < 0) {
-        throw EX::File_Error() << "Could not close file number " << fNo;
-    }
+    ASSERT_STD(close(fNo) == 0);
  }
 }
 
@@ -90,7 +88,7 @@ void FileHandler::Open(FILES::FileMode flag)
 
  if (fNo >= 0) {
     // Already opened:
-    throw EX::File_Error() << "Trying to re-open file, fd=" << fNo;
+    throw EX::File_Error() << "Trying to re-open file, fd=" << fNo << ", name='" << myName << "'";
  }
 
  int open_flags = O_RDONLY;
@@ -120,6 +118,32 @@ void FileHandler::Open(FILES::FileMode flag)
  }
 }
 
+void FileHandler::OpenSpecial(FILES::FileMode flag)
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ if (myName != "-" || myDir != ".") {
+    // Normal open:
+    Open(flag);
+    return;
+ }
+
+ switch (flag) {
+    case READ_ONLY:
+        SYS_DEBUG(DL_INFO1, "Reading from standard input");
+        fNo = 0;
+    break;
+    case READ_WRITE:
+    case APPEND_WRITE:
+        SYS_DEBUG(DL_INFO1, "Writing to standard output");
+        fNo = 1;
+    break;
+    default:
+        throw EX::File_Error() << "Wrong open mode for special file";
+    break;
+ }
+}
+
 size_t FileHandler::Write(const void * p_data, size_t p_length)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
@@ -138,7 +162,7 @@ size_t FileHandler::Write(const void * p_data, size_t p_length)
 
 do_again:;
  ssize_t result = write(fNo, p_data, p_length);
- if (result == -1 && errno == EAGAIN) {
+ if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     BlockedIo();
     goto do_again;
  }
@@ -152,6 +176,53 @@ do_again:;
  }
 
  return result;
+}
+
+bool FileHandler::Read(void * p_data, size_t p_length)
+{
+ SYS_DEBUG_MEMBER(DM_FILE);
+
+ if (fNo < 0) {
+    throw EX::File_Error() << "File not opened to read";
+ }
+
+ if (fNo == 1 || fNo == 2) {
+    throw EX::File_Error() << "Read from standard out/error";
+ }
+
+ if (!p_length) {
+    return true;
+ }
+
+ char * data = (char *)p_data;
+
+ size_t offset = 0;
+
+do_again:;
+ ssize_t result = read(fNo, (void*)(data+offset), p_length);
+
+ if (result < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        BlockedIo();
+        goto do_again;
+    }
+    throw EX::File_Error() << "Error reading " << p_length << " bytes, fd=" << fNo << "; " << strerror(errno);
+ }
+
+ if (result < (ssize_t)p_length) {
+    if (result == 0) {
+        if (offset == 0) {
+            return false;
+        }
+        throw EX::File_EOF(offset) << "EOF reached while reading " << p_length << " bytes, got " << offset << ", fd=" << fNo;
+    }
+    p_length -= result;
+    offset += result;
+    BlockedIo();
+    goto do_again;
+ }
+
+ return true;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
