@@ -141,12 +141,13 @@ bool DirHandler::IsFile(const char * path, bool p_any)
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-DirHandler::iterator::iterator(const char * p_parent):
-    myPath(p_parent),
-    myDir(opendir(myPath.c_str())),
-    actualEntry(NULL)
+void DirHandler::iterator::_iterator(const char * p_parent)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ myPath = p_parent;
+ myDir = opendir(myPath.c_str());
+ actualEntry = NULL;
 
  ASSERT(myDir, "Could not open '" << myPath << "' for iteration: " << strerror(errno));
  ++*this; // Step to the first entry

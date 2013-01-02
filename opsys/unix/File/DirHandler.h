@@ -131,14 +131,25 @@ namespace FILES
 
         class iterator
         {
+            // Some constructor-like functions, to be compatible with older
+            // compilers without c++11 support (instead of delegating these
+            // constructors):
+
+            void _iterator(const char * p_parent);
+
+            inline void _iterator(const std::string & p_parent)
+            {
+                _iterator(p_parent.c_str());
+            }
+
          friend class DirHandler;
 
          public:
             iterator(const char * p_parent);
 
-            inline iterator(const std::string & p_parent):
-                iterator(p_parent.c_str())
+            inline iterator(const std::string & p_parent)
             {
+                _iterator(p_parent.c_str());
             }
 
             ~iterator();
@@ -181,9 +192,9 @@ namespace FILES
          private:
             SYS_DEFINE_CLASS_NAME("File::DirHandler::iterator");
 
-            inline iterator(const DirHandler & p_parent):
-                iterator(p_parent.GetPath())
+            inline iterator(const DirHandler & p_parent)
             {
+                _iterator(p_parent.GetPath());
             }
 
             inline iterator(void):
