@@ -29,11 +29,12 @@ using namespace FILES;
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-DirHandler::DirHandler(const char * p_path):
-    path(p_path),
-    mode(DEFAULT_MODE)
+void DirHandler::_DirHandler(const char * p_path)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ path = p_path;
+ mode = DEFAULT_MODE;
 }
 
 DirHandler::~DirHandler()
