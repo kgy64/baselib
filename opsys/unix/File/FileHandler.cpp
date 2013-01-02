@@ -18,10 +18,11 @@ SYS_DECLARE_MODULE(DM_FILE);
 
 using namespace FILES;
 
-FileHandler::FileHandler(const DirHandler & p_dir, const char * p_filename):
-    FileHandler()
+void FileHandler::_FileHandler(const DirHandler & p_dir, const char * p_filename)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ _FileHandler();
 
  myDir = p_dir.GetPath();
  myName = p_filename;
@@ -31,10 +32,11 @@ FileHandler::FileHandler(const DirHandler & p_dir, const char * p_filename):
  }
 }
 
-FileHandler::FileHandler(const char * p_path, const char * p_name):
-    FileHandler()
+void FileHandler::_FileHandler(const char * p_path, const char * p_name)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ _FileHandler();
 
  myDir = p_path;
  myName = p_name;
@@ -44,10 +46,11 @@ FileHandler::FileHandler(const char * p_path, const char * p_name):
  }
 }
 
-FileHandler::FileHandler(const char * p_full_path):
-    FileHandler()
+void FileHandler::_FileHandler(const char * p_full_path)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
+
+ _FileHandler();
 
  std::string path(p_full_path);
 

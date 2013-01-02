@@ -13,8 +13,28 @@
 
 #include <boost/shared_ptr.hpp>
 
+// Note: to have a template typedef we need a c++11 compatible compiler. To be
+//       compatible with older ones, use inheritance instead:
+
 template <typename T>
-using SPtr = boost::shared_ptr<T>;
+class SPtr: public boost::shared_ptr<T>
+{
+ public:
+    inline SPtr(void):
+        boost::shared_ptr<T>()
+    {
+    }
+
+    inline SPtr(T* p_ptr):
+        boost::shared_ptr<T>(p_ptr)
+    {
+    }
+
+    inline SPtr(const boost::shared_ptr<T>& p_other):
+        boost::shared_ptr<T>(p_other)
+    {
+    }
+};
 
 #endif /* __SRC_MEMORY_SPTR_H_INCLUDED__ */
 

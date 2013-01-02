@@ -7,7 +7,9 @@ export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
 
 export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \;)
 
-CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS) -I$(PWD)/../include/private -std=c++11
+CXX_STANDARD =  c++0x
+
+CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS) -I$(PWD)/../include/private -std=$(CXX_STANDARD)
 
 export CXXFLAGS
 export CFLAGS
