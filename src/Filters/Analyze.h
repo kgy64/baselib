@@ -5,6 +5,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
 
+SYS_DECLARE_MODULE(DM_FILTER);
+
 namespace Filter
 {
     template<typename T>
@@ -47,7 +49,7 @@ namespace Filter
         virtual void In(const T & data, filter_time_t time)
         {
             SYS_DEBUG_MEMBER(DM_FILTER);
-            SYS_DEBUG(DL_GPS, "order=" << order << ", data: " << data << ", time=" << time);
+            SYS_DEBUG(DL_INFO1, "order=" << order << ", data: " << data << ", time=" << time);
             if (valid && next.get()) {
                 filter_time_t current_offset = time / 2.0;
 
@@ -67,12 +69,12 @@ namespace Filter
             if (!valid)
                 return T(0);
             filter_time_t my_offset = I_Filter<T>::time_offset + add_time;
-            SYS_DEBUG(DL_GPS, "order=" << order << ", state=" << state << ", offset=" << my_offset << ", time=" <<
+            SYS_DEBUG(DL_INFO1, "order=" << order << ", state=" << state << ", offset=" << my_offset << ", time=" <<
                     I_Filter<T>::state->time << ", full-time=" << my_offset + I_Filter<T>::state->time);
             T result(state);
             if (next.get())
                 result += next->GetMyState(my_offset) * (my_offset + I_Filter<T>::state->time);
-            SYS_DEBUG(DL_GPS, "result=" << result);
+            SYS_DEBUG(DL_INFO1, "result=" << result);
             return result;
         }
 
@@ -85,7 +87,7 @@ namespace Filter
         virtual I_Filter<T> & Set(T & data)
         {
             SYS_DEBUG_MEMBER(DM_FILTER);
-            SYS_DEBUG(DL_GPS, "order=" << order << ", state: " << state << ", time=" << I_Filter<T>::state->time);
+            SYS_DEBUG(DL_INFO1, "order=" << order << ", state: " << state << ", time=" << I_Filter<T>::state->time);
             if (valid)
                 data = state;
             return *this;

@@ -1,13 +1,13 @@
 #include "MainConfig.h"
 #include <Exceptions/ICExceptions.h>
 
-SYS_DEFINE_MODULE(DM_MAIN);
+SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
 MainConfig * MainConfig::myself = NULL;
 
 MainConfig::MainConfig(void)
 {
- SYS_DEBUG_MEMBER(DM_MAIN);
+ SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
 
  FILES::FileMap_char configFile(configName);
 
