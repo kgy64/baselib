@@ -26,14 +26,23 @@ namespace Parser
 
     class Tokenizer
     {
+        // Some constructor-like functions, to be compatible with older
+        // compilers without c++11 support (instead of delegating these
+        // constructors):
+
+        void _Tokenizer(const char * p_text, const char * p_delimiters);
+
      public:
         static const char default_delimiters[];
 
-        Tokenizer(const char * p_text, const char * p_delimiters = default_delimiters);
-
-        inline Tokenizer(const std::string & p_text, const char * p_delimiters = default_delimiters):
-            Tokenizer(p_text.c_str(), p_delimiters)
+        inline Tokenizer(const char * p_text, const char * p_delimiters = default_delimiters)
         {
+            _Tokenizer(p_text, p_delimiters);
+        }
+
+        inline Tokenizer(const std::string & p_text, const char * p_delimiters = default_delimiters)
+        {
+            _Tokenizer(p_text.c_str(), p_delimiters);
         }
 
         const char * operator[](int p_index) const;

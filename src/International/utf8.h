@@ -80,12 +80,21 @@ namespace UTF8
 
     class FromWstring
     {
-     public:
-        FromWstring(const WChar * p_str);
+        // Some constructor-like functions, to be compatible with older
+        // compilers without c++11 support (instead of delegating these
+        // constructors):
 
-        inline FromWstring(const std::wstring & p_st):
-            FromWstring(p_st.c_str())
+        void _FromWstring(const WChar * p_str);
+
+     public:
+        inline FromWstring(const WChar * p_str)
         {
+            _FromWstring(p_str);
+        }
+
+        inline FromWstring(const std::wstring & p_st)
+        {
+            _FromWstring(p_st.c_str());
         }
 
         /// Returns the length of the UTF8 representation of a Unicode character
@@ -141,7 +150,7 @@ namespace UTF8
 
         size_t myLength;
 
-        const boost::scoped_ptr<char> myStr;
+        boost::scoped_ptr<char> myStr;
 
         static void GetChar(WChar p_char, char *& p_result);
     };

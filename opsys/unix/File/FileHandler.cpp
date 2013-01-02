@@ -8,6 +8,7 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <errno.h>
 #include <fcntl.h>
 
 #include <Exceptions/ICExceptions.h>

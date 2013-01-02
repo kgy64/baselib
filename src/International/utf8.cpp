@@ -111,11 +111,12 @@ WChar ToWstring::GetChar(const char *& p_str)
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /// Convert a Unicode string to UTF8
-FromWstring::FromWstring(const WChar * p_str):
-    myLength(CalculateLength(p_str)),
-    myStr(new char[myLength+1])
+void FromWstring::_FromWstring(const WChar * p_str)
 {
  SYS_DEBUG_MEMBER(DM_UTF8);
+
+ myLength = CalculateLength(p_str);
+ myStr.reset(new char[myLength+1]);
 
  char * ch;
  for (ch = myStr.get(); *p_str; ) {

@@ -16,7 +16,9 @@
 namespace Base
 {
     template <class K, class T>
-    using Map = std::map<K,T>;
+    class Map: public std::map<K,T>
+    {
+    };
 }
 
 #endif /* __INCLUDE_PUBLIC_BASE_MAP_H_INCLUDED__ */
