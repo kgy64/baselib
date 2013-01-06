@@ -72,17 +72,17 @@ namespace EX {
      *  */
     DEFINE_EXCEPTION(Fatal, "Fatal", BaseException);
 
+    /// Uncorrectable error occured
+    /*! Throwing this class closes the current operation but it can continue if possible.
+     *  */
+    DEFINE_EXCEPTION(Error, "Error", Fatal);
+
     /// Assert failed
     /*! This exception is tied to boost assertion, if BOOST_ENABLE_ASSERT_HANDLER is defined.
      *  Basically it is a fatal exception but can be caught in some special cases.<br>
      *  Also thrown by the macros \ref ASSERT and \ref ASSERT_DBG
      *  */
-    DEFINE_EXCEPTION(Assert, "Assert", BaseException);
-
-    /// Uncorrectable error occured
-    /*! Throwing this class closes the current operation but it can continue if possible.
-     *  */
-    DEFINE_EXCEPTION(Error, "Error", Fatal);
+    DEFINE_EXCEPTION(Assert, "Assert", Error);
 
     /// Correctable problem during processing
     /*! Throwing this class means that some correctable error occured during processing, but it is
@@ -91,20 +91,22 @@ namespace EX {
     DEFINE_EXCEPTION(Continue, "Continue", Error);
 }
 
-#define __DO_ASSERT(cond, message)  \
-    throw ::EX::Assert() << "In file '" __FILE__ "', line " << __LINE__ << ": '" #cond "' failed: " << message
+#define __DO_ASSERT(type, cond, message)  \
+    throw type() << "In file '" __FILE__ "', line " << __LINE__ << ": '" #cond "' failed: " << message
 
-#define ASSERT(cond, message)   { if (!(cond)) { __DO_ASSERT(cond, message); } }
+#define ASSERT_T(type, cond, message)   { if (!(cond)) { __DO_ASSERT(type, cond, message); } }
+
+#define ASSERT(cond, message)   ASSERT_T(::EX::Assert, cond, message)
 
 #define ASSERT_DBG(cond, message) \
     { \
         if (!(cond)) { \
             SYS_DEBUG(DL_ASSERT, "Line " << __LINE__ << ": Assert '" #cond "' is failed here"); \
-            __DO_ASSERT(cond, message); \
+            __DO_ASSERT(::EX::Assert, cond, message); \
         } \
     }
 
-#define ASSERT_STD(cond)    if (!(cond)) __DO_ASSERT(cond, strerror(errno))
+#define ASSERT_STD(cond)    if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(errno))
 
 #endif // _EXCEPTIONS_EXCEPTIONS_H_
 
