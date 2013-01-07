@@ -50,6 +50,8 @@ namespace FILES
 
         void * GetData(void) { return mapped; }
 
+        const void * GetData(void) const { return mapped; }
+
         size_t GetSize(void) { return size; }
 
      protected:
