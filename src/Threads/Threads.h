@@ -1,44 +1,88 @@
 #ifndef __THREADS_H__
 #define __THREADS_H__
 
-//#include <clutter/clutter.h>
 #include <glibmm/thread.h>
 
-class ICThread
+#include <Memory/SPtr.h>
+
+namespace Threads
 {
- public:
-    ICThread(void);
-    ~ICThread();
-
-    void Start(void);
-    void Kill(void);
-
-    /*! This function can be called by the main function to perform a graceful
-        exit if necessary. */
-    bool Finished(void)
+    class Thread
     {
-        return toBeFinished;
-    }
+     public:
+        Thread(void);
+        virtual ~Thread();
 
-    static void yield(void)
+        virtual void Start(void);
+        virtual void Kill(void);
+
+        /*! This function can be called by the main function to perform a graceful
+            exit if necessary. */
+        bool Finished(void)
+        {
+            return toBeFinished;
+        }
+
+        static inline void yield(void)
+        {
+            Glib::Thread::yield();
+        }
+
+     private:
+        /// This function is the startpoint of this thread
+        virtual int main(void) =0;
+
+        virtual void atExit(int)
+        {
+        }
+
+        void _main(void);
+
+        bool toBeFinished;
+
+        Glib::Thread* myThread;
+    };
+
+    template <typename T>
+    class DataPipe
     {
-        Glib::Thread::yield();
-    }
+     public:
+        inline void push(const SPtr<T> & p_data)
+        {
+            Glib::Mutex::Lock _l(myDataMutex);
+            myData = p_data;
+            myCond.signal();
+        }
 
- private:
-    /// This function is the startpoint of this thread
-    virtual int main(void) =0;
+        inline SPtr<T> pop(void)
+        {
+            Glib::Mutex::Lock _l(myDataMutex);
+            SPtr<T> result;
+            while (!isFinished && !myData.get()) {
+                myCond.wait(myDataMutex);
+            }
+            result = myData;
+            myData.reset();
+            return result;
+        }
 
-    virtual void atExit(int)
-    {
-    }
+        inline void finish(void)
+        {
+            Glib::Mutex::Lock _l(myDataMutex);
+            isFinished = true;
+            myCond.signal();
+        }
 
-    void _main(void);
+     protected:
+        bool isFinished;
 
-    bool toBeFinished;
+        SPtr<T> myData;
 
-    Glib::Thread* myThread;
-};
+        Glib::Mutex myDataMutex;
+
+        Glib::Cond myCond;
+    };
+} // namespace Threads
 
 #endif /* __THREADS_H__ */
 

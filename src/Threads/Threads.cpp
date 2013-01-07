@@ -1,17 +1,24 @@
 #include "Threads.h"
 
-ICThread::ICThread(void):
+using namespace Threads;
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class Thread:                                                                     *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+Thread::Thread(void):
     toBeFinished(false),
     myThread(NULL)
 {
 }
 
-ICThread::~ICThread(void)
+Thread::~Thread(void)
 {
- Kill();
 }
 
-void ICThread::Kill(void)
+void Thread::Kill(void)
 {
  if (!myThread)
     return;
@@ -20,12 +27,12 @@ void ICThread::Kill(void)
  myThread = NULL;
 }
 
-void ICThread::Start(void)
+void Thread::Start(void)
 {
- myThread = Glib::Thread::create(sigc::mem_fun(*this, &ICThread::_main), true);
+ myThread = Glib::Thread::create(sigc::mem_fun(*this, &Thread::_main), true);
 }
 
-void ICThread::_main(void)
+void Thread::_main(void)
 {
  atExit(main());
 }
