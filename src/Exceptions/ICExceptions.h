@@ -98,6 +98,8 @@ namespace EX {
 
 #define ASSERT(cond, message)   ASSERT_T(::EX::Assert, cond, message)
 
+#define ASSERT_FATAL(cond, message) ASSERT_T(::EX::Fatal, cond, message)
+
 #define ASSERT_DBG(cond, message) \
     { \
         if (!(cond)) { \
