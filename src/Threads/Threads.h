@@ -32,9 +32,7 @@ namespace Threads
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
-        virtual void atExit(int)
-        {
-        }
+        virtual void atExit(int p_exitCode);
 
         void _main(void);
 
