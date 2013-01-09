@@ -2,7 +2,7 @@
  *
  * Project:     General Purpose Library
  * Purpose:     Associative unsorted map with hash
- * Author:      György Kövesdi <kgy@teledigitleu>
+ * Author:      György Kövesdi <kgy@teledigit.eu>
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    This needs C++11
  *

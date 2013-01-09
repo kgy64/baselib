@@ -2,7 +2,7 @@
  *
  * Project:     General Purpose Library
  * Purpose:     Associative sorted map
- * Author:      György Kövesdi <kgy@teledigitleu>
+ * Author:      György Kövesdi <kgy@teledigit.eu>
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *
