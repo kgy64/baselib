@@ -7,7 +7,7 @@
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <System/Priority.h>
+#include <System/Generic.h>
 #include <Debug/Debug.h>
 #include <iomanip>
 

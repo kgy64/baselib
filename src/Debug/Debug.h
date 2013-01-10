@@ -37,6 +37,8 @@
 
 #define _SYS_DEBUG_MODULE_NAME(name)   __debug_module_##name
 
+#define CLASS_NAME_FUNCTION     __Class_Name
+
 namespace _Debug_Info_
 {
     class _Debug_Module_;
@@ -85,9 +87,11 @@ namespace _Debug_Info_
     };
 }
 
+#define SYS_GET_CLASS_NAME  CLASS_NAME_FUNCTION()
+
 #if SYS_DEBUG_ON
 #define SYS_DEFINE_CLASS_NAME(name) \
-    virtual const char* className(void) const { return name; }
+    virtual const char* CLASS_NAME_FUNCTION(void) const { return name; }
 #else
 #define SYS_DEFINE_CLASS_NAME(name)
 #endif
@@ -113,7 +117,7 @@ namespace _Debug_Info_
         the levels of nested function calls if DL_CALLS is set. If the functions are
         class members, the class name and 'this' pointer is also displayed. To do this,
         those classes (where the debug messages are printed from) must have a function
-        to reach their class name (called className()).<br>
+        to reach their class name (called __Class_Name()).<br>
         This class can be fine-tuned by changing ::_Debug_Info_::DebugPrint::fill_1_begin,
         ::_Debug_Info_::DebugPrint::fill_1_end, ::_Debug_Info_::DebugPrint::fill_2 strngs.<br>
         <b>Usage:</b><br>
@@ -278,7 +282,7 @@ namespace _Debug_Info_
     passes the name of the class and the function to the constructor. */
 #if SYS_DEBUG_ON
 #define SYS_DEBUG_MEMBER(module_name) \
-    ::_Debug_Info_::DebugPrint __debugprint(this, className(), __FUNCTION_STRING__ __FILE_LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
+    ::_Debug_Info_::DebugPrint __debugprint(this, CLASS_NAME_FUNCTION(), __FUNCTION_STRING__ __FILE_LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_MEMBER(module_name) { }
 #endif
