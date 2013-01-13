@@ -48,11 +48,11 @@ namespace FILES
 
         virtual ~FileMap();
 
-        void * GetData(void) { return mapped; }
+        inline void * GetData(void) { return mapped; }
 
-        const void * GetData(void) const { return mapped; }
+        inline const void * GetData(void) const { return mapped; }
 
-        size_t GetSize(void) { return size; }
+        inline size_t GetSize(void) const { return size; }
 
      protected:
         int fd;
@@ -84,7 +84,9 @@ namespace FILES
         int ChrGet(void)
         {
             if (actual >= (char*)ende) {
-                ++actual; // Must be incremented here to be able to call UnGet() later
+                if (actual == (char*)ende) {
+                    ++actual; // Must be incremented here to be able to call UnGet() later
+                }
                 return -1;
             }
             return *actual++;

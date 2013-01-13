@@ -35,6 +35,7 @@ void FileMap::_FileMap(const char * name, OpenMode mode)
  ASSERT(fd >= 0, "File '" << name << "' could not be opened.");
 
  struct stat sb;
+
  {
     int result = fstat(fd, &sb);
     ASSERT(result == 0, "Stat error on file '" << name << "'");
@@ -43,22 +44,25 @@ void FileMap::_FileMap(const char * name, OpenMode mode)
  size = sb.st_size;
  if (size == 0) {
     mapped = NULL;
+    ende = NULL;
  } else {
     mapped = mmap(NULL, size, map_prot, MAP_PRIVATE, fd, 0);
     ASSERT(mapped != MAP_FAILED, "File '" << name << "' could not be mapped.");
+    ende = (void*)((char*)mapped + size);
  }
-
- ende = (void*)((char*)mapped + size);
 }
 
 FileMap::~FileMap()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- if (mapped && mapped != MAP_FAILED)
+ if (mapped && mapped != MAP_FAILED) {
     munmap(mapped, size);
- if (fd >= 0)
+ }
+
+ if (fd >= 0) {
     close(fd);
+ }
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
