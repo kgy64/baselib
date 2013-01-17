@@ -59,6 +59,7 @@ namespace FILES
         void * mapped;
         void * ende;
         size_t size;
+        OpenMode myMode;
 
      private:
         SYS_DEFINE_CLASS_NAME("FileMap");
