@@ -11,9 +11,9 @@ class MainConfig
     static MainConfig & Get(void)
     {
         if (!myself) {
-            //ICThread::Lock _l;
+            Glib::Mutex::Lock _l(myMutex);
             if (!myself) {
-                myself = new MainConfig();
+                myself.reset(new MainConfig());
             }
         }
         return *myself;
@@ -38,7 +38,7 @@ class MainConfig
  protected:
     MainConfig(void);
 
-    static MainConfig * myself;
+    static SPtr<MainConfig> myself;
 
     static const char configName[];
 
@@ -46,6 +46,8 @@ class MainConfig
     SYS_DEFINE_CLASS_NAME("MainConfig");
 
     ConfigStore theConfig;
+
+    static Glib::Mutex myMutex;
 };
 
 #endif /* __MAINCONFIG_H__ */

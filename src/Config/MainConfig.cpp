@@ -3,7 +3,7 @@
 
 SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
-MainConfig * MainConfig::myself = NULL;
+SPtr<MainConfig> MainConfig::myself;
 
 MainConfig::MainConfig(void)
 {
