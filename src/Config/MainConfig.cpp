@@ -5,6 +5,8 @@ SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
 SPtr<MainConfig> MainConfig::myself;
 
+Glib::Mutex MainConfig::myMutex;
+
 MainConfig::MainConfig(void)
 {
  SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
