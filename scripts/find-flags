@@ -13,8 +13,7 @@ shift
 
 for package in $*
 do
-    pkg-config $mode $package 2>/dev/null || {
-        echo "Error: package '$package' is not installed!" >&2
+    $PKGCONFIG $mode $package 2>/dev/null || {
         error=1
     }
 done
