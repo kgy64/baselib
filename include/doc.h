@@ -1,3 +1,13 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Project:     My Generic C++ Library
+ * Purpose:     This is a documentational header file, not to be included in source.
+ * Author:      György Kövesdi <kgy@teledigit.eu>
+ * Licence:     GPL (see file 'COPYING' in the project root for more details)
+ * Comments:    
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 /*!
 \mainpage My Base Library Documentation
 The source can be downloaded from <b>git.teledigit.eu:/git/lib/base.git</b><br>
@@ -13,9 +23,184 @@ To build my projects in a generic way, i created some makefile rules.<br>
 <br>
 <b>Make Steps:</b><br>
 - <b>Pre-Compilation Phase:</b><br>
+  TODO
 - <b>Dependency Phase:</b><br>
+  TODO
 - <b>Compilation Phase:</b><br>
+  TODO
 - <b>Linking Phase:</b><br>
+  TODO
 */
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+/*!
+\page   UseAuton   Auton: smart pointer for singleton Implementations
+\see \ref UseInterfaces first.
+
+If you have defined the \a Interface and \a Implementation(s) as described on the page above, usage of \ref Auton
+is very simple:
+\code
+ int i = Auton<MyInterface>()->Value();
+\endcode
+This example corresponds the description on the previously mentioned page: the Implementation
+having highest priority will be instantiated by the first such call. Being singleton, this instance
+will be used for all of such smart pointers in the same executable.
+<hr>
+Download the source from <b>git.teledigit.eu:/git/lib/base.git</b>, see the file <b>src/Memory/Auton.h</b><br>
+*/
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+/*!
+\page   UseAutoImp  AutoImp: smart pointer for Implementations
+\see \ref UseInterfaces first.
+
+If you have defined the \a Interface and \a Implementation(s) as described on the page above, usage of \ref AutoImp
+is very simple:
+\code
+ AutoImp<MyInterface> myInstance;
+ ...
+ int i = myInstance->Value();
+ ...
+\endcode
+Note that such a smart pointer instantiates the corresponding Implementation for each instance of it.
+<hr>
+Download the source from <b>git.teledigit.eu:/git/lib/base.git</b>, see the file <b>src/Memory/Auton.h</b><br>
+*/
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+/*!
+\page   UseInterfaces   How to define Implementations for Auton and AutoImp
+To simplify the Project Design, \a Interfaces can be used having unlimited number of
+\a Implementations.<br>
+To use the corresponding Implementation, see \ref Auton for a singleton instance, or
+\ref AutoImp for a non-singleton instance.<br>
+    <br>
+    Let's see an example:<br>
+    - <b>The Interface:</b><br>
+    You can use any kind of class as Interface here, but of course, it is necessary
+    to have some virtual functions to act as an Interface:
+\code
+ class MyInterface
+ {
+    public:
+        virtual ~MyInterface() {}
+        virtual int Value() =0;
+ }
+\endcode
+    It is also necessary to define the Interface for the \ref Auton usage:
+\code
+ AUTON_INTERFACE(MyInterface);
+\endcode
+    Put this definition in one of the cpp sources. It can be anywhere in the code, it is
+    not necessary to be visible for the \ref Auton pointer implementations.<br>
+    That's enough, you can use the \ref Auton for this Interface like this:
+\code
+ Auton<MyInterface> something;
+ int i = something->Value();
+\endcode
+    In this example, the variable \a i will be assigned according to the Implementation. The
+    Implementation is not visible in this code, so currently we don't know the result. :-)
+    Let's see the following paragraph to see the Implementation.<br>
+    <br>
+    - <b>The Implementation:</b><br>
+    In the another part of the source, you can define at least one Implementation for that
+    Interface. The Implementation can be in a different object, it is enough for they to meet
+    only at linking time.<br>
+    Let's see the exmaple Implementation:
+\code
+ class MyImplementation: public MyInterface
+ {
+     virtual int Value() { return 3; }
+ }
+\endcode
+    The Implementation classes are also necessary to be defined for the \ref Auton usage:
+\code
+ AUTON_IMPLEMENT(MyImplementation, MyInterface);
+\endcode
+    Put it in one of the cpp files. It also can be in another part of the source, it is not
+    necessary to be visible for the \ref Auton pointers nor for the Implementation class.<br>
+    If you use this Implementation, you will get \a 3 as result in the above example.<br>
+    <br>
+    - <b>Define more Implementations:</b><br>
+    It is possible to have more Implementations at a time, the \ref Auton will select one of
+    them according to their \a priority. To do this, use the following macro:
+\code
+ AUTON_IMPLEMENT_PRIO(MyOtherTry, MyInterface, 1);
+\endcode
+    Note that in the previous example, the class \a MyImplementation was defined with
+    \a priority=0 as a default used by the macro \ref AUTON_IMPLEMENT. So, the \a priority=1
+    here will override the other Implementation.<br>
+    <br>
+    <b>Warning:</b> Do \a not define more classes with the same priority, because in this
+    case the selection between them is defined by the initialization order of the
+    corresponding static instances, so it is practically unknown.<br>
+    <br>
+    - <b>Selecting the Implementation by name:</b><br>
+    Let's see the following example (see \ref UseAuton for other details):
+\code
+ Auton<MyInterface> something;
+ int i = something->Value();
+ AUTON_FORCE(MyInterface, "MyImplementation");
+ int j = something->Value();
+\endcode
+    Assuming that we have the two Implementations mentioned above, the variable \a i will have
+    value from class \a MyOtherTry, while \a j will have \a 3, from class \a MyImplementation.<br>
+    See the details in the source documentation.<br>
+    <b>Notes:</b>
+     - The forced selection itself needs linear time (according to the number of implementations), while
+     the running time of the pointers is not affected at all.
+     - If the \ref AUTON_FORCE is called before the first construction of the corresponding \ref Auton
+     instance, then the original Implementation is not instantiated at all.<br>
+    <br>
+    - <b>The Internals:</b>
+     - <b>Independency</b><br>
+      All parts of the code (the Interface, the Implementations, and all the definition-like
+      macros) can be put in different parts of the source. They must only meet at linking time.<br>
+      <br>
+     - <b>Optimization</b><br>
+      The code is optimized for speed. The election of the highest priority Implementation is
+      done in static initialization time, it does not need running time at all. Except the
+      selection by name: doing this (and also the static initialization) needs linear time,
+      so practically you can use unlimited number of Implementations. Note that selecting by
+      name does not bother the \ref Auton pointer behavior, so it has no speed impact at all.<br>
+      <br>
+     - <b>How does it work:</b>
+      - <b>The Interface side:</b><br>
+       The macro \ref AUTON_INTERFACE instantiates a template class \ref _AutonPrivate::AutonInterface
+       in the anonymous namespace. This is a very small helper class, having only some static members
+       (which are also defined by the macro). See the source documentation for more details.<br>
+       Its main job is to keep a pointer to the currently elected Implementation helper class (see below).<br>
+       <br>
+      - <b>The Implementation side:</b><br>
+       The macros \ref AUTON_IMPLEMENT and \ref AUTON_IMPLEMENT_PRIO instantiate a template class
+       \ref _AutonPrivate::AutonHandler in the anonymous namespace. This is also a very small helper
+       class. However, it has static and non-static members, the access to these instances is not necessary,
+       because it registers itself into the corresponding Interface helper class (_AutonPrivate::AutonInterface)
+       and accessed through its static functions. The registration phase also elects the highest priority
+       one in constant time (see \ref _AutonPrivate::AutonInterface::_RegisterImplementation()) and all this
+       is done during static initialization. This procedure guarantees fast execution.<br>
+       <br>
+      - <b>The Smart Pointers \ref Auton and \ref AutoImp</b><br>
+       An instance of such a smart pointer uses only the corresponding Interface helper class (see \ref
+       _AutonPrivate::AutonInterface) through its static member functions.<br>
+       Its operation is <b>optimized for speed</b>: the instance of the Implementation is accessed by a pointer
+       of the helper class directly. It is also done exactly the same way after a name-based forced election.<br>
+       In \ref Auton it is <b>reference-counted</b> by the helper class, while \ref AutoImp instantiates one
+       Implementation for each instance.<br>
+       The name-based <b>forced election</b> takes linear time, according to the number of Implementations.
+       The speed of all further operations is not affected at all.
+
+<hr>
+Download the source from <b>git.teledigit.eu:/git/lib/base.git</b>, see the file <b>src/Memory/Auton.h</b><br>
+*/
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+/// This namespace is generated by <a href="http://www.gnu.org/software/bison/">Bison</a>
+/*! This is the parser used in my projects. No detailed information is available. */
+namespace yy { }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

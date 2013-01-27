@@ -1,8 +1,6 @@
 # Makefile for my basic library
 #
 
-include scripts/make.flags
-
 .PHONY: all
 all:
 	@(cd src && $(MAKE) -s)
@@ -20,5 +18,5 @@ clean:
 
 .PHONY: doc
 doc:
-	@(cd src && $(MAKE) -s doc)
+	@doxygen Doxyfile
 
