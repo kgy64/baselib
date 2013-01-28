@@ -55,7 +55,7 @@ const char DebugPrint::fill_left[] = " /";
 /*! This constructor can be used from C or static C++ functions. The class name and 'this'
     pointer are not used.
     \param  name
-    \param  module  */
+    \param  p_module  */
 #ifdef __GNUC__
 /*! \param  fname
     \param  lineno */
@@ -92,9 +92,7 @@ DebugPrint::DebugPrint(const char *name,
     \param  thisptr     The class pointer of the caller.
     \param  classptr    The name of the caller class.
     \param  name        The name of the caller function.
-    \param  module      The module mask. Each bit represents a module, therefore
-                        32 modules can be controlled this way. A 'one' bit switches
-                        on the corresponding module. */
+    \param  p_module    Reference of the actual module. */
 #ifdef __GNUC__
 /*! \param  fname
     \param  lineno */
