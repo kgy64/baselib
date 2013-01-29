@@ -5,7 +5,7 @@ export PROJECT_ROOT     ?=  $(PWD)
 export BINDIR           ?=  $(PROJECT_ROOT)/bin
 export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
 
-export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \;)
+export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT)/include $(SUBPROJECTS:%=$(PROJECT_ROOT)/%) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \; 2>/dev/null)
 
 CXX_STANDARD =  c++0x
 
