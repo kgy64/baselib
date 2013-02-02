@@ -12,6 +12,7 @@ Y_OBJECTS   =   $(YSOURCES:.y=.o)
 OBJECTS     =   $(CSOURCES:.c=.o) $(CPPSOURCES:.cpp=.o)
 DEPENDS     =   $(Y_OBJECTS:.o=.depend) $(OBJECTS:.o=.depend)
 
-export PKGCONFIG        ?=  $(shell which pkg-config 2>/dev/null)
-export MY_PROJECT_FLAGS  =  $(shell test "$(BASE_LIBRARIES)" && test "$(PKGCONFIG)" && "$(PKGCONFIG)" --cflags $(BASE_LIBRARIES) 2>/dev/null)
-export MY_PROJECT_LIBS   =  $(shell test "$(BASE_LIBRARIES)" && test "$(PKGCONFIG)" && "$(PKGCONFIG)" --libs $(BASE_LIBRARIES) 2>/dev/null)
+export MY_LIBRARY_ERRORS :=  $(shell $(SCRIPTDIR)/find-flags --test-only $(BASE_LIBRARIES) 2>&1 >/dev/null)
+export MY_PROJECT_FLAGS   =  $(shell $(SCRIPTDIR)/find-flags --cflags $(BASE_LIBRARIES))
+export MY_PROJECT_LIBS    =  $(shell $(SCRIPTDIR)/find-flags --libs $(BASE_LIBRARIES))
+

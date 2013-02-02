@@ -1,19 +1,31 @@
 #!/bin/bash
 #
 
+mode="$1"
+shift
+
+test $# = 0 && exit
+
+test_mode=0
+
+case "$mode" in
+    --test-only)
+        mode="--modversion"
+        test_mode=1
+    ;;
+esac
+
 PKGCONFIG="`which pkg-config`"
 
 if test ! "$PKGCONFIG"; then
-    echo "Error: pkg-config is not installed!" >&2
+    test $test_mode = 1 && echo "'pkg-config' is not installed!" >&2
     exit 1
 fi
-
-mode="$1"
-shift
 
 for package in $*
 do
     $PKGCONFIG $mode $package 2>/dev/null || {
+        test $test_mode = 1 && echo "$package" >&2
         error=1
     }
 done
