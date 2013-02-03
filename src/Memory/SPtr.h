@@ -34,6 +34,12 @@ class SPtr: public boost::shared_ptr<T>
         boost::shared_ptr<T>(p_other)
     {
     }
+
+    template <typename U>
+    inline SPtr(const boost::shared_ptr<U>& p_other):
+        boost::shared_ptr<T>(p_other)
+    {
+    }
 };
 
 #endif /* __SRC_MEMORY_SPTR_H_INCLUDED__ */
