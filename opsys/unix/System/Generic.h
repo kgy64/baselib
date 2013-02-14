@@ -13,7 +13,7 @@
 
 #define PACKED  __attribute__((aligned(1), packed))
 
-/// Forces to the object to be linked in
+/// Forces the object to be linked in
 #define MAKE_REFERENCED __attribute__((used))
 
 /// Increases the static initialization priority
