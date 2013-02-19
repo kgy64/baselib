@@ -10,7 +10,7 @@ Y_CPPFILES  =   $(YSOURCES:.y=.cpp)
 Y_HEADERS   =   $(YSOURCES:.y=.hpp)
 Y_OBJECTS   =   $(YSOURCES:.y=.o)
 OBJECTS     =   $(CSOURCES:.c=.o) $(CPPSOURCES:.cpp=.o)
-DEPENDS     =   $(Y_OBJECTS:.o=.depend) $(OBJECTS:.o=.depend)
+DEPENDS     =   $(Y_OBJECTS:.o=.depend) $(OBJECTS:.o=.depend) $(EXTRA_OBJECTS:.o=.depend)
 
 export MY_LIBRARY_ERRORS :=  $(shell $(SCRIPTDIR)/find-flags --test-only $(BASE_LIBRARIES) 2>&1 >/dev/null)
 export MY_PROJECT_FLAGS   =  $(shell $(SCRIPTDIR)/find-flags --cflags $(BASE_LIBRARIES))

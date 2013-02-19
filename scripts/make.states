@@ -43,7 +43,7 @@ do_depend: _depend_phase
 	@$(MAKE) DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.depends
 
 do_compile: _compile_phase
-	@$(MAKE) OBJECTS="$(OBJECTS)" DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.compile
+	@$(MAKE) OBJECTS="$(OBJECTS) $(EXTRA_OBJECTS)" DEPENDS="$(DEPENDS)" -s -r -f $(SCRIPTDIR)/make.compile
 
 do_link_lib: $(A_LIB_PATH) $(SO_LIB_PATH)
 
