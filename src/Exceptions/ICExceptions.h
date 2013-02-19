@@ -92,7 +92,7 @@ namespace EX {
 }
 
 #define __DO_ASSERT(type, cond, message)  \
-    throw type() << "In file '" __FILE__ "', line " << __LINE__ << ": '" #cond "' failed: " << message
+    throw type() << "In file " __FILE__ ":" << __LINE__ << ": '" #cond "' failed: " << message
 
 #define ASSERT_T(type, cond, message)   { if (!(cond)) { __DO_ASSERT(type, cond, message); } }
 
