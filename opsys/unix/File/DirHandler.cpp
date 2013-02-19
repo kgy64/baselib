@@ -150,7 +150,7 @@ void DirHandler::iterator::_iterator(const char * p_parent)
  myDir = opendir(myPath.c_str());
  actualEntry = NULL;
 
- ASSERT(myDir, "Could not open '" << myPath << "' for iteration: " << strerror(errno));
+ ASSERT_DBG(myDir, "Could not open '" << myPath << "' for iteration: " << strerror(errno));
  ++*this; // Step to the first entry
 }
 
@@ -159,7 +159,7 @@ DirHandler::iterator::~iterator()
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (myDir) {
-    ASSERT(!closedir(myDir), "Could not close directory iterator");
+    ASSERT_DBG(!closedir(myDir), "Could not close directory iterator");
  }
 }
 
@@ -191,7 +191,7 @@ DirHandler::iterator & DirHandler::iterator::operator++()
 
  do {
     int result = readdir_r(myDir, &myEntry, &actualEntry);
-    ASSERT(!result, "Could not iterate on '" << myPath << "': " << strerror(result));
+    ASSERT_DBG(!result, "Could not iterate on '" << myPath << "': " << strerror(result));
  } while (actualEntry && actualEntry->d_name[0] == '.'); // Skip '.' '..' and hidden files
 
  SYS_DEBUG(DL_INFO1, "Current entry: '" << (actualEntry ? actualEntry->d_name : "") << "'");
