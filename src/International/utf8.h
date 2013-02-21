@@ -67,6 +67,8 @@ namespace UTF8
             return *ToWChar(p_index);
         }
 
+        static WChar GetChar(const char *& p_str);
+
      private:
         SYS_DEFINE_CLASS_NAME("UTF8::ToWstring");
 
@@ -74,7 +76,6 @@ namespace UTF8
 
         const std::auto_ptr<WChar> myStr;
 
-        static WChar GetChar(const char *& p_str);
         static WChar GetContinuationChar(const char *& p_str);
     };
 
@@ -145,14 +146,14 @@ namespace UTF8
             return *ToChar(p_index);
         }
 
+        static void GetChar(WChar p_char, char *& p_result);
+
      private:
         SYS_DEFINE_CLASS_NAME("UTF8::FromWstring");
 
         size_t myLength;
 
         boost::scoped_ptr<char> myStr;
-
-        static void GetChar(WChar p_char, char *& p_result);
     };
 };
 

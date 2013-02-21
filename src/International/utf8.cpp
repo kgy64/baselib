@@ -47,6 +47,10 @@ WChar ToWstring::GetContinuationChar(const char *& p_str)
 }
 
 /// Convert one UTF8 character to Unicode
+/*! \param  p_str   Pointer reference to the character to be converted. The pointer is advanced
+                    past to the character accordingly.
+    \retval WChar   The converted wide character is returned.
+ */
 WChar ToWstring::GetChar(const char *& p_str)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
@@ -129,6 +133,10 @@ void FromWstring::_FromWstring(const WChar * p_str)
 }
 
 /// Convert one Unicode character to UTF8
+/*! \param  p_char      The wide character to be converted
+    \param  p_result    Pointer refernce of the result. It is advanced pasto to the currently converted
+                        character, but nothing is stored beyond it.
+ */
 void FromWstring::GetChar(WChar p_char, char *& p_result)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
