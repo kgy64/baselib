@@ -81,6 +81,38 @@ namespace UTF8
         static WChar GetContinuationChar(const char *& p_str);
     };
 
+    class WideStringIterator: public ToWstring
+    {
+     public:
+        inline WideStringIterator(const char * p_str):
+            UTF8::ToWstring(p_str),
+            myPosition(0)
+        {
+        }
+
+        inline UTF8::WChar operator*() const
+        {
+            return *ToWChar(myPosition);
+        }
+
+        inline WideStringIterator & operator++()
+        {
+            ++myPosition;
+        }
+
+        inline const WChar * Remaining(void) const
+        {
+            return ToWChar(myPosition);
+        }
+
+     protected:
+        size_t myPosition;
+
+     private:
+        SYS_DEFINE_CLASS_NAME("UTF8::WideStringIterator");
+
+    }; // class WideStringIterator
+
     class FromWstring
     {
         // Some constructor-like functions, to be compatible with older
