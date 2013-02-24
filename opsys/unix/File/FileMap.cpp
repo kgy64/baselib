@@ -40,7 +40,7 @@ void FileMap::_FileMap(const char * name, OpenMode mode)
  }
 
  fd = open(name, open_mode);
- ASSERT(fd >= 0, "File '" << name << "' could not be opened.");
+ ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
 
  struct stat sb;
 
