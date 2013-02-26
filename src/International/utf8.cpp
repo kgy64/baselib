@@ -74,7 +74,7 @@ WChar ToWstring::GetChar(const char *& p_str)
             // 2-byte sequence (0x0080...0x07ff):
             int cont_1 = GetContinuationChar(p_str);
             int result = ((actual & 0x1f) << 6) | cont_1;
-            SYS_DEBUG(DL_VERBOSE, " - 2-byte sequence: " << std::hex << actual << "-" << cont_1 << "=" << result);
+            SYS_DEBUG(DL_VERBOSE, " - 2-byte sequence: " << std::hex << (int)actual << "-" << cont_1 << "=" << result);
             return result;
         }
     break;
@@ -84,7 +84,7 @@ WChar ToWstring::GetChar(const char *& p_str)
             int cont_1 = GetContinuationChar(p_str);
             int cont_2 = GetContinuationChar(p_str);
             int result = cont_2 | ((cont_1 | ((actual & 0x0f) << 6)) << 6);
-            SYS_DEBUG(DL_VERBOSE, " - 3-byte sequence: " << std::hex << actual << "-" << cont_1 << "-" << cont_2 << "=" << result);
+            SYS_DEBUG(DL_VERBOSE, " - 3-byte sequence: " << std::hex << (int)actual << "-" << cont_1 << "-" << cont_2 << "=" << result);
             return result;
         }
     break;
@@ -99,13 +99,13 @@ WChar ToWstring::GetChar(const char *& p_str)
             int cont_2 = GetContinuationChar(p_str);
             int cont_3 = GetContinuationChar(p_str);
             int result = cont_3 | ((cont_2 | ((cont_1 | ((actual & 0x0f) << 6)) << 6)) << 6);
-            SYS_DEBUG(DL_VERBOSE, " - 4-byte sequence: " << std::hex << actual << "-" << cont_1 << "-" << cont_2 << "-" << cont_3 << "=" << result);
+            SYS_DEBUG(DL_VERBOSE, " - 4-byte sequence: " << std::hex << (int)actual << "-" << cont_1 << "-" << cont_2 << "-" << cont_3 << "=" << result);
             return result;
         }
     break;
  }
 
- throw UTF8_Conversion() << "Invalid character: " << std::hex << actual;
+ throw UTF8_Conversion() << "Invalid character: " << std::hex << (int)actual;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
