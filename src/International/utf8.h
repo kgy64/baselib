@@ -98,6 +98,7 @@ namespace UTF8
         inline WideStringIterator & operator++()
         {
             ++myPosition;
+            return *this;
         }
 
         inline const WChar * Remaining(void) const
@@ -192,6 +193,9 @@ namespace UTF8
         boost::scoped_ptr<char> myStr;
     };
 };
+
+std::ostream & operator<<(std::ostream & os, const UTF8::WChar * st);
+std::ostream & operator<<(std::ostream & os, UTF8::WChar ch);
 
 #endif /* __SRC_INTERNATIONAL_UTF8_H_INCLUDED__ */
 

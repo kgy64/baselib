@@ -59,7 +59,7 @@ WChar ToWstring::GetChar(const char *& p_str)
 
  if (actual >= 0 && actual <= 0x7f) {
     // Simple ASCII character:
-    SYS_DEBUG(DL_VERBOSE, " - Simple ASCII char: " << std::hex << actual);
+    SYS_DEBUG(DL_VERBOSE, " - Simple ASCII char: 0x" << std::hex << (unsigned int)actual);
     return actual;
  }
 
@@ -162,6 +162,43 @@ void FromWstring::GetChar(WChar p_char, char *& p_result)
  }
 
  throw UTF8_Conversion() << "Invalid wide character value: " << std::hex << (int)p_char;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *       Operators:                                                                      *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+std::ostream & operator<<(std::ostream & os, const UTF8::WChar * st)
+{
+ UTF8::FromWstring utf8(st);
+ return os << utf8.ToChar();
+}
+
+std::ostream & operator<<(std::ostream & os, UTF8::WChar ch)
+{
+ switch (ch) {
+    case L'\0':
+        return os << "\\0";
+    break;
+    case L'\r':
+        return os << "\\r";
+    break;
+    case L'\n':
+        return os << "\\n";
+    break;
+    case L'\t':
+        return os << "\\t";
+    break;
+ }
+
+ char result[8];
+ char * p = result;
+ UTF8::FromWstring::GetChar(ch, p);
+ *p = '\0';
+
+ return os << result;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
