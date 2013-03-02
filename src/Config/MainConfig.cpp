@@ -11,7 +11,7 @@ MainConfig::MainConfig(void)
 {
  SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
 
- FILES::FileMap_char configFile(configName);
+ FILES::FileMap_typed<unsigned char> configFile(configName);
 
  SYS_DEBUG(DL_INFO1, "Main config file: size=" << configFile.GetSize());
 

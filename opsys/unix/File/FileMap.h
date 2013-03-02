@@ -65,27 +65,28 @@ namespace FILES
         SYS_DEFINE_CLASS_NAME("FileMap");
     }; // class FileMap
 
-    class FileMap_char: public FileMap
+    template <typename T>
+    class FileMap_typed: public FileMap
     {
      public:
-        FileMap_char(const char * name, FileMap::OpenMode mode = Read_Only):
+        FileMap_typed(const char * name, FileMap::OpenMode mode = Read_Only):
             FileMap(name, mode)
         {
             actual = GetData();
         }
 
-        virtual ~FileMap_char()
+        virtual ~FileMap_typed()
         {
         }
 
-        char * GetData(void) { return (char*) FileMap::GetData(); }
+        T * GetData(void) { return (T*) FileMap::GetData(); }
 
         off_t GetPosition(void) { return (off_t)actual - (off_t)GetData(); }
 
         int ChrGet(void)
         {
-            if (actual >= (char*)ende) {
-                if (actual == (char*)ende) {
+            if (actual >= (T*)ende) {
+                if (actual == (T*)ende) {
                     ++actual; // Must be incremented here to be able to call UnGet() later
                 }
                 return -1;
@@ -95,16 +96,17 @@ namespace FILES
 
         void UnGet(void)
         {
-            if (actual > (char*)mapped)
+            if (actual > (T*)mapped)
                 --actual;
         }
 
      protected:
-        char * actual;
+        T * actual;
 
      private:
-        SYS_DEFINE_CLASS_NAME("FileMap_char");
-    }; // class FileMap_char
+        SYS_DEFINE_CLASS_NAME("FileMap_typed");
+
+    }; // class FileMap_typed
 } // namespace FILES
 
 #endif /* __FILEMAP_H__ */

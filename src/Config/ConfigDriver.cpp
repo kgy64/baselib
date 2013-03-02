@@ -24,7 +24,7 @@ void ConfigStore::List(void) const
     theConfig->List(0);
 }
 
-ConfDriver::ConfDriver(FILES::FileMap_char & p_file, ConfigStore & store):
+ConfDriver::ConfDriver(FILES::FileMap_typed<unsigned char> & p_file, ConfigStore & store):
     file(p_file),
     lineNo(1),
     column(1),
@@ -116,7 +116,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
         for (;;) {
             ch = file.ChrGet();
             if (ch <= 0) {
-                // Error: string is not terminated
+                SYS_DEBUG(DL_ERROR, "String is not terminated [1] at line " << lineNo);
                 return -1;
             }
             ++column;
@@ -126,8 +126,29 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
                 case '\\':
                     ch = file.ChrGet();
                     if (ch <= 0) {
-                        // Error: string is not terminated
+                        SYS_DEBUG(DL_ERROR, "String is not terminated [2] at line " << lineNo);
                         return -1;
+                    }
+                    switch (ch) {
+                        case '\r':
+                        case '\n':
+                            ++lineNo;
+                            column = 1;
+                            // Ignore this EOL:
+                            continue;
+                        break;
+                        case 'n':
+                            ch = '\n';
+                        break;
+                        case 'r':
+                            ch = '\r';
+                        break;
+                        case 't':
+                            ch = '\t';
+                        break;
+                        case 'b':
+                            ch = '\b';
+                        break;
                     }
                     ++column;
                 break;

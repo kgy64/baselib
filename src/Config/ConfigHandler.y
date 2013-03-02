@@ -42,8 +42,8 @@ eleje:      // Zero content is also allowed
     | BODY                          { driver.Declare($1); }
     ;
 
-BODY:
-      ASSIGN                                 { ($$ = new AssignmentSet())->Append($1); }
+BODY:                                        {  $$ = new AssignmentSet(); }
+    | ASSIGN                                 { ($$ = new AssignmentSet())->Append($1); }
     | DECLARATION                            { ($$ = new AssignmentSet())->Append($1); }
     | BODY ASSIGN                            {  $$ = $1->Append($2); }
     | BODY DECLARATION                       {  $$ = $1->Append($2); }
