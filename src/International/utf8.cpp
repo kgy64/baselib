@@ -68,7 +68,7 @@ WChar ToWstring::GetChar(const char *& p_str)
         if (actual < 0xc2) {
             break;
         }
-        // No break!
+        // No break here!
     case 0xd0:
         {
             // 2-byte sequence (0x0080...0x07ff):
@@ -105,7 +105,7 @@ WChar ToWstring::GetChar(const char *& p_str)
     break;
  }
 
- throw UTF8_Conversion() << "Invalid character: " << std::hex << (int)actual;
+ ASSERT_T(UTF8_Conversion, false, "Invalid UTF8 character: " << (int)actual);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -127,7 +127,7 @@ void FromWstring::_FromWstring(const WChar * p_str)
     GetChar(*p_str++, ch);
  }
 
- ASSERT(ch == myStr.get() + myLength, "UTF8 string length calculation problem");
+ ASSERT_DBG(ch == myStr.get() + myLength, "UTF8 string length calculation problem");
 
  *ch = '\0';
 }
@@ -140,6 +140,8 @@ void FromWstring::_FromWstring(const WChar * p_str)
 void FromWstring::GetChar(WChar p_char, char *& p_result)
 {
  SYS_DEBUG_STATIC(DM_UTF8);
+
+ SYS_DEBUG(DL_INFO2, "Converting 0x" << std::hex << (int)p_char);
 
  if ((p_char & ~ONE_BYTE_MASK) == 0) {
     *p_result++ = (char)(p_char & ONE_BYTE_MASK);
@@ -161,7 +163,7 @@ void FromWstring::GetChar(WChar p_char, char *& p_result)
     return;
  }
 
- throw UTF8_Conversion() << "Invalid wide character value: " << std::hex << (int)p_char;
+ ASSERT_T(UTF8_Conversion, false, "Invalid wide character value: " << (int)p_char);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
