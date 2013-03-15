@@ -66,9 +66,10 @@ WChar ToWstring::GetChar(const char *& p_str)
  switch (actual & 0xf0) {
     case 0xc0:
         if (actual < 0xc2) {
+            // Wrong code:
             break;
         }
-        // No break here!
+        // No break here! (this is also a 2-byte sequence)
     case 0xd0:
         {
             // 2-byte sequence (0x0080...0x07ff):
@@ -168,6 +169,71 @@ void FromWstring::GetChar(WChar p_char, char *& p_result)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
+ *       Functions:                                                                      *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/// Seek in a UTF8 string
+/*! \param  p_str       The input string to seek
+    \param  p_offset    Number of characters to seek. It means number of UTF8 Characters, not bytes, of course.<br>
+                        If it is less than 1, nothing happens. If greater than the string length, then a pointer
+                        to the closing null character is returned.
+    \retval result      Pointer to the requested character is returned. Note that it points into the input
+                        string, calculating the UTF8 character boundaries.
+ */
+const char * UTF8::Seek(const char * p_str, int p_offset)
+{
+ SYS_DEBUG_STATIC(DM_UTF8);
+
+ do {
+    if (p_offset <= 0) {
+        return p_str;
+    }
+
+    --p_offset;
+
+    unsigned int actual = static_cast<unsigned int>(*reinterpret_cast<const unsigned char *>(p_str));
+
+    if (actual == 0U) {
+        // End of string:
+        return p_str;
+    }
+
+    ++p_str;
+
+    if (actual <= 0x7f) {
+        // Simple ASCII character:
+        continue;
+    }
+
+    switch (actual & 0xf0) {
+        case 0xc0:
+            if (actual < 0xc2) {
+                // Wrong code:
+                ASSERT_T(UTF8_Conversion, false, "Invalid UTF8 character: " << (int)actual);
+            }
+            // No break here! (this is also a 2-byte sequence)
+        case 0xd0:
+            // 2-byte sequence (0x0080...0x07ff):
+            p_str += 1;
+        break;
+        case 0xe0:
+            // 3-byte sequence (0x0800...0xffff):
+            p_str += 2;
+        break;
+        case 0xf0:
+            // 4-byte sequence (>=0x10000):
+            p_str += 3;
+        break;
+        default:
+            ASSERT_T(UTF8_Conversion, false, "Invalid UTF8 character: " << (int)actual);
+        break;
+    }
+ } while (true);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
  *       Operators:                                                                      *
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -192,6 +258,12 @@ std::ostream & operator<<(std::ostream & os, UTF8::WChar ch)
     break;
     case L'\t':
         return os << "\\t";
+    break;
+    case L'\'':
+        return os << "\\'";
+    break;
+    case L'"':
+        return os << "\\\"";
     break;
  }
 

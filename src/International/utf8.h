@@ -106,6 +106,12 @@ namespace UTF8
             return ToWChar(myPosition);
         }
 
+        inline int RemainingLength(void) const
+        {
+            int result = length() - myPosition;
+            return result < 0 ? 0 : result;
+        }
+
      protected:
         size_t myPosition;
 
@@ -192,6 +198,8 @@ namespace UTF8
 
         boost::scoped_ptr<char> myStr;
     };
+
+    const char * Seek(const char * p_str, int p_offset);
 };
 
 std::ostream & operator<<(std::ostream & os, const UTF8::WChar * st);
