@@ -75,6 +75,8 @@ void FileHandler::_FileHandler(const char * p_full_path)
  }
 
  myDir = path.substr(0, slash+1);
+
+ SYS_DEBUG(DL_INFO2, "My dir: '" << myDir << "', filename: '" << myName << "'");
 }
 
 FileHandler::~FileHandler()
