@@ -26,14 +26,14 @@ namespace Threads
 
         inline void push(const DataType & p_data)
         {
-            Thread::Mutex::Lock _l(myDataMutex);
+            Thread::Lock _l(myDataMutex);
             myData = p_data;
             myCond.Signal();
         }
 
         inline DataType pop(void)
         {
-            Threads::Mutex::Lock _l(myDataMutex);
+            Threads::Lock _l(myDataMutex);
             while (!isFinished && !myData.get()) {
                 myCond.Wait(myDataMutex);
             }
@@ -44,7 +44,7 @@ namespace Threads
 
         inline void finish(void)
         {
-            Glib::Mutex::Lock _l(myDataMutex);
+            Threads::Lock _l(myDataMutex);
             isFinished = true;
             myCond.Signal();
         }
