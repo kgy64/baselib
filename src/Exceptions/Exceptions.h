@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Name:        ICExceptions.h
+ * Name:        Exceptions.h
  * Purpose:     General purpose exceptions
  * Author:      Kövesdi György  (kgy@teledigit.eu)
  * Modified by:
@@ -10,7 +10,7 @@
 #ifndef _EXCEPTIONS_EXCEPTIONS_H_
 #define _EXCEPTIONS_EXCEPTIONS_H_
 
-#include <Debug/Debug.h>
+#include <string.h> // for strerror()
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -35,8 +35,6 @@
             return *this;                   \
         }                                   \
                                             \
-     private:                               \
-        SYS_DEFINE_CLASS_NAME("EX::" MSG "Exception"); \
     };
 
 namespace EX {
@@ -59,9 +57,6 @@ namespace EX {
             os += s.str();
             return *this;
         }
-
-     private:
-        SYS_DEFINE_CLASS_NAME("EX::BaseException");
 
         std::string os;
     };
@@ -109,6 +104,10 @@ namespace EX {
     }
 
 #define ASSERT_STD(cond)    if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(errno))
+
+#define ASSERT_STD_ERRNO(cond, error_code)    if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(error_code))
+
+#define ASSERT_STD_ZERO(cond)   { int e = (cond); if (e) __DO_ASSERT(::EX::Assert, cond, strerror(e)); }
 
 #endif // _EXCEPTIONS_EXCEPTIONS_H_
 

@@ -14,7 +14,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <string>
 
-#include <Exceptions/ICExceptions.h>
+#include <Exceptions/Exceptions.h>
 #include <Debug/Debug.h>
 
 namespace UTF8

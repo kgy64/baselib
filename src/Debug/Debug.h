@@ -2,7 +2,7 @@
  * Name:        Debug.h
  * Purpose:     Class for debugging
  * Author:      Kövesdi György  (kgy@teledigit.eu)
- * Modified by: KGy 2012-06-10: Use it in glib environment
+ * Modified by: KGy 2013-05-31: The stdc++-based version
  * Created:     2006-03-28
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -10,30 +10,17 @@
 #ifndef _DEBUGPRINT_H_
 #define _DEBUGPRINT_H_
 
-#include <Memory/SPtr.h>
+#include <pthread.h>
+#include <boost/scoped_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <map>
-#include <glibmm/thread.h>
 #include <string.h>
 #include <stdint.h>
 
-#include "debuglevels.h"
+#include <Threads/Mutex.h>
 
-#ifdef __GNUC__
-#define __FILE_LINE__   , __FILE__, __LINE__
-#else
-#define __FILE_LINE__
-#endif
-
-#if !defined(__GNUC__) && !defined(_VC2005)
-// Define this macro as empty if it cannot be used:
-#define __FUNCTION__
-#define __FUNCTION_STRING__ "Unknown"
-#else
-#define __FUNCTION_WORKS__
-#define __FUNCTION_STRING__ __FUNCTION__
-#endif // __GNUC__ && _VC2005
+#include "debuglevels.h" // Note: this must be provided by the user!
 
 #define _SYS_DEBUG_MODULE_NAME(name)   __debug_module_##name
 
@@ -100,17 +87,18 @@ namespace _Debug_Info_
 
 namespace _Debug_Info_
 {
-    class PrintLock: public Glib::Mutex::Lock
+    class PrintLock: public Threads::Lock
     {
     public:
-        PrintLock(void):
-            Glib::Mutex::Lock(debugMutex)
+        inline PrintLock(void):
+            Threads::Lock(debugMutex)
         {
         }
 
     private:
-        static Glib::Mutex debugMutex;
-    };
+        static Threads::Mutex debugMutex;
+
+    }; // class PrintLock
 
     /// Debug message handler class
     /*! This class is responsible for handling debug messages. The messages can show
@@ -134,19 +122,8 @@ namespace _Debug_Info_
     class DebugPrint
     {
      public:
-        DebugPrint(const char *name,
-#ifdef __GNUC__
-                         const char *fname, int lineno,
-#endif
-                         ::_Debug_Info_::_Debug_Module_ & p_module
-                         );
-        DebugPrint(const void *thisptr, const char *classptr,
-                          const char *name,
-#ifdef __GNUC__
-                         const char *fname, int lineno,
-#endif
-                         ::_Debug_Info_::_Debug_Module_ & p_module
-                         );
+        DebugPrint(const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module);
+        DebugPrint(const void *thisptr, const char *classptr, const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module);
         ~DebugPrint();
 
         void draw_left(void);
@@ -167,23 +144,21 @@ namespace _Debug_Info_
         void header(void);
 
         /*! This variable stores the copy of the function name. */
-        SPtr<char> my_name;
+        boost::scoped_ptr<char> my_name;
 
         /*! If the caller function is a class member, this is the copy of the
             class name. */
-        SPtr<char> my_class;
+        boost::scoped_ptr<char> my_class;
 
         /*! If the caller function is a class member, this is the class pointer
             (this). */
         const void *my_this;
 
-#ifdef __GNUC__
         /*! */
-        SPtr<char> my_filename;
+        boost::scoped_ptr<char> my_filename;
 
         /*! */
         int my_lineno;
-#endif
 
         class TabInfo
         {
@@ -257,7 +232,7 @@ namespace _Debug_Info_
     passes the name of the function to the constructor. */
 #if SYS_DEBUG_ON
 #define SYS_DEBUG_FUNCTION(module_name) \
-    ::_Debug_Info_::DebugPrint __debugprint(__FUNCTION_STRING__ __FILE_LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
+    ::_Debug_Info_::DebugPrint __debugprint(__FUNCTION__, __FILE__, __LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_FUNCTION(name) { }
 #endif
@@ -272,7 +247,7 @@ namespace _Debug_Info_
     passes the name of the class and the function to the constructor. */
 #if SYS_DEBUG_ON
 #define SYS_DEBUG_MEMBER_NAME(name, module_name) \
-    ::_Debug_Info_::DebugPrint __debugprint(this, name, __FUNCTION_STRING__ __FILE_LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
+    ::_Debug_Info_::DebugPrint __debugprint(this, name, __FUNCTION__, __FILE__, __LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_MEMBER_NAME(name, module_name) { }
 #endif
@@ -282,7 +257,7 @@ namespace _Debug_Info_
     passes the name of the class and the function to the constructor. */
 #if SYS_DEBUG_ON
 #define SYS_DEBUG_MEMBER(module_name) \
-    ::_Debug_Info_::DebugPrint __debugprint(this, CLASS_NAME_FUNCTION(), __FUNCTION_STRING__ __FILE_LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
+    ::_Debug_Info_::DebugPrint __debugprint(this, CLASS_NAME_FUNCTION(), __FUNCTION__, __FILE__, __LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_MEMBER(module_name) { }
 #endif

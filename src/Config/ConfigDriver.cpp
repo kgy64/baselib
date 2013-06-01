@@ -255,7 +255,7 @@ AssignmentSet * AssignmentSet::Append(ConfigLevel * conf)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *conf);
- subConfigs[conf->GetName()] = Glib::RefPtr<ConfigLevel>(conf);
+ subConfigs[conf->GetName()] = boost::shared_ptr<ConfigLevel>(conf);
  return this;
 }
 

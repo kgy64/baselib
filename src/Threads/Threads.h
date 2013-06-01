@@ -1,9 +1,20 @@
-#ifndef __THREADS_H__
-#define __THREADS_H__
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Project:     My Generic C++ Library
+ * Purpose:     Thread handler classes
+ * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Licence:     GPL (see file 'COPYING' in the project root for more details)
+ * Comments:    
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <glibmm/thread.h>
+#ifndef __SRC_THREADS_THREADS_H_INCLUDED__
+#define __SRC_THREADS_THREADS_H_INCLUDED__
 
-#include <Memory/SPtr.h>
+#include <pthread.h>
+#include <sched.h>
+
+#include <Threads/Error.h>
 
 namespace Threads
 {
@@ -23,10 +34,41 @@ namespace Threads
             return toBeFinished;
         }
 
-        static inline void yield(void)
+        static inline void Yield(void)
         {
-            Glib::Thread::yield();
+            ASSERT_STD(sched_yield()==0);
         }
+
+     protected:
+        class Attribute
+        {
+         public:
+            inline Attribute(void)
+            {
+                ASSERT_THREAD(pthread_attr_init(&myAttrib)==0, "pthread_attr_init() failed");
+            }
+
+            inline ~Attribute()
+            {
+                ASSERT_THREAD(pthread_attr_destroy(&myAttrib)==0, "pthread_attr_destroy() failed");
+            }
+
+            inline void SetJoinable(bool joinable)
+            {
+                ASSERT_THREAD(pthread_attr_setdetachstate(&myAttrib, joinable ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED)==0, "pthread_attr_setdetachstate() failed");
+            }
+
+            inline pthread_attr_t * get()
+            {
+                return &myAttrib;
+            }
+
+         private:
+            pthread_attr_t myAttrib;
+
+        }; // class Attribute
+
+        pthread_t myThread;
 
      private:
         /// This function is the startpoint of this thread
@@ -34,54 +76,15 @@ namespace Threads
 
         virtual void atExit(int p_exitCode);
 
-        void _main(void);
+        static void * _main(void * thread_pointer);
 
         bool toBeFinished;
 
-        Glib::Thread* myThread;
+        Attribute myAttr;
     };
 
-    template <typename T>
-    class DataPipe
-    {
-     public:
-        inline void push(const SPtr<T> & p_data)
-        {
-            Glib::Mutex::Lock _l(myDataMutex);
-            myData = p_data;
-            myCond.signal();
-        }
-
-        inline SPtr<T> pop(void)
-        {
-            Glib::Mutex::Lock _l(myDataMutex);
-            SPtr<T> result;
-            while (!isFinished && !myData.get()) {
-                myCond.wait(myDataMutex);
-            }
-            result = myData;
-            myData.reset();
-            return result;
-        }
-
-        inline void finish(void)
-        {
-            Glib::Mutex::Lock _l(myDataMutex);
-            isFinished = true;
-            myCond.signal();
-        }
-
-     protected:
-        bool isFinished;
-
-        SPtr<T> myData;
-
-        Glib::Mutex myDataMutex;
-
-        Glib::Cond myCond;
-    };
 } // namespace Threads
 
-#endif /* __THREADS_H__ */
+#endif // __SRC_THREADS_THREADS_H_INCLUDED__
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

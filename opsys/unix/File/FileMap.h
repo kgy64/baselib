@@ -5,7 +5,6 @@
 #include <sys/types.h>
 
 #include <File/DirHandler.h>
-#include <Memory/SPtr.h>
 #include <Debug/Debug.h>
 
 namespace FILES

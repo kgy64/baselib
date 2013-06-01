@@ -1,7 +1,8 @@
 #ifndef __FILTERBASE_H__
 #define __FILTERBASE_H__
 
-#include <glibmm/refptr.h>
+#include <boost/shared_ptr.hpp>
+
 #include <Base/Linked.h>
 #include <Debug/Debug.h>
 
@@ -80,7 +81,7 @@ namespace Filter
         }
     };
 
-    typedef Glib::RefPtr<_FilterState> StateP;
+    typedef boost::shared_ptr<_FilterState> StateP;
 
     template <typename T>
     class I_Filter: public FilterBase

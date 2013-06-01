@@ -13,7 +13,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <Exceptions/ICExceptions.h>
+#include <Debug/Debug.h>
+#include <Exceptions/Exceptions.h>
 
 #include "FileFunctions.h"
 

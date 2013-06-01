@@ -2,12 +2,10 @@
 #
 
 NAME                 =  Basic
-VERS_MAJOR           =  0
+VERS_MAJOR           =  1
 VERS_MINOR           =  1
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-BASE_LIBRARIES       =  glibmm-2.4
 
 export SRCDIR        =  . ../opsys/unix
 

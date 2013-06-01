@@ -1,3 +1,13 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Project:     My Generic C++ Library
+ * Purpose:     Thread handler classes
+ * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Licence:     GPL (see file 'COPYING' in the project root for more details)
+ * Comments:    
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "Threads.h"
 
 using namespace Threads;
@@ -9,8 +19,8 @@ using namespace Threads;
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 Thread::Thread(void):
-    toBeFinished(true),
-    myThread(NULL)
+    myThread(0),
+    toBeFinished(true)
 {
 }
 
@@ -29,16 +39,16 @@ void Thread::Kill(void)
 
  // If it is called from the thread itself, then it is not necessary at all. Calling
  // the join() is a bad idea in this case.
- if (Glib::Thread::self() == myThread)
+ if (pthread_equal(myThread, pthread_self()))
     return;
 
- myThread->join();      // Wait until exited
- myThread = NULL;       // The thread is already exited
+ pthread_join(myThread, NULL);  // Wait until exited
+ myThread = 0;                  // The thread is already exited
 }
 
 /// Start the thread
 /*! \warning    Do <b>not</b> call it from the constructor (even in the derivative classes), because
-                virtual function is used here.
+                virtual function is used when it has started.
  */
 void Thread::Start(void)
 {
@@ -50,15 +60,19 @@ void Thread::Start(void)
  toBeFinished = false;
 
  // Create the thread:
- myThread = Glib::Thread::create(sigc::mem_fun(*this, &Thread::_main), true);
+ myAttr.SetJoinable(true);
+
+ ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, this)==0, "pthread_create() failed");
 }
 
 /// The physical start of the thread
 /*! This is just a helper function, calling the real main() function.
  */
-void Thread::_main(void)
+void * Thread::_main(void * thread_pointer)
 {
- atExit(main());
+ Thread * th = reinterpret_cast<Thread*>(thread_pointer);
+ th->atExit(th->main());
+ return (void*)0;
 }
 
 /// Called after main()

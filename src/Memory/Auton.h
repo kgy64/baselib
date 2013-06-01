@@ -15,7 +15,8 @@
 #include <string.h>
 
 #include <System/Generic.h>
-#include <Exceptions/ICExceptions.h>
+#include <Threads/Threads.h>
+#include <Threads/Mutex.h>
 #include <Debug/Debug.h>
 
 SYS_DECLARE_MODULE(DM_AUTON);
@@ -119,7 +120,7 @@ namespace _AutonPrivate
         inline void Use(void)
         {
             SYS_DEBUG_MEMBER(DM_AUTON);
-            Glib::Mutex::Lock _l(myMutex);
+            Threads::Lock _l(myMutex);
             ++references;
             SYS_DEBUG(DL_INFO1, "The usage conunter of '" << myName << "' is now " << references);
         }
@@ -132,7 +133,7 @@ namespace _AutonPrivate
         inline void Drop(void)
         {
             SYS_DEBUG_MEMBER(DM_AUTON);
-            Glib::Mutex::Lock _l(myMutex);
+            Threads::Lock _l(myMutex);
             SYS_DEBUG(DL_INFO1, "The usage conunter of '" << myName << "' was " << references);
             if (--references == 0) {
                 delete myInterface;
@@ -189,7 +190,7 @@ namespace _AutonPrivate
         /// Mutex for this pointer
         /*! It will lock all the operation to guarantee thread-safety for \ref Auton.
          */
-        Glib::Mutex myMutex;
+        Threads::Mutex myMutex;
 
         static AutonInterface<I> myStaticImplementation;
     };
@@ -458,7 +459,7 @@ namespace _AutonPrivate
     {
         SYS_DEBUG_MEMBER(DM_AUTON);
         if (myInterface) return myInterface; // It is already created, nothing to do
-        Glib::Mutex::Lock _l(myMutex);
+        Threads::Lock _l(myMutex);
         if (myInterface) return myInterface; // Somebody else has just created it
         myInterface = CreateImplementation();
         return myInterface;

@@ -11,7 +11,7 @@
 #ifndef __OPSYS_UNIX_FILE_FILEPTRS_H_INCLUDED__
 #define __OPSYS_UNIX_FILE_FILEPTRS_H_INCLUDED__
 
-#include <Memory/SPtr.h>
+#include <boost/shared_ptr.hpp>
 
 namespace FILES
 {
@@ -19,9 +19,9 @@ namespace FILES
     class DirHandler;
     class FileMap;
 
-    typedef SPtr<FileHandler> FilePtr;
-    typedef SPtr<FileMap> MapPtr;
-    typedef SPtr<DirHandler> DirPtr;
+    typedef boost::shared_ptr<FileHandler> FilePtr;
+    typedef boost::shared_ptr<FileMap> MapPtr;
+    typedef boost::shared_ptr<DirHandler> DirPtr;
 }
 
 #endif /* __OPSYS_UNIX_FILE_FILEPTRS_H_INCLUDED__ */

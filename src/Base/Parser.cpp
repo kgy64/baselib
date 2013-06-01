@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include <Exceptions/ICExceptions.h>
+#include <Exceptions/Exceptions.h>
 
 #include "Parser.h"
 

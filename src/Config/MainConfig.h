@@ -3,6 +3,7 @@
 
 #include <Config/ConfigDriver.h>
 #include <Threads/Threads.h>
+#include <Threads/Mutex.h>
 #include <Debug/Debug.h>
 
 class MainConfig
@@ -11,7 +12,7 @@ class MainConfig
     static MainConfig & Get(void)
     {
         if (!myself) {
-            Glib::Mutex::Lock _l(myMutex);
+            Threads::Lock _l(myMutex);
             if (!myself) {
                 myself.reset(new MainConfig());
             }
@@ -38,7 +39,7 @@ class MainConfig
  protected:
     MainConfig(void);
 
-    static SPtr<MainConfig> myself;
+    static boost::shared_ptr<MainConfig> myself;
 
     static const char configName[];
 
@@ -47,7 +48,7 @@ class MainConfig
 
     ConfigStore theConfig;
 
-    static Glib::Mutex myMutex;
+    static Threads::Mutex myMutex;
 };
 
 #endif /* __MAINCONFIG_H__ */

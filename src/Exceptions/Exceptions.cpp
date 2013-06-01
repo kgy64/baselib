@@ -8,7 +8,7 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "ICExceptions.h"
+#include "Exceptions.h"
 
 using namespace EX;
 

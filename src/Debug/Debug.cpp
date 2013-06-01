@@ -35,7 +35,7 @@ map<pthread_t, DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH DebugPrint::levels;
 
 /// Mutex for Debug Output
 /*! */
-Glib::Mutex INITIALIZE_PRIORITY_HIGH PrintLock::debugMutex;
+Threads::Mutex INITIALIZE_PRIORITY_HIGH PrintLock::debugMutex;
 
 /*! The DebugPrint::entering() function starts the new message with
     this string. */
@@ -56,17 +56,11 @@ const char DebugPrint::fill_left[] = " /";
     pointer are not used.
     \param  name
     \param  p_module  */
-#ifdef __GNUC__
 /*! \param  fname
     \param  lineno */
-#endif // __GNUC__
 /*! \warning    Do <b>not</b> use this constructor directly, use the macro
                 ::SYS_DEBUG_STATIC instead. */
-DebugPrint::DebugPrint(const char *name,
-#ifdef __GNUC__
-        const char *fname, int lineno,
-#endif // __GNUC__
-        ::_Debug_Info_::_Debug_Module_ & p_module):
+DebugPrint::DebugPrint(const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module):
     info((TabInfo*)0),
     myModule(p_module)
 {
@@ -78,10 +72,8 @@ DebugPrint::DebugPrint(const char *name,
  my_name.reset(StrDup(name));
  my_class.reset(StrDup(""));
  my_this = NULL;
-#ifdef __GNUC__
  my_filename.reset(StrDup(fname));
  my_lineno = lineno;
-#endif // __GNUC__
  entering();
 }
 
@@ -93,18 +85,11 @@ DebugPrint::DebugPrint(const char *name,
     \param  classptr    The name of the caller class.
     \param  name        The name of the caller function.
     \param  p_module    Reference of the actual module. */
-#ifdef __GNUC__
 /*! \param  fname
     \param  lineno */
-#endif // __GNUC__
 /*! \warning    Do <b>not</b> use this constructor deirectly, use the macro
                 ::SYS_DEBUG_MEMBER instead. */
-DebugPrint::DebugPrint(const void *thisptr, const char *classptr,
-                                     const char *name,
-#ifdef __GNUC__
-                                    const char *fname, int lineno,
-#endif // __GNUC__
-                                    ::_Debug_Info_::_Debug_Module_ & p_module):
+DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module):
     myModule(p_module)
 {
  if (!myModule.IsOn()) {
@@ -115,10 +100,8 @@ DebugPrint::DebugPrint(const void *thisptr, const char *classptr,
  my_name.reset(StrDup(name));
  my_class.reset(StrDup(classptr));
  my_this = thisptr;
-#ifdef __GNUC__
  my_filename.reset(StrDup(fname));
  my_lineno = lineno;
-#endif // __GNUC__
  entering();
 }
 

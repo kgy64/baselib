@@ -1,5 +1,5 @@
 #include "FileMap.h"
-#include "Exceptions/ICExceptions.h"
+#include "Exceptions/Exceptions.h"
 #include "International/International.h"
 
 #include <sys/mman.h>

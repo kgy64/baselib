@@ -1,11 +1,11 @@
 #include "MainConfig.h"
-#include <Exceptions/ICExceptions.h>
+#include <Exceptions/Exceptions.h>
 
 SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
-SPtr<MainConfig> MainConfig::myself;
+boost::shared_ptr<MainConfig> MainConfig::myself;
 
-Glib::Mutex MainConfig::myMutex;
+Threads::Mutex MainConfig::myMutex;
 
 MainConfig::MainConfig(void)
 {
