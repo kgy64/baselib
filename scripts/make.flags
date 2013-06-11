@@ -1,6 +1,0 @@
-#
-#
-
-export MY_PROJECT_FLAGS  =  $(shell test "$(BASE_LIBRARIES)" && $(SCRIPTDIR)/find-flags --cflags $(BASE_LIBRARIES))
-export MY_PROJECT_LIBS   =  $(shell test "$(BASE_LIBRARIES)" && $(SCRIPTDIR)/find-flags --libs $(BASE_LIBRARIES))
-

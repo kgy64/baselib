@@ -7,9 +7,10 @@ export SCRIPTDIR        ?=  $(PROJECT_ROOT)/scripts
 
 export PUBLIC_INCLUDES  ?=  $(shell find -L $(PROJECT_ROOT)/include $(SUBPROJECTS:%=$(PROJECT_ROOT)/%) -name include -exec $(SCRIPTDIR)/echo_public_include_dir "{}" \; 2>/dev/null)
 
-CXX_STANDARD =  c++0x
+CXX_STANDARD            ?=  c++0x
 
-CXXFLAGS += $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS) -I$(PWD)/../include/private -std=$(CXX_STANDARD)
+CXXFLAGS                +=  $(PUBLIC_INCLUDES) $(MY_PROJECT_FLAGS) $(EXTRA_CXXFLAGS) -I$(PWD)/../include/private -std=$(CXX_STANDARD)
+LFLAGS                  +=  $(MY_PROJECT_LIBS)
 
 export CXXFLAGS
 export CFLAGS
