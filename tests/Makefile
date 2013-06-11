@@ -17,11 +17,8 @@ all:
 	@echo "Don't use this make directly, call it from the root of this project."
 	@exit 1
 
-ifneq ($(wildcard $(SCRIPTDIR)/makesource),)
-include $(SCRIPTDIR)/make.flags
-include $(SCRIPTDIR)/makesource
-include $(SCRIPTDIR)/make.states
-endif
+-include $(SCRIPTDIR)/makesource
+-include $(SCRIPTDIR)/make.states
 
 export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
 export LFLAGS       +=  $(MY_PROJECT_LIBS)
