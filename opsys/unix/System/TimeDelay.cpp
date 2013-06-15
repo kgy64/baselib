@@ -25,7 +25,8 @@ TimeDelay & TimeDelay::operator-=(const TimeDelay & other)
 
 void TimeDelay::AddMillisecond(int delta)
 {
- myTime.tv_nsec += delta * 1000000;
+ myTime.tv_sec += delta / 1000;
+ myTime.tv_nsec += (delta % 1000) * 1000000;
  if (myTime.tv_nsec >= 1000000000) {
     myTime.tv_nsec -= 1000000000;
     myTime.tv_sec += 1;
@@ -37,7 +38,8 @@ void TimeDelay::AddMillisecond(int delta)
 
 void TimeDelay::AddMicrosecond(int delta)
 {
- myTime.tv_nsec += delta * 1000;
+ myTime.tv_sec += delta / 1000000;
+ myTime.tv_nsec += (delta % 1000000) * 1000;
  if (myTime.tv_nsec >= 1000000000) {
     myTime.tv_nsec -= 1000000000;
     myTime.tv_sec += 1;
