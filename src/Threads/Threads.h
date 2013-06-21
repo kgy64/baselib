@@ -32,7 +32,7 @@ namespace Threads
 
         /*! This function can be called by the main function to perform a graceful
             exit if necessary. */
-        bool Finished(void)
+        bool Finished(void) const
         {
             return toBeFinished;
         }
