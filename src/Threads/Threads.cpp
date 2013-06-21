@@ -10,6 +10,8 @@
 
 #include "Threads.h"
 
+SYS_DEFINE_MODULE(DM_THREAD);
+
 using namespace Threads;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -22,15 +24,19 @@ Thread::Thread(void):
     myThread(0),
     toBeFinished(true)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
 }
 
 Thread::~Thread(void)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
 }
 
 /// Stop the thread
 void Thread::Kill(void)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
  // If it has already been stopped, do nothing:
  if (toBeFinished)
     return;
@@ -50,11 +56,15 @@ void Thread::Kill(void)
 /*! \warning    Do <b>not</b> call it from the constructor (even in the derivative classes), because
                 virtual function is used when it has started.
  */
-void Thread::Start(void)
+void Thread::Start(size_t stack)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
  // If it has already been started, do nothing:
  if (myThread)
     return;
+
+ myAttr.SetStackSize(stack);
 
  // It is in running state:
  toBeFinished = false;
@@ -78,6 +88,9 @@ void * Thread::_main(void * thread_pointer)
 /// Called after main()
 void Thread::atExit(int p_exitCode)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
+ SYS_DEBUG(DL_INFO1, "Thread::atExit(" << p_exitCode << ");");
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

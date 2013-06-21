@@ -15,6 +15,9 @@
 #include <sched.h>
 
 #include <Threads/Error.h>
+#include <Debug/Debug.h>
+
+SYS_DECLARE_MODULE(DM_THREAD);
 
 namespace Threads
 {
@@ -24,12 +27,12 @@ namespace Threads
         Thread(void);
         virtual ~Thread();
 
-        virtual void Start(void);
+        virtual void Start(size_t stack = 1024*1024);
         virtual void Kill(void);
 
         /*! This function can be called by the main function to perform a graceful
             exit if necessary. */
-        bool Finished(void)
+        bool Finished(void) const
         {
             return toBeFinished;
         }
@@ -58,6 +61,11 @@ namespace Threads
                 ASSERT_THREAD(pthread_attr_setdetachstate(&myAttrib, joinable ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED)==0, "pthread_attr_setdetachstate() failed");
             }
 
+            inline void SetStackSize(size_t stack)
+            {
+                ASSERT_THREAD(pthread_attr_setstacksize(&myAttrib, stack)==0, "pthread_attr_setstacksize() failed");
+            }
+
             inline pthread_attr_t * get()
             {
                 return &myAttrib;
@@ -71,6 +79,8 @@ namespace Threads
         pthread_t myThread;
 
      private:
+        SYS_DEFINE_CLASS_NAME("Threads::Thread");
+
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
