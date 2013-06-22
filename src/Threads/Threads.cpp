@@ -30,6 +30,8 @@ Thread::Thread(void):
 Thread::~Thread(void)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
+
+ Kill();
 }
 
 /// Stop the thread
