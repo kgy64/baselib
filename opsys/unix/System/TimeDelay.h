@@ -11,8 +11,7 @@
 #ifndef __BASELIB_OPSYS_UNIX_SYSTEM_TIMEDELAY_H_INCLUDED__
 #define __BASELIB_OPSYS_UNIX_SYSTEM_TIMEDELAY_H_INCLUDED__
 
-#include <Debug/Debug.h>
-
+#include <ostream>
 #include <time.h>
 
 namespace SYS
@@ -39,7 +38,7 @@ namespace SYS
             clock_gettime(clock_type, &myTime);
         }
 
-        TimeDelay & operator=(const TimeDelay & other)
+        inline TimeDelay & operator=(const TimeDelay & other)
         {
             myTime = other.myTime;
             return *this;
@@ -47,23 +46,23 @@ namespace SYS
 
         TimeDelay & operator-=(const TimeDelay & other);
 
-        TimeDelay operator-(const TimeDelay & other) const
+        inline TimeDelay operator-(const TimeDelay & other) const
         {
             TimeDelay result(*this);
             return result -= other;
         }
 
-        int ToSecond(void) const
+        inline int ToSecond(void) const
         {
             return myTime.tv_sec;
         }
 
-        int ToMillisecond(void) const
+        inline int ToMillisecond(void) const
         {
             return myTime.tv_sec * 1000 + myTime.tv_nsec / 1000000L;
         }
 
-        int ToMicrosecond(void) const
+        inline int ToMicrosecond(void) const
         {
             return myTime.tv_sec * 1000000 + myTime.tv_nsec / 1000L;
         }
@@ -73,8 +72,10 @@ namespace SYS
 
      private:
         struct timespec myTime;
-    };
-}
+
+    }; // class TimeDelay
+
+} // namespace SYS
 
 #endif /* __BASELIB_OPSYS_UNIX_SYSTEM_TIMEDELAY_H_INCLUDED__ */
 
