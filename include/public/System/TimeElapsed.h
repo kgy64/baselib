@@ -19,7 +19,7 @@ namespace SYS
     {
      public:
         inline TimeElapsed(const SYS::TimeDelay & start):
-            myTime(TimeDelay() - start)
+            myTime(TimeDelay().SetNow() - start)
         {
         }
 
