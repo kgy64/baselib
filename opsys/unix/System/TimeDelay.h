@@ -30,12 +30,17 @@ namespace SYS
      public:
         inline TimeDelay(void)
         {
+        }
+
+        inline TimeDelay & SetNow(void)
+        {
 #ifdef CLOCK_MONOTONIC_RAW
             static const clockid_t clock_type = CLOCK_MONOTONIC_RAW;
 #else
             static const clockid_t clock_type = CLOCK_MONOTONIC;
 #endif
             clock_gettime(clock_type, &myTime);
+            return *this;
         }
 
         inline TimeDelay & operator=(const TimeDelay & other)
