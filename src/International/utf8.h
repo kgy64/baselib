@@ -79,7 +79,8 @@ namespace UTF8
         const std::auto_ptr<WChar> myStr;
 
         static WChar GetContinuationChar(const char *& p_str);
-    };
+
+    }; // class ToWstring
 
     class WideStringIterator: public ToWstring
     {
