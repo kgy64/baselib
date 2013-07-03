@@ -49,7 +49,8 @@ class MainConfig
     ConfigStore theConfig;
 
     static Threads::Mutex myMutex;
-};
+
+}; // class MainConfig
 
 #endif /* __MAINCONFIG_H__ */
 
