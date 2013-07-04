@@ -42,6 +42,10 @@ namespace Threads
             ASSERT_STD(sched_yield()==0);
         }
 
+        int GetPriority(void) const;
+
+        bool SetPriority(int prio);
+
      protected:
         class Attribute
         {

@@ -8,6 +8,9 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <sys/time.h>
+#include <sys/resource.h> // for setpriority()
+
 #include "Threads.h"
 
 SYS_DEFINE_MODULE(DM_THREAD);
@@ -93,6 +96,16 @@ void Thread::atExit(int p_exitCode)
  SYS_DEBUG_MEMBER(DM_THREAD);
 
  SYS_DEBUG(DL_INFO1, "Thread::atExit(" << p_exitCode << ");");
+}
+
+int Thread::GetPriority(void) const
+{
+ return getpriority(PRIO_PROCESS, 0);
+}
+
+bool Thread::SetPriority(int prio)
+{
+ return setpriority(PRIO_PROCESS, 0, prio) == 0;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
