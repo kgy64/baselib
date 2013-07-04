@@ -62,7 +62,8 @@ close: ';'  /* mandatory */
     ;
 
 EXP:
-      NAME
+      '-' EXP                       { (*($$ = $2))->Sign(); }
+    | NAME
     ;
 
 %%

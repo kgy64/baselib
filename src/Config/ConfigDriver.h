@@ -103,6 +103,13 @@ class ConfExpression
         delete this;
     }
 
+    void Sign(void)
+    {
+        *iValue.Value_p = - *iValue.Value_p;
+        *fValue.Value_p = - *fValue.Value_p;
+        *dValue.Value_p = - *dValue.Value_p;
+    }
+
  private:
     SYS_DEFINE_CLASS_NAME("ConfExpression");
 
@@ -117,7 +124,8 @@ class ConfExpression
         }
 
         T Value;
-        const T * Value_p;
+
+        T * Value_p;
     };
 
     Value_t<int> iValue;
