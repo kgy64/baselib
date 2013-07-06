@@ -35,7 +35,7 @@ namespace Threads
 
         inline void Wait(Threads::Mutex & mutex)
         {
-            ASSERT_THREAD_STD(pthread_cond_wait(&myCond));
+            ASSERT_THREAD_STD(pthread_cond_wait(&myCond, &mutex.myMutex));
         }
 
      private:

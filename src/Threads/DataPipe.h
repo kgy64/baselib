@@ -15,6 +15,8 @@
 #include <pthread.h>
 
 #include <Threads/Error.h>
+#include <Threads/Condition.h>
+#include <Threads/Mutex.h>
 
 namespace Threads
 {
@@ -26,7 +28,7 @@ namespace Threads
 
         inline void push(const DataType & p_data)
         {
-            Thread::Lock _l(myDataMutex);
+            Threads::Lock _l(myDataMutex);
             myData = p_data;
             myCond.Signal();
         }
