@@ -117,6 +117,8 @@ void FileHandler::Open(FILES::FileMode flag)
 
  std::string full_path(GetFullPath());
 
+ open_flags |= O_LARGEFILE;
+
  fNo = open(full_path.c_str(), open_flags, mode);
 
  if (fNo < 0) {
