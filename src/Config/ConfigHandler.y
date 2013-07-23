@@ -39,30 +39,31 @@ static int yylex(yy::ConfParser::semantic_type * yylval, yy::ConfParser::locatio
 %%
 
 eleje:      // Zero content is also allowed
-    | BODY                          { driver.Declare($1); }
+    | BODY                                      { driver.Declare($1); }
     ;
 
-BODY:                                        {  $$ = new AssignmentSet(); }
-    | ASSIGN                                 { ($$ = new AssignmentSet())->Append($1); }
-    | DECLARATION                            { ($$ = new AssignmentSet())->Append($1); }
-    | BODY ASSIGN                            {  $$ = $1->Append($2); }
-    | BODY DECLARATION                       {  $$ = $1->Append($2); }
-    | BODY error { driver.AddError(); } BODY {  $$ = $1->Append($4); }
+BODY:
+      ASSIGN                                    { $$ = (new AssignmentSet())->Append($1); }
+    | DECLARATION                               { $$ = (new AssignmentSet())->Append($1); }
+    | BODY ASSIGN                               { $$ = $1->Append($2); }
+    | BODY DECLARATION                          { $$ = $1->Append($2); }
+    | BODY error { driver.AddError(); } BODY    { $$ = $1->Append($4); }
     ;
 
 DECLARATION:
-      NAME '{' BODY '}'             { $$ = new ConfigLevel(*$1, $3); }
+      NAME '{' BODY '}'                         { $$ = new ConfigLevel(*$1, $3); }
     ;
 
 ASSIGN:
-      NAME '=' EXP close            { $$ = new ConfAssign(*$1, *$3); }
+      NAME '=' EXP close                        { $$ = new ConfAssign(*$1, *$3); }
     ;
 
-close: ';'  /* mandatory */
+close:
+      ';'  /* mandatory */
     ;
 
 EXP:
-      '-' EXP                       { (*($$ = $2))->Sign(); }
+      '-' EXP                                   { (*($$ = $2))->Sign(); }
     | NAME
     ;
 
