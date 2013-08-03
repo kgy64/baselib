@@ -39,7 +39,7 @@ namespace SYS
             return status;
         }
 
-        inline int Write(void * Buffer, int Size)
+        inline int Write(const void * Buffer, int Size)
         {
             int status = write(fd, Buffer, Size);
             if (status < 0 && (errno == EAGAIN || errno == EINTR))
