@@ -17,33 +17,19 @@ namespace FILES
             Read_Write
         };
 
-     private:
-        // Some constructor-like functions, to be compatible with older
-        // compilers without c++11 support (instead of delegating these
-        // constructors):
+        FileMap(const char * name, OpenMode mode = Read_Only);
 
-        void _FileMap(const char * name, OpenMode mode);
-
-        inline void _FileMap(const std::string & name, OpenMode mode)
+        inline FileMap(const std::string & name, OpenMode mode = Read_Only):
+            FileMap(name.c_str(), mode)
         {
-            _FileMap(name.c_str(), mode);
         }
 
-     public:
-        inline FileMap(const char * name, OpenMode mode = Read_Only)
+        inline FileMap(const DirHandler::iterator & p_it, OpenMode mode = Read_Only):
+            FileMap(p_it.Pathname(), mode)
         {
-            _FileMap(name, mode);
         }
 
-        inline FileMap(const std::string & name, OpenMode mode = Read_Only)
-        {
-            _FileMap(name.c_str(), mode);
-        }
-
-        inline FileMap(const DirHandler::iterator & p_it, OpenMode mode = Read_Only)
-        {
-            _FileMap(p_it.Pathname(), mode);
-        }
+        FileMap(FileMap & other);
 
         virtual ~FileMap();
 

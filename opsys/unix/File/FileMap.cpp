@@ -11,7 +11,7 @@ SYS_DEFINE_MODULE(DM_FILE);
 
 using namespace FILES;
 
-void FileMap::_FileMap(const char * name, OpenMode mode)
+FileMap::FileMap(const char * name, OpenMode mode)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
@@ -58,6 +58,18 @@ void FileMap::_FileMap(const char * name, OpenMode mode)
     ASSERT(mapped != MAP_FAILED, "File '" << name << "' could not be mapped.");
     ende = (void*)((char*)mapped + size);
  }
+}
+
+FileMap::FileMap(FileMap & other)
+{
+ fd = other.fd;
+ mapped = other.mapped;
+ ende = other.ende;
+ size = other.size;
+ myMode = other.myMode;
+
+ other.mapped = 0;
+ other.fd = -1;
 }
 
 FileMap::~FileMap()
