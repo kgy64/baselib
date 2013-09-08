@@ -29,6 +29,7 @@ namespace Threads
         inline void push(const DataType & p_data)
         {
             Threads::Lock _l(myDataMutex);
+            isFinished = false;
             if (myData.get()) {
                 myFreeCondition.Wait(myDataMutex);
             }
