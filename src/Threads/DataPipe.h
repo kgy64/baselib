@@ -29,18 +29,23 @@ namespace Threads
         inline void push(const DataType & p_data)
         {
             Threads::Lock _l(myDataMutex);
+            if (myData.get()) {
+                myFreeCondition.Wait(myDataMutex);
+            }
+            ASSERT(myData.get() == NULL, "Data is not handled yet");
             myData = p_data;
-            myCond.Signal();
+            myUseCondition.Signal();
         }
 
         inline DataType pop(void)
         {
             Threads::Lock _l(myDataMutex);
             while (!isFinished && !myData.get()) {
-                myCond.Wait(myDataMutex);
+                myUseCondition.Wait(myDataMutex);
             }
-            DataType result = myData;
-            myData.reset();
+            DataType result;
+            result.swap(myData);
+            myFreeCondition.Signal();
             return result;
         }
 
@@ -48,7 +53,7 @@ namespace Threads
         {
             Threads::Lock _l(myDataMutex);
             isFinished = true;
-            myCond.Signal();
+            myUseCondition.Signal();
         }
 
      protected:
@@ -58,7 +63,9 @@ namespace Threads
 
         Threads::Mutex myDataMutex;
 
-        Threads::Condition myCond;
+        Threads::Condition myUseCondition;
+
+        Threads::Condition myFreeCondition;
 
     }; // class DataPipe
 
