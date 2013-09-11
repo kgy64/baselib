@@ -12,7 +12,6 @@
 #define __SRC_THREADS_DATAPIPE_H_INCLUDED__
 
 #include <boost/shared_ptr.hpp>
-#include <pthread.h>
 
 #include <Threads/Error.h>
 #include <Threads/Condition.h>

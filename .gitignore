@@ -3,3 +3,5 @@ bin
 cscope.*
 tags
 doc
+*.o
+*.depend

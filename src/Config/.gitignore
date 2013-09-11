@@ -1,5 +1,2 @@
-*.dep
-*.depend
-*.o
-ConfigHandler.[ch]pp
+ConfigHandler.?pp
 *.hh
