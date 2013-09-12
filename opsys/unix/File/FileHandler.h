@@ -56,64 +56,35 @@ namespace FILES
 
     class FileHandler
     {
-        // Some constructor-like functions, to be compatible with older
-        // compilers without c++11 support (instead of delegating these
-        // constructors):
-
-        inline void _FileHandler(void)
-        {
-            mode = DEFAULT_MODE;
-            fNo = -1;
-        }
-
-        void _FileHandler(const DirHandler & p_dir, const char * p_filename);
-        void _FileHandler(const char * p_full_path);
-        void _FileHandler(const char * p_path, const char * p_name);
-
-        inline void _FileHandler(const std::string & p_full_path)
-        {
-            _FileHandler(p_full_path.c_str());
-        }
-
      public:
-        inline FileHandler(void)
+        FileHandler(const DirHandler & p_dir, const char * p_filename);
+        FileHandler(const char * p_full_path);
+        FileHandler(const char * p_path, const char * p_name);
+
+        inline FileHandler(void):
+            mode(DEFAULT_MODE),
+            fNo(-1)
         {
-            _FileHandler();
         }
 
-        inline FileHandler(const char * p_full_path)
+        inline FileHandler(const std::string & p_full_path):
+            FileHandler(p_full_path.c_str())
         {
-            _FileHandler(p_full_path);
         }
 
-        inline FileHandler(const char * p_path, const char * p_name)
+        inline FileHandler(const DirHandler & p_dir, const std::string & p_filename):
+            FileHandler(p_dir, p_filename.c_str())
         {
-            _FileHandler(p_path, p_name);
         }
 
-        inline FileHandler(const DirHandler & p_dir, const char * p_filename)
+        inline FileHandler(const std::string & p_path, const std::string & p_name):
+            FileHandler(p_path.c_str(), p_name.c_str())
         {
-            _FileHandler(p_dir, p_filename);
         }
 
-        inline FileHandler(const DirHandler & p_dir, const std::string & p_filename)
+        inline FileHandler(const DirHandler::iterator & p_it):
+            FileHandler(p_it.Pathname())
         {
-            _FileHandler(p_dir, p_filename.c_str());
-        }
-
-        inline FileHandler(const std::string & p_full_path)
-        {
-            _FileHandler(p_full_path);
-        }
-
-        inline FileHandler(const std::string & p_path, const std::string & p_name)
-        {
-            _FileHandler(p_path.c_str(), p_name.c_str());
-        }
-
-        inline FileHandler(const DirHandler::iterator & p_it)
-        {
-            _FileHandler(p_it.Pathname());
         }
 
         ~FileHandler();
