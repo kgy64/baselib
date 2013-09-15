@@ -1,0 +1,23 @@
+#
+#
+
+.PHONY: sources
+sources: $(SUBPROJECTS) $(MY_BASELIB)/src
+	@for dir in $(SUBPROJECTS); do (cd $$dir/src && $(MAKE) -s) || exit 1; done
+	@cd src && $(MAKE) -s
+
+.PHONY: clean
+clean:
+	@for dir in $(SUBPROJECTS); do (cd $$dir/src && $(MAKE) -s clean) || exit 1; done
+	@cd src && $(MAKE) -s clean
+	@rm -rf doc/html
+
+.PHONY: doc
+doc:
+	@doxygen Doxyfile
+
+.PHONY: cleandepend
+cleandepend:
+	@find $(SUBPROJECTS) src -name "*.depend" -exec rm "{}" \;
+	@echo "Dependency files are removed, they will be re-created on next make."
+
