@@ -27,24 +27,25 @@ namespace Threads
         Thread(void);
         virtual ~Thread();
 
-        virtual void Start(size_t stack = 1024*1024);
-        virtual void Kill(void);
+        void Start(size_t stack = 1024*1024);
+        void Kill(void);
+        bool SetPriority(int prio);
+        int GetPriority(void) const;
 
-        /*! This function can be called by the main function to perform a graceful
-            exit if necessary. */
+        /*! This function can be called by the main function to get the exit status. The thread
+         *  must exit if it returns true.
+         *  \note   The virtual function \ref Threads::KillSignal() is also called when this
+         *          flag is just set to signal the thread if necessary. */
         bool Finished(void) const
         {
             return toBeFinished;
         }
 
+        /// Allows other processes to run
         static inline void Yield(void)
         {
             ASSERT_STD(sched_yield()==0);
         }
-
-        int GetPriority(void) const;
-
-        bool SetPriority(int prio);
 
      protected:
         class Attribute
@@ -89,6 +90,12 @@ namespace Threads
         virtual int main(void) =0;
 
         virtual void atExit(int p_exitCode);
+
+        /// Called to signal the thread to exit
+        /*! This default implementation does nothing, see the reimplementations for details. */
+        virtual void KillSignal(void)
+        {
+        }
 
         static void * _main(void * thread_pointer);
 

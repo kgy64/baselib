@@ -28,11 +28,22 @@ namespace Threads
             ASSERT_THREAD_STD(pthread_cond_destroy(&myCond));
         }
 
+        /// Signals the Condition
+        /*! This function can be called if the corresponding mutex has already been locked. */
         inline void Signal(void)
         {
             ASSERT_THREAD_STD(pthread_cond_signal(&myCond));
         }
 
+        /// Signals the Condition
+        /*! This function can be called at any time: it locks the corresponding mutex. */
+        inline void Signal(Threads::Mutex & mutex)
+        {
+            Threads::Lock _l(mutex);
+            ASSERT_THREAD_STD(pthread_cond_signal(&myCond));
+        }
+
+        /// Waits for the Signal
         inline void Wait(Threads::Mutex & mutex)
         {
             ASSERT_THREAD_STD(pthread_cond_wait(&myCond, &mutex.myMutex));

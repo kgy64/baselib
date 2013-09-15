@@ -23,40 +23,53 @@ namespace Threads
     class DataPipe
     {
      public:
+        inline DataPipe(void):
+            isBusy(false),
+            isFinished(false)
+        {
+        }
+
         typedef boost::shared_ptr<T> DataType;
 
         inline void push(const DataType & p_data)
         {
             Threads::Lock _l(myDataMutex);
-            isFinished = false;
-            if (myData.get()) {
+            if (isBusy) {
                 myFreeCondition.Wait(myDataMutex);
             }
             ASSERT(myData.get() == NULL, "Data is not handled yet");
             myData = p_data;
+            isBusy = true;
             myUseCondition.Signal();
         }
 
         inline DataType pop(void)
         {
             Threads::Lock _l(myDataMutex);
-            while (!isFinished && !myData.get()) {
+            if (!isBusy && !isFinished) {
                 myUseCondition.Wait(myDataMutex);
             }
             DataType result;
             result.swap(myData);
+            isBusy = false;
             myFreeCondition.Signal();
             return result;
         }
 
+        inline bool busy(void) const
+        {
+            return isBusy;
+        }
+
         inline void finish(void)
         {
-            Threads::Lock _l(myDataMutex);
             isFinished = true;
-            myUseCondition.Signal();
+            myUseCondition.Signal(myDataMutex);
         }
 
      protected:
+        bool isBusy;
+
         bool isFinished;
 
         DataType myData;

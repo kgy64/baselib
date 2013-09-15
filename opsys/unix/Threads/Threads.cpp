@@ -38,6 +38,11 @@ Thread::~Thread(void)
 }
 
 /// Stop the thread
+/*! This function initiates the exit procedure.<br>
+ *  \note   This is a collaborative exit, the thread must poll the function \ref Threads::Finished() and/or
+ *          the function \ref Threads::KillSignal() must be used.<br>
+ *          If this function is called from another thread, then it does not return while the thread is running.
+ */
 void Thread::Kill(void)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
@@ -46,7 +51,9 @@ void Thread::Kill(void)
  if (toBeFinished)
     return;
 
- toBeFinished = true;   // Flag it to be stopped
+ toBeFinished = true;           // Flag it to be stopped
+
+ KillSignal();                  // Send the signal to the thread
 
  // If it is called from the thread itself, then it is not necessary at all. Calling
  // the join() is a bad idea in this case.
@@ -58,9 +65,6 @@ void Thread::Kill(void)
 }
 
 /// Start the thread
-/*! \warning    Do <b>not</b> call it from the constructor (even in the derivative classes), because
-                virtual function is used when it has started.
- */
 void Thread::Start(size_t stack)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
