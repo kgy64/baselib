@@ -46,6 +46,11 @@ namespace EX
     };
 }
 
+namespace Threads
+{
+    class Mutex;
+}
+
 namespace FILES
 {
     enum FileMode {
@@ -87,7 +92,7 @@ namespace FILES
         {
         }
 
-        ~FileHandler();
+        virtual ~FileHandler();
 
         inline void SetMode(mode_t p_mode)
         {
@@ -152,6 +157,11 @@ namespace FILES
             DEFAULT_MODE    =   0644
         };
 
+        virtual Threads::Mutex & GetMutex(void)
+        {
+            throw EX::File_Error() << "FileHandler::GetLock() is called on a non-lockable handler";
+        }
+
      protected:
         std::string myDir;
 
@@ -193,7 +203,8 @@ namespace FILES
             fNo = 2;
         }
     };
-}
+
+} // namespace FILES
 
 #endif /* __OPSYS_UNIX_FILE_FILEHANDLER_H_INCLUDED__ */
 

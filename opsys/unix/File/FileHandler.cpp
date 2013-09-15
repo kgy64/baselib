@@ -167,9 +167,18 @@ size_t FileHandler::Write(const void * p_data, size_t p_length)
 
 do_again:;
  ssize_t result = write(fNo, p_data, p_length);
- if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    BlockedIo();
-    goto do_again;
+ if (result == -1) {
+    switch (errno) {
+        case EWOULDBLOCK:
+            BlockedIo();
+            goto do_again;
+        break;
+#if EAGAIN != EWOULDBLOCK
+        case EAGAIN:
+            goto do_again;
+        break;
+#endif
+    }
  }
 
  if (result < 0) {
