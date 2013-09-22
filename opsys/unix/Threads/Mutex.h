@@ -26,10 +26,19 @@ namespace Threads
         friend class TryLock;
         friend class Condition;
 
-     public:
-        inline Mutex(void)
+     protected:
+        inline Mutex(bool recursive)
         {
-            ASSERT_THREAD_STD(pthread_mutex_init(&myMutex, NULL));
+            pthread_mutexattr_t attr;
+            ASSERT_THREAD_STD(pthread_mutexattr_init(&attr));
+            ASSERT_THREAD_STD(pthread_mutexattr_settype(&attr, recursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_NORMAL));
+            ASSERT_THREAD_STD(pthread_mutex_init(&myMutex, &attr));
+        }
+
+     public:
+        inline Mutex(void):
+            Mutex(false)
+        {
         }
 
         inline ~Mutex()
@@ -41,6 +50,16 @@ namespace Threads
         pthread_mutex_t myMutex;
 
     }; // class Mutex
+
+    class MutexRecursive: public Mutex
+    {
+     public:
+        MutexRecursive(void):
+            Mutex(true)
+        {
+        }
+
+    }; // MutexRecursive
 
     class Lock
     {
