@@ -13,6 +13,7 @@
 
 #include <pthread.h>
 #include <sched.h>
+#include <errno.h>
 
 #include <Threads/Error.h>
 #include <Debug/Debug.h>

@@ -10,7 +10,7 @@ VERS_MINOR           =  1
 MY_BASIC_LIB         =  $(PROJECT_ROOT)/bin/Basic.a
 OBJECTS_AND_LIBS     =  $(OBJECTS) $(MY_BASIC_LIB) $(MY_PROJECT_LIBS)
 
-export BASE_LIBRARIES    =  glibmm-2.4
+export BASE_LIBRARIES    =
 
 .PHONY: all
 all:
