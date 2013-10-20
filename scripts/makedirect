@@ -1,6 +1,12 @@
 #
 #
 
+%.depend: %.c
+	@echo "    Depending $< ..."; \
+	rm -f "$@"; \
+	_objfile="$(<:.c=.o)"; \
+	$(CC) $(CFLAGS) -M -MF "$@" -MT "$$_objfile $@" $< || exit 1; \
+
 %.depend: %.cpp
 	@echo "    Depending $< ..."; \
 	rm -f "$@"; \
