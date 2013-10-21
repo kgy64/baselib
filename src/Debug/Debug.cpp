@@ -14,6 +14,14 @@
 using namespace std;
 using namespace _Debug_Info_;
 
+AUTON_INTERFACE(I_DebugOut);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *         class _Debug_Info_::_All_Modules_:                                            *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 _Debug_Module_ * _All_Modules_::first = (_Debug_Module_*)0;
 
 void _All_Modules_::SetMode(bool mode)
@@ -29,6 +37,14 @@ void _All_Modules_::SetDebuglevel(unsigned int level)
     mod->SetDebuglevel(level);
  }
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *         class _Debug_Info_::DebugPrint:                                               *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+boost::scoped_ptr<Auton<I_DebugOut> > _Debug_Info_::DebugPrint::out_stream;
 
 /*! */
 map<pthread_t, DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH DebugPrint::levels;
@@ -110,7 +126,7 @@ DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *na
 DebugPrint::~DebugPrint()
 {
  if (!myModule.IsOn()) {
-    // The class has not initial;ized: do nothing here
+    // The class has not been initialized: do nothing here
     return;
  }
 
@@ -129,17 +145,20 @@ void DebugPrint::entering(void)
     return;
  }
 
+ I_DebugOut & out(GetOutStream());
+
  shift_right();
  draw_left();
- cerr << fill_1_begin;
+ out << fill_1_begin;
 
  if (my_this != NULL) {
-    cerr << &*my_class << "::" << &*my_name << "(): this=" << my_this << ", ";
+    out << my_class.get() << "::" << my_name.get() << "(): this=" << my_this << ", ";
  } else {
-    cerr << &*my_name << "(): ";
+    out << my_name.get() << "(): ";
  }
 
- cerr << &*my_filename << ":" << my_lineno << endl;
+ out << my_filename.get() << ":" << my_lineno;
+ endline();
 
  info->tablevel++;
 }
@@ -156,15 +175,18 @@ void DebugPrint::leaving(void)
 
  info = &levels[pthread_self()];
 
+ I_DebugOut & out(GetOutStream());
+
  shift_left();
  draw_left();
- cerr << fill_1_end;
+ out << fill_1_end;
 
  if (my_this != NULL) {
-    cerr << &*my_class << "::";
+    out << my_class.get() << "::";
  }
 
- cerr << &*my_name << "()" << endl;
+ out << my_name.get() << "()";
+ endline();
 }
 
 
@@ -172,15 +194,16 @@ void DebugPrint::shift_right(void)
 {
  if (info->tablevel > 20) {
     if (level_is_on(DL_CALLS)) {
+        I_DebugOut & out(GetOutStream());
         for (int j = 0; j < 10; j++) {
             --info->tablevel;
             header();
-            cerr << "/";
-            for (int i = 0; i<info->tablevel; i++) cerr << fill_left;
-            cerr << endl;
+            out << "/";
+            for (int i = 0; i<info->tablevel; i++) out << fill_left;
+            endline();
             header();
-            for (int i = 0; i<info->tablevel; i++) cerr << fill_left;
-            cerr << endl;
+            for (int i = 0; i<info->tablevel; i++) out << fill_left;
+            endline();
         }
     }
     info->tabshift++;
@@ -193,14 +216,15 @@ void DebugPrint::shift_left(void)
  --info->tablevel;
  if (info->tabshift > 0 && info->tablevel <= 5) {
     if (level_is_on(DL_CALLS)) {
+        I_DebugOut & out(GetOutStream());
         for (int j = 0; j < 10; j++) {
             header();
-            cerr << "\\";
-            for (int i = 0; i<info->tablevel; i++) cerr << fill_right;
-            cerr << endl;
+            out << "\\";
+            for (int i = 0; i<info->tablevel; i++) out << fill_right;
+            endline();
             header();
-            for (int i = -1; i<info->tablevel; i++) cerr << fill_right;
-            cerr << endl;
+            for (int i = -1; i<info->tablevel; i++) out << fill_right;
+            endline();
             ++info->tablevel;
         }
     }
@@ -215,8 +239,9 @@ void DebugPrint::draw_left(void)
 {
  header();
  if (level_is_on(DL_CALLS)) {
+    I_DebugOut & out(GetOutStream());
     for (int i=0; i<info->tablevel; i++) {
-        cerr << fill_2;
+        out << fill_2;
     }
  }
 }
@@ -224,22 +249,21 @@ void DebugPrint::draw_left(void)
 
 void DebugPrint::header(void)
 {
- cerr << setw(3) << info->id << ": ";
+ GetOutStream() << (void*)info << " " << info->id << ": ";
 }
 
 
 DebugPrint& DebugPrint::operator<<(const std::ostringstream& p_string)
 {
- cerr << p_string.str();
+ GetOutStream() << p_string.str().c_str();
  return *this;
 }
 
-
-void DebugPrint::endline(void)
-{
- cerr << endl;
-}
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *         class _Debug_Info_::DebugPrint::TabInfo:                                      *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int DebugPrint::TabInfo::next_id = 0;
 

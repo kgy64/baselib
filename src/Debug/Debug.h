@@ -3,6 +3,7 @@
  * Purpose:     Class for debugging
  * Author:      Kövesdi György  (kgy@teledigit.eu)
  * Modified by: KGy 2013-05-31: The stdc++-based version
+ *              KGy 2013-10-20: Customizable output stream
  * Created:     2006-03-28
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -11,6 +12,7 @@
 #define _DEBUGPRINT_H_
 
 #include <pthread.h>
+#include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
 #include <sstream>
@@ -19,12 +21,31 @@
 #include <stdint.h>
 
 #include <Threads/Mutex.h>
+#include <Memory/Auton.h>
 
 #include "debuglevels.h" // Note: this must be provided by the user!
 
 #define _SYS_DEBUG_MODULE_NAME(name)   __debug_module_##name
 
 #define CLASS_NAME_FUNCTION     __Class_Name
+
+class I_DebugOut
+{
+ public:
+    virtual ~I_DebugOut()
+    {
+    }
+
+    virtual I_DebugOut & operator<<(const char *) =0;
+    virtual I_DebugOut & operator<<(const void *) =0;
+    virtual I_DebugOut & operator<<(int) =0;
+
+ protected:
+    inline I_DebugOut(void)
+    {
+    }
+
+}; // class I_DebugOut
 
 namespace _Debug_Info_
 {
@@ -144,18 +165,18 @@ namespace _Debug_Info_
         void header(void);
 
         /*! This variable stores the copy of the function name. */
-        boost::scoped_ptr<char> my_name;
+        boost::scoped_array<char> my_name;
 
         /*! If the caller function is a class member, this is the copy of the
             class name. */
-        boost::scoped_ptr<char> my_class;
+        boost::scoped_array<char> my_class;
 
         /*! If the caller function is a class member, this is the class pointer
             (this). */
         const void *my_this;
 
         /*! */
-        boost::scoped_ptr<char> my_filename;
+        boost::scoped_array<char> my_filename;
 
         /*! */
         int my_lineno;
@@ -185,8 +206,7 @@ namespace _Debug_Info_
 
         /// Hack to allocate with operator new[] instead of malloc
         /*! This function works like the system function strdup(), but allocates with operator new[].
-            \note   It is added due to problems reported by valgrind. However, there is a mismatch of new and new[] yet,
-                    but it is not really a problem. */
+            \note   It is added due to problems reported by valgrind. */
         static inline char* StrDup(const char *s)
         {
             char *n = new char[strlen(s)+1];
@@ -201,7 +221,19 @@ namespace _Debug_Info_
         static const char fill_2[];
         static const char fill_right[];
         static const char fill_left[];
-    };
+
+        static boost::scoped_ptr<Auton<I_DebugOut> > out_stream;
+
+        inline static I_DebugOut & GetOutStream(void)
+        {
+            if (!out_stream) {
+                out_stream.reset(new Auton<I_DebugOut>);
+            }
+            return **out_stream;
+        }
+
+    }; // class DebugPrint
+
 } // namespace _Debug_Info_
 
 /*! This macro can be used to display the debug messages.<br>

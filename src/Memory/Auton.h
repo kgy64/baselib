@@ -4,6 +4,7 @@
  * Purpose:     Class Auton is a smart pointer to instantiate a singleton
  *              using its interface
  * Author:      György Kövesdi <kgy@teledigit.eu>
+ * Modified by: KGy Removed debugging code because debug logger uses Auton
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *
@@ -17,9 +18,6 @@
 #include <System/Generic.h>
 #include <Threads/Threads.h>
 #include <Threads/Mutex.h>
-#include <Debug/Debug.h>
-
-SYS_DECLARE_MODULE(DM_AUTON);
 
 // Note that in this file 'I' means the Interface class, while 'C' means the Implementation
 
@@ -83,8 +81,6 @@ namespace _AutonPrivate
         bool _ForceImplementation(const char * typeName);
 
      private:
-        SYS_DEFINE_CLASS_NAME(myName);
-
         void SetName(const char * p_name)
         {
             myTypeName = p_name;
@@ -119,10 +115,8 @@ namespace _AutonPrivate
          */
         inline void Use(void)
         {
-            SYS_DEBUG_MEMBER(DM_AUTON);
             Threads::Lock _l(myMutex);
             ++references;
-            SYS_DEBUG(DL_INFO1, "The usage conunter of '" << myName << "' is now " << references);
         }
 
         /// Decrements the reference counter
@@ -132,9 +126,7 @@ namespace _AutonPrivate
          */
         inline void Drop(void)
         {
-            SYS_DEBUG_MEMBER(DM_AUTON);
             Threads::Lock _l(myMutex);
-            SYS_DEBUG(DL_INFO1, "The usage conunter of '" << myName << "' was " << references);
             if (--references == 0) {
                 delete myInterface;
                 myInterface = (I*)0;
@@ -246,17 +238,12 @@ namespace _AutonPrivate
         AutonHandler(const char * name, int prio):
             AutonBase<I>(name, prio)
         {
-            SYS_DEBUG_MEMBER(DM_AUTON);
-            SYS_DEBUG(DL_INFO1, "Name: '" << name << "', priority: " << prio);
         }
 
      private:
-        SYS_DEFINE_CLASS_NAME("_AutonPrivate::AutonHandler<C,I>");
-
         /// Returns a new instance of the Implementation
         virtual I * Create(void)
         {
-            SYS_DEBUG_MEMBER(DM_AUTON);
             return new C;
         }
 
@@ -457,7 +444,6 @@ namespace _AutonPrivate
     template <class I>
     inline I * AutonInterface<I>::GetImplementation(void)
     {
-        SYS_DEBUG_MEMBER(DM_AUTON);
         if (myInterface) return myInterface; // It is already created, nothing to do
         Threads::Lock _l(myMutex);
         if (myInterface) return myInterface; // Somebody else has just created it

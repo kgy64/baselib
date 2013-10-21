@@ -16,9 +16,6 @@
 #include <errno.h>
 
 #include <Threads/Error.h>
-#include <Debug/Debug.h>
-
-SYS_DECLARE_MODULE(DM_THREAD);
 
 namespace Threads
 {
@@ -85,12 +82,13 @@ namespace Threads
         pthread_t myThread;
 
      private:
-        SYS_DEFINE_CLASS_NAME("Threads::Thread");
-
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
-        virtual void atExit(int p_exitCode);
+        /// Called after main()
+        virtual void atExit(int p_exitCode)
+        {
+        }
 
         /// Called to signal the thread to exit
         /*! This default implementation does nothing, see the reimplementations for details. */

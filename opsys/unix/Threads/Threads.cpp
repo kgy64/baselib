@@ -3,6 +3,7 @@
  * Project:     My Generic C++ Library
  * Purpose:     Thread handler classes
  * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Modified by: KGy Removed debug code, because debug logger includes it
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *
@@ -12,8 +13,6 @@
 #include <sys/resource.h> // for setpriority()
 
 #include "Threads.h"
-
-SYS_DEFINE_MODULE(DM_THREAD);
 
 using namespace Threads;
 
@@ -27,13 +26,10 @@ Thread::Thread(void):
     myThread(0),
     toBeFinished(true)
 {
- SYS_DEBUG_MEMBER(DM_THREAD);
 }
 
 Thread::~Thread(void)
 {
- SYS_DEBUG_MEMBER(DM_THREAD);
-
  Kill();
 }
 
@@ -45,8 +41,6 @@ Thread::~Thread(void)
  */
 void Thread::Kill(void)
 {
- SYS_DEBUG_MEMBER(DM_THREAD);
-
  // If it has already been stopped, do nothing:
  if (toBeFinished)
     return;
@@ -67,8 +61,6 @@ void Thread::Kill(void)
 /// Start the thread
 void Thread::Start(size_t stack)
 {
- SYS_DEBUG_MEMBER(DM_THREAD);
-
  // If it has already been started, do nothing:
  if (myThread)
     return;
@@ -92,14 +84,6 @@ void * Thread::_main(void * thread_pointer)
  Thread * th = reinterpret_cast<Thread*>(thread_pointer);
  th->atExit(th->main());
  return (void*)0;
-}
-
-/// Called after main()
-void Thread::atExit(int p_exitCode)
-{
- SYS_DEBUG_MEMBER(DM_THREAD);
-
- SYS_DEBUG(DL_INFO1, "Thread::atExit(" << p_exitCode << ");");
 }
 
 int Thread::GetPriority(void) const
