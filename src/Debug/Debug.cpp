@@ -274,4 +274,24 @@ DebugPrint::TabInfo::TabInfo(void):
 {
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *         class I_DebugOut:                                                             *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+I_DebugOut & I_DebugOut::operator<<(const void * p)
+{
+ char tmp[30];
+ sprintf(tmp, "0x%08x", (unsigned)p);
+ return *this << tmp;
+}
+
+I_DebugOut & I_DebugOut::operator<<(int data)
+{
+ char tmp[30];
+ sprintf(tmp, "%d", (unsigned)data);
+ return *this << tmp;
+}
+
 /* ------------------------- End - of - file --------------------------- */

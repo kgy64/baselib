@@ -21,8 +21,6 @@ class DefaultDebugOutput: public I_DebugOut
     }
 
     virtual I_DebugOut & operator<<(const char * msg);
-    virtual I_DebugOut & operator<<(const void * p);
-    virtual I_DebugOut & operator<<(int val);
 
 }; // DefaultDebugOutput
 

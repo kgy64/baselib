@@ -33,16 +33,4 @@ I_DebugOut & DefaultDebugOutput::operator<<(const char * msg)
  return *this;
 }
 
-I_DebugOut & DefaultDebugOutput::operator<<(const void * p)
-{
- std::cerr << p;
- return *this;
-}
-
-I_DebugOut & DefaultDebugOutput::operator<<(int val)
-{
- std::cerr << val;
- return *this;
-}
-
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

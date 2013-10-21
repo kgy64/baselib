@@ -37,8 +37,8 @@ class I_DebugOut
     }
 
     virtual I_DebugOut & operator<<(const char *) =0;
-    virtual I_DebugOut & operator<<(const void *) =0;
-    virtual I_DebugOut & operator<<(int) =0;
+    virtual I_DebugOut & operator<<(const void *);
+    virtual I_DebugOut & operator<<(int);
 
  protected:
     inline I_DebugOut(void)
