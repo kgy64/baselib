@@ -34,9 +34,16 @@ namespace Threads
          *  must exit if it returns true.
          *  \note   The virtual function \ref Threads::KillSignal() is also called when this
          *          flag is just set to signal the thread if necessary. */
-        bool Finished(void) const
+        inline bool ToBeFinished(void) const
         {
             return toBeFinished;
+        }
+
+        /*! This function returns true if the thread has already exited (the main has returned), or
+         *  not started yet. */
+        inline bool IsFinished(void) const
+        {
+            return !myThread;
         }
 
         /// Allows other processes to run
