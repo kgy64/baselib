@@ -92,7 +92,7 @@ namespace FILES
         {
         }
 
-        virtual ~FileHandler();
+        VIRTUAL_IF_DEBUG ~FileHandler();
 
         inline void SetMode(mode_t p_mode)
         {

@@ -63,7 +63,7 @@ namespace FILES
             _DirHandler(p_iter.Pathname());
         }
 
-        ~DirHandler();
+        VIRTUAL_IF_DEBUG ~DirHandler();
 
         inline void SetMode(mode_t p_mode)
         {

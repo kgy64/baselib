@@ -1,7 +1,7 @@
 # Makefile for my basic library
 #
 
-export NAME                 =  Unix Sources
+export NAME                 =  Unix-specific
 export SRCDIR              ?=  .
 
 .PHONY: all
@@ -14,6 +14,6 @@ include $(SCRIPTDIR)/make.states
 
 .PHONY: clean
 clean:
-	@echo " - Cleaning Unix objects..."
+	@echo " - Cleaning $(NAME) objects..."
 	@rm -f $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
 

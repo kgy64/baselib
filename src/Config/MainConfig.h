@@ -9,6 +9,10 @@
 class MainConfig
 {
  public:
+    VIRTUAL_IF_DEBUG inline ~MainConfig()
+    {
+    }
+
     static MainConfig & Get(void)
     {
         if (!myself) {

@@ -36,7 +36,7 @@ test: _everything
 
 .PHONY: clean
 clean:
-	@echo " - Cleanincs tests..."
+	@echo " - Cleanincs $(NAME)..."
 	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
 
 .PHONY: $(BINDIR)

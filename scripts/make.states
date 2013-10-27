@@ -33,7 +33,7 @@ basic_test:
 	exit 1
 
 _first_message: basic_test
-	@echo "========== Building '$(NAME)' =========="
+	@echo "========== Building '$(NAME)' sources =========="
 
 pre_compilation: $(Y_CPPFILES)
 
