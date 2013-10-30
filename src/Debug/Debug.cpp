@@ -283,7 +283,7 @@ DebugPrint::TabInfo::TabInfo(void):
 I_DebugOut & I_DebugOut::operator<<(const void * p)
 {
  char tmp[30];
- sprintf(tmp, "0x%08x", (unsigned)p);
+ sprintf(tmp, "%p", p);
  return *this << tmp;
 }
 
