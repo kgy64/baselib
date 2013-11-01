@@ -8,8 +8,8 @@
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef _DEBUGPRINT_H_
-#define _DEBUGPRINT_H_
+#ifndef __SRC_DEBUG_DEBUG_H_INCLUDED__
+#define __SRC_DEBUG_DEBUG_H_INCLUDED__
 
 #include <pthread.h>
 #include <boost/scoped_array.hpp>
@@ -342,6 +342,6 @@ namespace _Debug_Info_
 
 #define YESNO(value)    ((value) ? "yes" : "no")
 
-#endif // _DEBUGPRINT_H_
+#endif // __SRC_DEBUG_DEBUG_H_INCLUDED__
 
 /* ------------------------- End - of - file --------------------------- */
