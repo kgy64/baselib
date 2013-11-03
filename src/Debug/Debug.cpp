@@ -249,7 +249,9 @@ void DebugPrint::draw_left(void)
 
 void DebugPrint::header(void)
 {
- GetOutStream() << (void*)info << " " << info->id << ": ";
+ char id_string[40];
+ sprintf(id_string, "%4d: ", info->id);
+ GetOutStream() << id_string;
 }
 
 

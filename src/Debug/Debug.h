@@ -236,6 +236,14 @@ namespace _Debug_Info_
 
 } // namespace _Debug_Info_
 
+#define DEBUG_OUT(msg)                                  \
+    {                                                   \
+        std::ostringstream __debug_temp_;               \
+        __debug_temp_ << msg << std::endl;              \
+        Auton<I_DebugOut> __debug_out;                  \
+        (*__debug_out) << __debug_temp_.str().c_str();  \
+    }
+
 /*! This macro can be used to display the debug messages.<br>
     The main usage is:<br>
     <code>
