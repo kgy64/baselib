@@ -6,6 +6,12 @@
 
 SYS_DEFINE_MODULE(DM_CONFIG);
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class ConfigStore:                                                                *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 const ConfigValue ConfigStore::GetConfig(const std::string & key) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
@@ -24,8 +30,30 @@ void ConfigStore::List(void) const
     theConfig->List(0);
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class ConfigDriver:                                                               *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/// Config Driver from Config File
 ConfDriver::ConfDriver(FILES::FileMap_typed<unsigned char> & p_file, ConfigStore & store):
-    file(p_file),
+    file(&p_file),
+    myData(0),
+    myLength(0),
+    myPosition(0),
+    lineNo(1),
+    column(1),
+    configStore(store)
+{
+}
+
+/// Config Driver from Config Data in memory
+ConfDriver::ConfDriver(const char * data, int length, ConfigStore & store):
+    file(0),
+    myData(data),
+    myLength(length),
+    myPosition(0),
     lineNo(1),
     column(1),
     configStore(store)
@@ -44,6 +72,32 @@ void ConfDriver::error(const yy::location & loc, const std::string & message)
  SYS_DEBUG(DL_INFO1, "Error at " << loc.begin << "-" << loc.end << ": " << message);
 }
 
+int ConfDriver::ChrGet(void)
+{
+ int result = 0;
+ if (file) {
+    result = file->ChrGet();
+ } else {
+    if (myPosition >= myLength) {
+        result = -1;
+    } else {
+        result = myData[myPosition++];
+    }
+ }
+ return result;
+}
+
+void ConfDriver::UnGet(void)
+{
+ if (file) {
+    file->UnGet();
+ } else {
+    if (myPosition > 0 && myPosition < myLength) {
+        --myPosition;
+    }
+ }
+}
+
 int ConfDriver::parse(void)
 {
  yy::ConfParser parser(*this);
@@ -57,7 +111,7 @@ int ConfDriver::yylex(yy::ConfParser::semantic_type & yylval, yy::ConfParser::lo
  int ch;
 
  do {
-     while (isspace(ch = file.ChrGet())) {
+     while (isspace(ch = ChrGet())) {
          switch (ch) {
              case '\r':
              case '\n':
@@ -70,7 +124,7 @@ int ConfDriver::yylex(yy::ConfParser::semantic_type & yylval, yy::ConfParser::lo
          }
      }
 
-     file.UnGet();
+     UnGet();
 
      yylloc.begin.line = lineNo;
      yylloc.begin.column = column;
@@ -89,7 +143,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
- int ch = file.ChrGet();
+ int ch = ChrGet();
 
  if (ch < 0) {
     SYS_DEBUG(DL_INFO1, "End-of-file detected at line " << lineNo);
@@ -101,9 +155,9 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
  if (isdigit(ch)) {
     for (;;) {
         st.append(1, (char)ch);
-        ch = file.ChrGet();
+        ch = ChrGet();
         if (!isdigit(ch)) {
-            file.UnGet();
+            UnGet();
             break;
         }
         ++column;
@@ -114,7 +168,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
  } else switch (ch) {
     case '"':
         for (;;) {
-            ch = file.ChrGet();
+            ch = ChrGet();
             if (ch <= 0) {
                 SYS_DEBUG(DL_ERROR, "String is not terminated [1] at line " << lineNo);
                 return -1;
@@ -124,7 +178,7 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
                 break;
             switch (ch) {
                 case '\\':
-                    ch = file.ChrGet();
+                    ch = ChrGet();
                     if (ch <= 0) {
                         SYS_DEBUG(DL_ERROR, "String is not terminated [2] at line " << lineNo);
                         return -1;
@@ -167,7 +221,8 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
 
     case '#':
         // Skip the whole line until EOL:
-        while ((ch = file.ChrGet()) != '\r' && ch != '\n' && ch >= 0)
+        SYS_DEBUG(DL_INFO1, "Line " << lineNo << " is a comment");
+        while ((ch = ChrGet()) != '\r' && ch != '\n' && ch >= 0)
             ++column;
         switch (ch) {
             case '\r':
@@ -200,13 +255,13 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
 
  for (;;) {
     if (ch == '\\') {
-        ch = file.ChrGet();
+        ch = ChrGet();
         ++column;
     }
     st.append(1, (char)ch);
-    ch = file.ChrGet();
+    ch = ChrGet();
     if (!isalnum(ch) && ch != '_' && ch != '\\') {
-        file.UnGet();
+        UnGet();
         break;
     }
     ++column;
@@ -216,6 +271,12 @@ int ConfDriver::lexical_analyzer(yy::ConfParser::semantic_type & yylval)
  yylval.name = new ConfigValue(new ConfExpression(st));
  return yy::ConfParser::token::NAME;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class ConfExpression:                                                             *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 ConfExpression::ConfExpression(const std::string & value):
     myValue(value),
@@ -241,6 +302,12 @@ ConfExpression::~ConfExpression()
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class AssignmentSet:                                                              *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 {
@@ -317,6 +384,12 @@ void AssignmentSet::List(int level) const
     i->second->List(level);
  }
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
+ *     class ConfigLevel:                                                                *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 {

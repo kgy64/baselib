@@ -1,10 +1,35 @@
-#ifndef __MAINCONFIG_H__
-#define __MAINCONFIG_H__
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Project:     
+ * Purpose:     
+ * Author:      
+ * Licence:     GPL (see file 'COPYING' in the project root for more details)
+ * Comments:    
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#ifndef __SRC_CONFIG_MAINCONFIG_H_INCLUDED__
+#define __SRC_CONFIG_MAINCONFIG_H_INCLUDED__
 
 #include <Config/ConfigDriver.h>
 #include <Threads/Threads.h>
 #include <Threads/Mutex.h>
+#include <Memory/Auton.h>
 #include <Debug/Debug.h>
+
+class ConfigData
+{
+ public:
+    virtual ~ConfigData()
+    {
+    }
+
+    virtual void ParseConfig(ConfigStore & conf) =0;
+
+ private:
+    SYS_DEFINE_CLASS_NAME("ConfigData");
+
+}; // class ConfigData
 
 class MainConfig
 {
@@ -45,8 +70,6 @@ class MainConfig
 
     static boost::shared_ptr<MainConfig> myself;
 
-    static const char configName[];
-
  private:
     SYS_DEFINE_CLASS_NAME("MainConfig");
 
@@ -56,6 +79,6 @@ class MainConfig
 
 }; // class MainConfig
 
-#endif /* __MAINCONFIG_H__ */
+#endif /* __SRC_CONFIG_MAINCONFIG_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

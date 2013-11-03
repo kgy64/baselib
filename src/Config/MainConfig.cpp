@@ -1,5 +1,17 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Project:     
+ * Purpose:     
+ * Author:      
+ * Licence:     GPL (see file 'COPYING' in the project root for more details)
+ * Comments:    
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "MainConfig.h"
 #include <Exceptions/Exceptions.h>
+
+AUTON_INTERFACE(ConfigData);
 
 SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
@@ -11,17 +23,8 @@ MainConfig::MainConfig(void)
 {
  SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
 
- FILES::FileMap_typed<unsigned char> configFile(configName);
-
- SYS_DEBUG(DL_INFO1, "Main config file: size=" << configFile.GetSize());
-
- ConfDriver parser(configFile, theConfig);
-
- if (parser.parse() != 0) {
-    SYS_DEBUG(DL_INFO1, "Error parsing config file " << configName << ", some settings may be incorrect.");
- }
-
- SYS_DEBUG(DL_INFO1, "Config file " << configName << " parsed.");
+ Auton<ConfigData> conf;
+ conf->ParseConfig(theConfig);
 }
 
 const std::string & MainConfig::GetConfig(const std::string & key, const std::string & def_val)

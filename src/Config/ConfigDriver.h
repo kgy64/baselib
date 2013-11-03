@@ -44,6 +44,7 @@ class ConfDriver
 {
  public:
     ConfDriver(FILES::FileMap_typed<unsigned char> & file_2_parse, ConfigStore & store);
+    ConfDriver(const char * data, int length, ConfigStore & store);
 
     int parse();
     void error(const yy::location & loc, const std::string & message);
@@ -59,13 +60,22 @@ class ConfDriver
  private:
     SYS_DEFINE_CLASS_NAME("ConfDriver");
 
-    FILES::FileMap_typed<unsigned char> & file;
+    int ChrGet(void);
+    void UnGet(void);
+
+    FILES::FileMap_typed<unsigned char> * file;
+
+    const char * myData;
+    int myLength;
+    int myPosition;
 
     int lineNo;
     int column;
 
     ConfigStore & configStore;
 };
+
+typedef boost::shared_ptr<ConfDriver> ConfDriverPtr;
 
 static std::ostream & operator<<(std::ostream & os, const ConfExpression & ex);
 
