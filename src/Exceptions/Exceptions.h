@@ -19,7 +19,7 @@
     class NAME: public BASE                 \
     {                                       \
      public:                                \
-        NAME(const char * msg = MSG " Exception", int line = -1): \
+        NAME(const char * msg = MSG, int line = -1): \
             BASE(msg, line)                 \
         {                                   \
         }                                   \
@@ -41,7 +41,7 @@ namespace EX {
     class BaseException: public std::exception
     {
      public:
-        BaseException(const char * msg = "Generic Exception", int line = -1);
+        BaseException(const char * msg = NULL, int line = -1);
         virtual ~BaseException() throw();
 
         virtual const char * what(void) const throw()
@@ -65,7 +65,7 @@ namespace EX {
     /*! Throwing this class anywhere in the program the whole system exits. This is the
      *  possible highest level of exceptions.
      *  */
-    DEFINE_EXCEPTION(Fatal, "Fatal", BaseException);
+    DEFINE_EXCEPTION(Fatal, "Fatal Exception", BaseException);
 
     /// Uncorrectable error occured
     /*! Throwing this class closes the current operation but it can continue if possible.
@@ -79,11 +79,14 @@ namespace EX {
      *  */
     DEFINE_EXCEPTION(Assert, "Assert", Error);
 
-    /// Correctable problem during processing
-    /*! Throwing this class means that some correctable error occured during processing, but it is
-     *  not necessary to stop.
-     *  */
-    DEFINE_EXCEPTION(Continue, "Continue", Error);
+    /// Less critical problem occured
+    /*! This exception probably prints a warning message and continues the operation. */
+    DEFINE_EXCEPTION(Warning, "Warning", Error);
+
+    /// Stop operation and continue
+    /*! This exception means that the current operation must be stopped, but it is not really
+     *  an error and no further actions needed. The operation can continue. */
+    DEFINE_EXCEPTION(Continue, NULL, Warning);
 }
 
 #define __DO_ASSERT(type, cond, message)  \
