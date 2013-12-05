@@ -90,7 +90,7 @@ namespace EX {
 }
 
 #define __DO_ASSERT(type, cond, message)  \
-    throw type("In '" __FILE__ "', assertion " #cond " failed", __LINE__) << message
+    throw type("In '" __FILE__ "', assertion '" #cond "' failed", __LINE__) << message
 
 #define ASSERT_T(type, cond, message)   { if (!(cond)) { __DO_ASSERT(type, cond, message); } }
 
