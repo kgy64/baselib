@@ -11,7 +11,10 @@ SYS_DEFINE_MODULE(DM_FILE);
 
 using namespace FILES;
 
-FileMap::FileMap(const char * name, OpenMode mode)
+FileMap::FileMap(const char * name, OpenMode mode):
+    mapped(NULL),
+    ende(NULL),
+    size(0)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
@@ -22,6 +25,7 @@ FileMap::FileMap(const char * name, OpenMode mode)
  int map_mode = MAP_PRIVATE;
 
  switch (myMode) {
+    case Read_Unsafe:
     case Read_Only:
         open_mode = O_RDONLY;
         map_prot = PROT_READ;
@@ -40,7 +44,13 @@ FileMap::FileMap(const char * name, OpenMode mode)
  }
 
  fd = open(name, open_mode);
- ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
+
+ if (myMode == Read_Unsafe) {
+    SYS_DEBUG(DL_INFO1, "File '" << name << "' does not exist.");
+    return;
+ } else {
+    ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
+ }
 
  struct stat sb;
 
@@ -50,13 +60,11 @@ FileMap::FileMap(const char * name, OpenMode mode)
  }
 
  size = sb.st_size;
- if (size == 0) {
-    mapped = NULL;
-    ende = NULL;
- } else {
+
+ if (size > 0) {
     mapped = mmap(NULL, size, map_prot, map_mode, fd, 0);
     ASSERT(mapped != MAP_FAILED, "File '" << name << "' could not be mapped.");
-    ende = (void*)((char*)mapped + size);
+    ende = reinterpret_cast<char*>(mapped) + size;
  }
 }
 

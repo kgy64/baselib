@@ -14,6 +14,7 @@ namespace FILES
      public:
         enum OpenMode {
             Read_Only,
+            Read_Unsafe,
             Read_Write
         };
 
