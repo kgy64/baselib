@@ -21,15 +21,16 @@ namespace Threads
     /// Runs a job on many threads
     /*! Doc: TODO
      *  \param      T       This is the identifier of the threads. Can be e.g. int or string.
-     *  \param      U       The parameter passed to each thread. This identifies the job. */
-    template <typename T, typename U>
+     *  \param      U       The parameter passed to each thread. */
+    template <typename T, class U>
     class ThreadArray
     {
      public:
         class Job: public Threads::Thread
         {
          public:
-            virtual void Work(const U & task) =0;
+            /// The main function of the job
+            virtual void Work(U & task) =0;
 
             /// This virtual function is called before the thread is accessed by \ref Threads::ThreadArray
             virtual void BeforeUse(void)
