@@ -44,13 +44,15 @@ void Dump::PrintHex(std::ostream & os, uint64_t p_value, int p_size)
  os << tmp;
 }
 
-void Dump::ToStream(std::ostream & os)
+void Dump::ToStream(std::ostream & os) const
 {
  os << "Memory dump from " << std::hex << (void*)myStartAddress << " follows:";
- while (mySize > 0) {
+ const unsigned char * address = myStartAddress;
+ int size = mySize;
+ while (size > 0) {
     os << std::endl;
-    int offset = ((int64_t)myStartAddress) & 0x0f;
-    const unsigned char * real_start = myStartAddress - offset;
+    int offset = ((int64_t)address) & 0x0f;
+    const unsigned char * real_start = address - offset;
     Print(os, real_start);
     os << ":";
     for (int i = 0; i < 16; ++i) {
@@ -58,8 +60,8 @@ void Dump::ToStream(std::ostream & os)
             os << " ";
         }
         int index = i - offset;
-        if (index >= 0 && index < mySize) {
-            Print(os, myStartAddress[index]);
+        if (index >= 0 && index < size) {
+            Print(os, address[index]);
             os << " ";
         } else {
             os << "   ";
@@ -71,15 +73,15 @@ void Dump::ToStream(std::ostream & os)
             os << " ";
         }
         int index = i - offset;
-        if (index >= 0 && index < mySize) {
-            os << (char)((myStartAddress[index] < ' ' || myStartAddress[index] > 0x7e) ? '.' : myStartAddress[index]);
+        if (index >= 0 && index < size) {
+            os << (char)((address[index] < ' ' || address[index] > 0x7e) ? '.' : address[index]);
         } else {
             os << " ";
         }
     }
     os << "|";
-    myStartAddress += 16 - offset;
-    mySize -= 16 - offset;
+    address += 16 - offset;
+    size -= 16 - offset;
  }
 }
 
