@@ -52,18 +52,6 @@ namespace Threads
 
         typedef boost::shared_ptr<Job> JobPtr;
 
-     protected:
-        ThreadArray(size_t stack = 1024*1024):
-            myStack(stack)
-        {
-        }
-
-        inline size_t Size(void) const
-        {
-            Threads::Lock _l(myThreadMutex);
-            return myThreads.size();
-        }
-
         JobPtr operator[](const T & index)
         {
             Threads::Lock _l(myThreadMutex);
@@ -76,9 +64,22 @@ namespace Threads
             return th;
         }
 
+     protected:
+        ThreadArray(size_t stack = 1024*1024):
+            myStack(stack)
+        {
+        }
+
+        inline size_t Size(void) const
+        {
+            Threads::Lock _l(myThreadMutex);
+            return myThreads.size();
+        }
+
         typedef std::map<T, JobPtr> ThreadsType;
 
         /// Removes and returns the requested entry
+        /*! Note that it must be called in locked state (probably from the virtual function \ref CreateJob() ) */
         JobPtr Remove(const T & index)
         {
             typename ThreadsType::iterator i = myThreads.find(index);
@@ -98,6 +99,7 @@ namespace Threads
         /// Locks the access to \ref ThreadArray::myThreads
         mutable Threads::Mutex myThreadMutex;
 
+        /// Size of the stack for threads
         size_t myStack;
 
         /// This virtual function creates a new thread
