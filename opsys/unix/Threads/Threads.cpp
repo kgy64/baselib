@@ -14,6 +14,8 @@
 
 #include "Threads.h"
 
+SYS_DEFINE_MODULE(DM_THREAD);
+
 using namespace Threads;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -26,10 +28,12 @@ Thread::Thread(void):
     myThread(0),
     toBeFinished(true)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
 }
 
 Thread::~Thread(void)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
  Kill();
 }
 
@@ -41,6 +45,8 @@ Thread::~Thread(void)
  */
 void Thread::Kill(void)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
  // If it has already been stopped, do nothing:
  if (toBeFinished)
     return;
@@ -61,18 +67,20 @@ void Thread::Kill(void)
 /// Start the thread
 void Thread::Start(size_t stack)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
  // If it has already been started, do nothing:
  if (myThread)
     return;
 
- myAttr.SetStackSize(stack);
-
  // It is in running state:
  toBeFinished = false;
 
- // Create the thread:
+ // Set the attributes
+ myAttr.SetStackSize(stack);
  myAttr.SetJoinable(true);
 
+ // Create the thread:
  ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, this)==0, "pthread_create() failed");
 }
 
@@ -93,6 +101,9 @@ int Thread::GetPriority(void) const
 
 bool Thread::SetPriority(int prio)
 {
+ SYS_DEBUG_MEMBER(DM_THREAD);
+ SYS_DEBUG(DL_INFO1, "Priotiry is set to " << prio);
+
  return setpriority(PRIO_PROCESS, 0, prio) == 0;
 }
 

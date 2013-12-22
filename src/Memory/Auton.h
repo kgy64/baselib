@@ -16,7 +16,6 @@
 #include <string.h>
 
 #include <System/Generic.h>
-#include <Threads/Threads.h>
 #include <Threads/Mutex.h>
 
 // Note that in this file 'I' means the Interface class, while 'C' means the Implementation

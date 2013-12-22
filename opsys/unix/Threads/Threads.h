@@ -16,6 +16,9 @@
 #include <errno.h>
 
 #include <Threads/Error.h>
+#include <Debug/Debug.h>
+
+SYS_DECLARE_MODULE(DM_THREAD);
 
 namespace Threads
 {
@@ -36,6 +39,7 @@ namespace Threads
          *          flag is just set to signal the thread if necessary. */
         inline bool ToBeFinished(void) const
         {
+            SYS_DEBUG_MEMBER(DM_THREAD);
             return toBeFinished;
         }
 
@@ -49,6 +53,7 @@ namespace Threads
         /// Allows other processes to run
         static inline void Yield(void)
         {
+            SYS_DEBUG_STATIC(DM_THREAD);
             ASSERT_STD(sched_yield()==0);
         }
 
@@ -84,11 +89,13 @@ namespace Threads
          private:
             pthread_attr_t myAttrib;
 
-        }; // class Attribute
+        }; // class Threads::Thread::Attribute
 
         pthread_t myThread;
 
      private:
+        SYS_DEFINE_CLASS_NAME("Threads::Thread");
+
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
@@ -108,7 +115,8 @@ namespace Threads
         bool toBeFinished;
 
         Attribute myAttr;
-    };
+
+    }; // class Threads::Thread
 
 } // namespace Threads
 
