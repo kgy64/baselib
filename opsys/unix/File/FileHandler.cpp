@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     
- * Purpose:     
- * Author:      
+ * Project:     My Generic C++ Library
+ * Purpose:     Generic file handler classes for read and write
+ * Author:      György Kövesdi (kgy@teledigit.eu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *
@@ -12,6 +12,7 @@
 #include <fcntl.h>
 
 #include <Exceptions/Exceptions.h>
+#include <File/TemporaryBuffer.h>
 
 #include "FileHandler.h"
 
@@ -147,6 +148,11 @@ void FileHandler::OpenSpecial(FILES::FileMode flag)
         throw EX::File_Error() << "Wrong open mode for special file";
     break;
  }
+}
+
+size_t FileHandler::Write(const Buffer & buf)
+{
+ return Write(buf.GetData(), buf.GetSize());
 }
 
 size_t FileHandler::Write(const void * p_data, size_t p_length)

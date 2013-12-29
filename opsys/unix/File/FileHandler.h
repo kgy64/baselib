@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     
- * Purpose:     
- * Author:      
+ * Project:     My Generic C++ Library
+ * Purpose:     Generic file handler classes for read and write
+ * Author:      György Kövesdi (kgy@teledigit.eu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *
@@ -58,6 +58,8 @@ namespace FILES
         READ_WRITE,
         APPEND_WRITE
     };
+
+    class Buffer;
 
     class FileHandler
     {
@@ -120,6 +122,7 @@ namespace FILES
         void Open(FileMode flag = READ_ONLY);
         void OpenSpecial(FileMode flag);
         size_t Write(const void * p_data, size_t p_length);
+        size_t Write(const Buffer & buf);
         bool Read(void * p_data, size_t p_length);
 
         inline off_t Tell(void) const
