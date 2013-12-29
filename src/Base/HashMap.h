@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     General Purpose Library
+ * Project:     My Generic C++ Library
  * Purpose:     Associative unsorted map with hash
  * Author:      György Kövesdi <kgy@teledigit.eu>
  * Licence:     GPL (see file 'COPYING' in the project root for more details)

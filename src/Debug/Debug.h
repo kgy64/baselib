@@ -236,6 +236,7 @@ namespace _Debug_Info_
 
 } // namespace _Debug_Info_
 
+/// Print a message unconditionally
 #define DEBUG_OUT(msg)                                  \
     {                                                   \
         std::ostringstream __debug_temp_;               \

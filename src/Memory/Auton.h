@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     General Purpose Library
+ * Project:     My Generic C++ Library
  * Purpose:     Class Auton is a smart pointer to instantiate a singleton
  *              using its interface
  * Author:      György Kövesdi <kgy@teledigit.eu>
