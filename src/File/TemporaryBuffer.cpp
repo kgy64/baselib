@@ -27,7 +27,7 @@ Buffer::~Buffer()
  free(data);
 }
 
-uint32_t Buffer::Write(void * d, uint32_t size)
+size_t Buffer::Write(const void * d, size_t size)
 {
  if (position + size > allocated) {
     do {
@@ -41,6 +41,16 @@ uint32_t Buffer::Write(void * d, uint32_t size)
  position += size;
 
  return size;
+}
+
+const void * Buffer::GetData(void) const
+{
+ return data;
+}
+
+size_t Buffer::GetSize(void) const
+{
+ return position;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

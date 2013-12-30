@@ -12,7 +12,6 @@
 #include <fcntl.h>
 
 #include <Exceptions/Exceptions.h>
-#include <File/TemporaryBuffer.h>
 
 #include "FileHandler.h"
 
@@ -150,11 +149,6 @@ void FileHandler::OpenSpecial(FILES::FileMode flag)
  }
 }
 
-size_t FileHandler::Write(const Buffer & buf)
-{
- return Write(buf.GetData(), buf.GetSize());
-}
-
 size_t FileHandler::Write(const void * p_data, size_t p_length)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
@@ -189,10 +183,6 @@ do_again:;
 
  if (result < 0) {
     throw EX::File_Error() << "Error writing " << p_length << " bytes, fd=" << fNo << "; " << strerror(errno);
- }
-
- if (result != (int)p_length) {
-    throw EX::File_Error() << "Written " << result << " bytes instead of " << p_length << " to fd " << fNo;
  }
 
  return result;

@@ -13,38 +13,25 @@
 
 #include <stdint.h>
 
+#include <File/Base.h>
 #include <Debug/Debug.h>
 
 namespace FILES
 {
-    class Buffer
+    class Buffer: public FILES::Writeable, public FILES::Output
     {
      public:
         Buffer(void);
         virtual ~Buffer();
 
-        inline const void * GetData(void) const
-        {
-            return data;
-        }
-
-        inline uint32_t GetSize(void) const
-        {
-            return position;
-        }
-
-        uint32_t Write(void * d, uint32_t size);
-
-        template <typename T>
-        inline uint32_t Write(T & d)
-        {
-            return Write(&d, sizeof d);
-        }
+        virtual size_t Write(const void * d, size_t size) override;
+        virtual const void * GetData(void) const override;
+        virtual size_t GetSize(void) const override;
 
      protected:
-        uint32_t position;
+        size_t position;
 
-        uint32_t allocated;
+        size_t allocated;
 
         void * data;
 

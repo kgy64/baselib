@@ -13,38 +13,9 @@
 
 #include <string>
 
+#include <File/Base.h>
 #include <File/FileFunctions.h>
 #include <File/DirHandler.h>
-
-namespace EX
-{
-    DEFINE_EXCEPTION(File_Error, "File", Error);
-
-    class File_EOF: public File_Error
-    {
-     public:
-        File_EOF(size_t p_bytes_read):
-            File_Error("EOF Exception"),
-            myBytes(p_bytes_read)
-        {
-        }
-
-        inline size_t GetBytes(void)
-        {
-            return myBytes;
-        }
-
-        template <typename T>
-        inline File_EOF & operator<<(const T & value)
-        {
-            static_cast<File_Error &>(*this) << value;
-            return *this;
-        }
-
-     protected:
-        size_t myBytes;
-    };
-}
 
 namespace Threads
 {
@@ -59,9 +30,7 @@ namespace FILES
         APPEND_WRITE
     };
 
-    class Buffer;
-
-    class FileHandler
+    class FileHandler: public FILES::Output, public FILES::Input
     {
      public:
         FileHandler(const DirHandler & p_dir, const char * p_filename);
@@ -121,9 +90,9 @@ namespace FILES
 
         void Open(FileMode flag = READ_ONLY);
         void OpenSpecial(FileMode flag);
-        size_t Write(const void * p_data, size_t p_length);
-        size_t Write(const Buffer & buf);
-        bool Read(void * p_data, size_t p_length);
+
+        virtual bool Read(void * p_data, size_t p_length) override;
+        virtual size_t Write(const void * p_data, size_t p_length) override;
 
         inline off_t Tell(void) const
         {
@@ -142,6 +111,11 @@ namespace FILES
         inline bool Remove(void)
         {
             return FILES::Remove(GetFullPath().c_str());
+        }
+
+        inline size_t Write(const Writeable & buf)
+        {
+            return Write(buf.GetData(), buf.GetSize());
         }
 
         template <typename T>
