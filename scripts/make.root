@@ -18,6 +18,15 @@ doc:
 
 .PHONY: cleandepend
 cleandepend:
-	@find $(SUBPROJECTS) src -name "*.depend" -exec rm "{}" \;
-	@echo "Dependency files are removed, they will be re-created on next make."
+	@find $(SUBPROJECTS) src main -name "*.depend" -exec rm "{}" \;
+	@echo "Dependency files has been removed, they will be re-created on next make."
+
+$(MY_BASELIB)/src:
+	@$(MAKE) update
+
+.PHONY: update
+update:
+	@echo "Updating subprojects..."
+	@git submodule init
+	@git submodule update
 
