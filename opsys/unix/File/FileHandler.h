@@ -119,12 +119,6 @@ namespace FILES
         }
 
         template <typename T>
-        inline size_t Write(const T & p_data)
-        {
-            return Write((const void *)&p_data, sizeof(T));
-        }
-
-        template <typename T>
         inline bool Read(T & p_data)
         {
             return Read((void *)&p_data, sizeof(T));
