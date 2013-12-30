@@ -13,6 +13,8 @@
 
 #include <stddef.h>
 
+#include <Exceptions/Exceptions.h>
+
 namespace EX
 {
     DEFINE_EXCEPTION(File_Error, "File", Error);
@@ -62,7 +64,7 @@ namespace FILES
         {
             size_t written = Write(&data, sizeof data);
             if (written != sizeof data) {
-                throw EX::File_Error() << "Written " << written << " bytes instead of " << p_length;
+                throw EX::File_Error() << "Written " << written << " bytes instead of " << sizeof data;
             }
             return *this;
         }

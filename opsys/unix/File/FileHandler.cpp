@@ -11,8 +11,6 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <Exceptions/Exceptions.h>
-
 #include "FileHandler.h"
 
 SYS_DECLARE_MODULE(DM_FILE);
