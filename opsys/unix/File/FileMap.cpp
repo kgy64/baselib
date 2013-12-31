@@ -46,8 +46,10 @@ FileMap::FileMap(const char * name, OpenMode mode):
  fd = open(name, open_mode);
 
  if (myMode == Read_Unsafe) {
-    SYS_DEBUG(DL_INFO1, "File '" << name << "' does not exist.");
-    return;
+    if (fd < 0) {
+        SYS_DEBUG(DL_INFO1, "File '" << name << "' does not exist.");
+        return;
+    }
  } else {
     ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
  }
