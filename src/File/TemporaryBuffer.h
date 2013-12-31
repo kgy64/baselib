@@ -27,6 +27,7 @@ namespace FILES
         virtual size_t Write(const void * d, size_t size) override;
         virtual const void * GetData(void) const override;
         virtual size_t GetSize(void) const override;
+        virtual off_t Tell(void) const override;
 
      protected:
         size_t position;

@@ -94,7 +94,7 @@ namespace FILES
         virtual bool Read(void * p_data, size_t p_length) override;
         virtual size_t Write(const void * p_data, size_t p_length) override;
 
-        inline off_t Tell(void) const
+        virtual off_t Tell(void) const override
         {
             off_t result = lseek(fNo, 0, SEEK_CUR);
             ASSERT(result != (off_t)-1, "Cannot seek");

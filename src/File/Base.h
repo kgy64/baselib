@@ -47,14 +47,21 @@ namespace EX
 
 namespace FILES
 {
-    class Input
+    class Generic
+    {
+     public:
+        virtual off_t Tell(void) const =0;
+
+    }; // class FILES::Generic
+
+    class Input: public virtual Generic
     {
      public:
         virtual bool Read(void * p_data, size_t p_length) =0;
 
     }; // class FILES::Input
 
-    class Output
+    class Output: public virtual Generic
     {
      public:
         virtual size_t Write(const void * d, size_t size) =0;

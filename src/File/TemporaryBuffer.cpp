@@ -53,4 +53,9 @@ size_t Buffer::GetSize(void) const
  return position;
 }
 
+off_t Buffer::Tell(void) const
+{
+ return position;
+}
+
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
