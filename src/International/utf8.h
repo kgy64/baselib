@@ -123,21 +123,12 @@ namespace UTF8
 
     class FromWstring
     {
-        // Some constructor-like functions, to be compatible with older
-        // compilers without c++11 support (instead of delegating these
-        // constructors):
-
-        void _FromWstring(const WChar * p_str);
-
      public:
-        inline FromWstring(const WChar * p_str)
-        {
-            _FromWstring(p_str);
-        }
+        FromWstring(const WChar * p_str);
 
-        inline FromWstring(const std::wstring & p_st)
+        inline FromWstring(const std::wstring & p_st):
+            FromWstring(p_st.c_str())
         {
-            _FromWstring(p_st.c_str());
         }
 
         /// Returns the length of the UTF8 representation of a Unicode character

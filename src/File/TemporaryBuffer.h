@@ -40,6 +40,11 @@ namespace FILES
 
 } // namespace FILES
 
+inline FILES::Output & operator<<(FILES::Output & out, const FILES::Buffer & data)
+{
+ return out << static_cast<const FILES::Writeable &>(data);
+}
+
 #endif /* __SRC_FILE_TEMPORARYBUFFER_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

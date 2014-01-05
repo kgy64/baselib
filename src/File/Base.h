@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 #include <Exceptions/Exceptions.h>
+#include <Debug/Debug.h>
 
 namespace EX
 {
@@ -61,10 +62,28 @@ namespace FILES
 
     }; // class FILES::Input
 
+    class Writeable
+    {
+     public:
+        virtual const void * GetData(void) const =0;
+        virtual size_t GetSize(void) const =0;
+
+    }; // class FILES::Writeable
+
     class Output: public virtual Generic
     {
      public:
         virtual size_t Write(const void * d, size_t size) =0;
+
+        Output & operator<<(const Writeable & data)
+        {
+            size_t to_be_written = data.GetSize();
+            size_t written = Write(data.GetData(), to_be_written);
+            if (written != to_be_written) {
+                throw EX::File_Error() << "Written " << written << " bytes instead of " << to_be_written;
+            }
+            return *this;
+        }
 
         template <typename T>
         Output & operator<<(const T & data)
@@ -77,14 +96,6 @@ namespace FILES
         }
 
     }; // class FILES::Output
-
-    class Writeable
-    {
-     public:
-        virtual const void * GetData(void) const =0;
-        virtual size_t GetSize(void) const =0;
-
-    }; // class FILES::Writeable
 
 } // namespace FILES
 

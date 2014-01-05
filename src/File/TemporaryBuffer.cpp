@@ -29,6 +29,10 @@ Buffer::~Buffer()
 
 size_t Buffer::Write(const void * d, size_t size)
 {
+ if (size == 0) {
+    return 0;
+ }
+
  if (position + size > allocated) {
     do {
         allocated <<= 1;
