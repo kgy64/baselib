@@ -4,6 +4,7 @@
 
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -11,7 +12,7 @@ SYS_DEFINE_MODULE(DM_FILE);
 
 using namespace FILES;
 
-FileMap::FileMap(const char * name, OpenMode mode):
+FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
     mapped(NULL),
     ende(NULL),
     size(0)
@@ -33,7 +34,7 @@ FileMap::FileMap(const char * name, OpenMode mode):
         SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read-only...");
     break;
     case Read_Write:
-        open_mode = O_RDWR;
+        open_mode = O_RDWR | O_CREAT;
         map_prot = PROT_READ | PROT_WRITE;
         map_mode = MAP_SHARED;
         SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read/write...");
@@ -43,7 +44,7 @@ FileMap::FileMap(const char * name, OpenMode mode):
     break;
  }
 
- fd = open(name, open_mode);
+ fd = open(name, open_mode, 0644);
 
  if (myMode == Read_Unsafe) {
     if (fd < 0) {
@@ -54,14 +55,15 @@ FileMap::FileMap(const char * name, OpenMode mode):
     ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
  }
 
- struct stat sb;
-
- {
+ if (p_size) {
+    size = p_size;
+    ftruncate(fd, size);
+ } else {
+    struct stat sb;
     int result = fstat(fd, &sb);
-    ASSERT(result == 0, "Stat error on file '" << name << "'");
+    ASSERT_STD_ERRNO(result == 0, errno);
+    size = sb.st_size;
  }
-
- size = sb.st_size;
 
  if (size > 0) {
     mapped = mmap(NULL, size, map_prot, map_mode, fd, 0);

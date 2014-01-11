@@ -18,7 +18,7 @@ namespace FILES
             Read_Write
         };
 
-        FileMap(const char * name, OpenMode mode = Read_Only);
+        FileMap(const char * name, OpenMode mode = Read_Only, size_t p_size = 0);
 
         inline FileMap(const std::string & name, OpenMode mode = Read_Only):
             FileMap(name.c_str(), mode)
@@ -49,6 +49,7 @@ namespace FILES
 
      private:
         SYS_DEFINE_CLASS_NAME("FileMap");
+
     }; // class FileMap
 
     template <typename T>
@@ -93,6 +94,7 @@ namespace FILES
         SYS_DEFINE_CLASS_NAME("FileMap_typed");
 
     }; // class FileMap_typed
+
 } // namespace FILES
 
 #endif /* __FILEMAP_H__ */
