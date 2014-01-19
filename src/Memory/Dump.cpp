@@ -44,7 +44,7 @@ void Dump::PrintHex(std::ostream & os, uint64_t p_value, int p_size)
  os << tmp;
 }
 
-void Dump::ToStream(std::ostream & os) const
+void Dump::toStream(std::ostream & os) const
 {
  os << "Memory dump from " << std::hex << (void*)myStartAddress << " follows:";
  const unsigned char * address = myStartAddress;

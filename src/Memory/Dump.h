@@ -24,7 +24,7 @@ namespace Memory
         {
         }
 
-        void ToStream(std::ostream & os) const;
+        void toStream(std::ostream & os) const;
 
      private:
         static void PrintHex(std::ostream & os, uint64_t p_value, int p_size);
@@ -44,7 +44,7 @@ namespace Memory
 
 static inline std::ostream & operator<<(std::ostream & os, const Memory::Dump & mem)
 {
- mem.ToStream(os);
+ mem.toStream(os);
  return os;
 }
 
