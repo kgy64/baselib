@@ -15,6 +15,7 @@
 
 using namespace FILES;
 
+/// Executes the recursive scan
 void DirScanner::workOnDir(void)
 {
  SYS_DEBUG_MEMBER(DM_DB_IDX);
