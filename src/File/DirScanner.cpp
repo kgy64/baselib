@@ -11,14 +11,13 @@
 #include "DirScanner.h"
 
 #include <File/DirHandler.h>
-#include <Debug/Debug.h>
 
 using namespace FILES;
 
 /// Executes the recursive scan
 void DirScanner::workOnDir(void)
 {
- SYS_DEBUG_MEMBER(DM_DB_IDX);
+ SYS_DEBUG_MEMBER(DM_FILE);
 
  name_map_t names;
  name_map_t subdirs;

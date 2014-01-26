@@ -15,6 +15,10 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+#include <Debug/Debug.h>
+
+SYS_DECLARE_MODULE(DM_FILE);
+
 namespace FILES
 {
     class DirScanner;
@@ -108,6 +112,8 @@ namespace FILES
             }
 
         private:
+            SYS_DEFINE_CLASS_NAME("DB::DatabaseIndexer::DirScanner");
+
             void workOnDir(void);
 
     }; // class DB::DatabaseIndexer::DirScanner
