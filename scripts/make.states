@@ -23,6 +23,8 @@ _link_phase:
 # **** End of Phase Definitions
 #
 
+LFLAGS  +=  $(MY_UNDEFS:%=-Wl,-u,%)
+
 basic_test:
 	@if test ! "$(MY_LIBRARY_ERRORS)"; then exit; fi; \
 	echo "========================================="; \
