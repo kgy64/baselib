@@ -11,7 +11,7 @@
 #ifndef __SRC_THREADS_DATAPIPE_H_INCLUDED__
 #define __SRC_THREADS_DATAPIPE_H_INCLUDED__
 
-#include <boost/shared_ptr.hpp>
+#include <list>
 
 #include <Threads/Error.h>
 #include <Threads/Condition.h>
@@ -19,46 +19,50 @@
 
 namespace Threads
 {
-    template <typename T>
+    template <typename T, size_t maxSize = 1>
     class DataPipe
     {
      public:
         inline DataPipe(void):
-            isBusy(false),
+            currentSize(0),
             isFinished(false)
         {
         }
 
-        typedef boost::shared_ptr<T> DataType;
+        typedef T DataType;
 
         inline void push(const DataType & p_data)
         {
             Threads::Lock _l(myDataMutex);
-            if (isBusy) {
+            while (currentSize >= maxSize) {
                 myFreeCondition.Wait(myDataMutex);
             }
-            ASSERT(myData.get() == NULL, "Data is not handled yet");
-            myData = p_data;
-            isBusy = true;
+            myData.push_back(p_data);
+            ++currentSize;
             myUseCondition.Signal();
         }
 
         inline DataType pop(void)
         {
             Threads::Lock _l(myDataMutex);
-            if (!isBusy && !isFinished) {
+            while (true) {
+                if (isFinished) {
+                    return DataType();
+                }
+                if (!myData.empty()) {
+                    DataType result = myData.front();
+                    myData.pop_front();
+                    --currentSize;
+                    myFreeCondition.Signal();
+                    return result;
+                }
                 myUseCondition.Wait(myDataMutex);
             }
-            DataType result;
-            result.swap(myData);
-            isBusy = false;
-            myFreeCondition.Signal();
-            return result;
         }
 
         inline bool busy(void) const
         {
-            return isBusy;
+            return currentSize > 0;
         }
 
         inline void finish(void)
@@ -68,11 +72,11 @@ namespace Threads
         }
 
      protected:
-        bool isBusy;
+        size_t currentSize;
 
         bool isFinished;
 
-        DataType myData;
+        std::list<DataType> myData;
 
         Threads::Mutex myDataMutex;
 
