@@ -37,7 +37,7 @@ void ConfigStore::List(void) const
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /// Config Driver from Config File
-ConfDriver::ConfDriver(FILES::FileMap_typed<unsigned char> & p_file, ConfigStore & store):
+ConfDriver::ConfDriver(FILES::FileMap_char & p_file, ConfigStore & store):
     file(&p_file),
     myData(0),
     myLength(0),

@@ -1,3 +1,5 @@
+#define _BSD_SOURCE
+
 #include "FileMap.h"
 #include "Exceptions/Exceptions.h"
 #include "International/International.h"
@@ -102,6 +104,28 @@ FileMap::~FileMap()
     SYS_DEBUG(DL_VERBOSE, "Closing fd=" << fd);
     close(fd);
  }
+}
+
+void FileMap::Advise(AdviseMode mode)
+{
+ int mAdvise = 0;
+ switch (mode) {
+    case Adv_Normal:
+    break;
+    case Adv_Random:
+    break;
+    case Adv_Sequential:
+    break;
+    case Adv_Willneed:
+    break;
+    case Adv_Dontneed:
+    break;
+    default:
+        ASSERT(false, "Using wrong advice: " << (int)mode);
+    break;
+ }
+
+ ASSERT_STRERROR(madvise(mapped, size, mAdvise) == 0, "madvise() failed");
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

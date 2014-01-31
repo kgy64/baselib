@@ -106,11 +106,13 @@ namespace EX {
         } \
     }
 
-#define ASSERT_STD(cond)    if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(errno))
+#define ASSERT_STD(cond)                    { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(errno)); }
 
-#define ASSERT_STD_ERRNO(cond, error_code)    if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(error_code))
+#define ASSERT_STD_ERRNO(cond, error_code)  { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(error_code)); }
 
-#define ASSERT_STD_ZERO(cond)   { int e = (cond); if (e) __DO_ASSERT(::EX::Assert, cond, strerror(e)); }
+#define ASSERT_STRERROR(cond, message)      { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, message << strerror(errno)); }
+
+#define ASSERT_STD_ZERO(cond)               { int e = (cond); if (e) __DO_ASSERT(::EX::Assert, cond, strerror(e)); }
 
 #endif // _EXCEPTIONS_EXCEPTIONS_H_
 

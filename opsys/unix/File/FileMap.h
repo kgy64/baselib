@@ -18,6 +18,14 @@ namespace FILES
             Read_Write
         };
 
+        enum AdviseMode {
+            Adv_Normal,
+            Adv_Random,
+            Adv_Sequential,
+            Adv_Willneed,
+            Adv_Dontneed
+        };
+
         FileMap(const char * name, OpenMode mode = Read_Only, size_t p_size = 0);
 
         inline FileMap(const std::string & name, OpenMode mode = Read_Only):
@@ -40,6 +48,8 @@ namespace FILES
 
         inline size_t GetSize(void) const { return size; }
 
+        void Advise(AdviseMode mode);
+
      protected:
         int fd;
         void * mapped;
@@ -50,30 +60,65 @@ namespace FILES
      private:
         SYS_DEFINE_CLASS_NAME("FileMap");
 
-    }; // class FileMap
+    }; // class FIELS::FileMap
 
     template <typename T>
     class FileMap_typed: public FileMap
     {
      public:
-        FileMap_typed(const char * name, FileMap::OpenMode mode = Read_Only):
-            FileMap(name, mode)
-        {
-            actual = GetData();
-        }
-
-        virtual ~FileMap_typed()
+        inline FileMap_typed(const char * name, FileMap::OpenMode mode = Read_Only, size_t p_size = 0):
+            FileMap(name, mode, p_size * sizeof(T))
         {
         }
 
-        T * GetData(void) { return (T*) FileMap::GetData(); }
+        virtual inline ~FileMap_typed()
+        {
+        }
 
-        off_t GetPosition(void) { return (off_t)actual - (off_t)GetData(); }
+        T & operator*()
+        {
+            return *reinterpret_cast<T *>(FileMap::GetData());
+        }
+
+        const T & operator*() const
+        {
+            return *reinterpret_cast<const T *>(FileMap::GetData());
+        }
+
+        T & operator[](off_t index)
+        {
+            return reinterpret_cast<T *>(FileMap::GetData())[index];
+        }
+
+        const T & operator[](off_t index) const
+        {
+            return reinterpret_cast<const T *>(FileMap::GetData())[index];
+        }
+
+     private:
+        SYS_DEFINE_CLASS_NAME("FileMap_typed");
+
+    }; // class FIELS::FileMap_typed
+
+    class FileMap_char: public FileMap_typed<char>
+    {
+     public:
+        inline FileMap_char(const char * name, FileMap::OpenMode mode = Read_Only, size_t p_size = 0):
+            FileMap_typed(name, mode, p_size)
+        {
+            actual = &**this;
+        }
+
+        virtual inline ~FileMap_char()
+        {
+        }
+
+        off_t GetPosition(void) { return (off_t)actual - (off_t)&*this; }
 
         int ChrGet(void)
         {
-            if (actual >= (T*)ende) {
-                if (actual == (T*)ende) {
+            if (actual >= (char*)ende) {
+                if (actual == (char*)ende) {
                     ++actual; // Must be incremented here to be able to call UnGet() later
                 }
                 return -1;
@@ -83,17 +128,17 @@ namespace FILES
 
         void UnGet(void)
         {
-            if (actual > (T*)mapped)
+            if (actual > (char*)mapped)
                 --actual;
         }
 
      protected:
-        T * actual;
+        char * actual;
 
      private:
-        SYS_DEFINE_CLASS_NAME("FileMap_typed");
+        SYS_DEFINE_CLASS_NAME("FileMap_char");
 
-    }; // class FileMap_typed
+    }; // class FILES::FileMap_char
 
 } // namespace FILES
 

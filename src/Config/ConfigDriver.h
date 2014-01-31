@@ -43,7 +43,7 @@ class ConfigStore
 class ConfDriver
 {
  public:
-    ConfDriver(FILES::FileMap_typed<unsigned char> & file_2_parse, ConfigStore & store);
+    ConfDriver(FILES::FileMap_char & file_2_parse, ConfigStore & store);
     ConfDriver(const char * data, int length, ConfigStore & store);
 
     int parse();
@@ -63,7 +63,7 @@ class ConfDriver
     int ChrGet(void);
     void UnGet(void);
 
-    FILES::FileMap_typed<unsigned char> * file;
+    FILES::FileMap_char * file;
 
     const char * myData;
     int myLength;
