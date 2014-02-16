@@ -68,6 +68,12 @@ namespace FILES
         virtual const void * GetData(void) const =0;
         virtual size_t GetSize(void) const =0;
 
+        template <typename T>
+        inline const T * GetDataTyped(void) const
+        {
+            return reinterpret_cast<const T *>(GetData());
+        }
+
     }; // class FILES::Writeable
 
     class Output: public virtual Generic
