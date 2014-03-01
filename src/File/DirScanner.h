@@ -73,8 +73,9 @@ namespace FILES
 
             /// Do recursion: create another instance on the given path
             /*! This function can be called on directory entries.
-             *  \param  pathname    The full pathname of the directory. */
-            virtual DirScanPtr CreateSubdir(const std::string & pathname) =0;
+             *  \param  pathname    The full pathname of the directory.
+             *  \param  name        The directory name without path. */
+            virtual DirScanPtr CreateSubdir(const std::string & pathname, const std::string & name) =0;
 
             /// End of recursion
             /*! This function can be called on file or directory entries, but no further recursion will be done.

@@ -26,7 +26,7 @@ void DirScanner::workOnDir(void)
     std::string entry_name = i.Name();
     switch (CheckName(entry_name)) {
         case T_SCAN_NOW:
-            CreateSubdir(i.Pathname())->Scan();
+            CreateSubdir(i.Pathname(), entry_name)->Scan();
         break;
         case T_SCAN_SORT:
             subdirs[entry_name] = i.Pathname();
@@ -45,7 +45,7 @@ void DirScanner::workOnDir(void)
 
  SYS_DEBUG(DL_INFO2, "Number of directories under '" << path << "': " << subdirs.size());
  for (name_map_t::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
-    CreateSubdir(i->second)->Scan();
+    CreateSubdir(i->second, i->first)->Scan();
  }
 
  SYS_DEBUG(DL_INFO2, "Number of files under '" << path << "': " << names.size());
