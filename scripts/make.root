@@ -24,9 +24,3 @@ cleandepend:
 $(MY_BASELIB)/src:
 	@$(MAKE) update
 
-.PHONY: update
-update:
-	@echo "Updating subprojects..."
-	@git submodule init
-	@git submodule update
-
