@@ -11,7 +11,6 @@
 #ifndef __SRC_DEBUG_DEBUG_H_INCLUDED__
 #define __SRC_DEBUG_DEBUG_H_INCLUDED__
 
-#include <pthread.h>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>

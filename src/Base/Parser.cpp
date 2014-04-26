@@ -61,12 +61,13 @@ using namespace Parser;
 
 const char Tokenizer::default_delimiters[] = " \t\r\n";
 
-void Tokenizer::_Tokenizer(const char * p_text, const char * p_delimiters)
+Tokenizer::Tokenizer(const char * p_text, const char * p_delimiters)
 {
  SYS_DEBUG_MEMBER(DM_PARSER);
- SYS_DEBUG(DL_VERBOSE, "To be tokenized: '" << myText.get() << "'");
 
  myText.reset(strdup(p_text));
+
+ SYS_DEBUG(DL_VERBOSE, "To be tokenized: '" << myText.get() << "'");
 
  bool inserted = false;
  for (const char * p = myText.get(); *p; ++p) {
