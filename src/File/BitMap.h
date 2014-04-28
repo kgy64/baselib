@@ -143,6 +143,12 @@ class BitMapFile_interface: public FILES::FileMap
 template <size_t BITS>
 class BitMapMem: public BitMapBase<BITS, InlineData<(BITS+7)/8> >
 {
+ public:
+    BitMapMem(void)
+    {
+        memset(BitMapBase<BITS, InlineData<(BITS+7)/8> >::getMyData(), 0, BitMapBase<BITS, InlineData<(BITS+7)/8> >::GetSize());
+    }
+
 }; // BitMapMem<>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
