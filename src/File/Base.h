@@ -81,25 +81,28 @@ namespace FILES
      public:
         virtual size_t Write(const void * d, size_t size) =0;
 
-        Output & operator<<(const Writeable & data)
+        Output & WriteChecked(const void * data, size_t size)
         {
-            size_t to_be_written = data.GetSize();
-            size_t written = Write(data.GetData(), to_be_written);
-            if (written != to_be_written) {
-                throw EX::File_Error() << "Written " << written << " bytes instead of " << to_be_written;
+            size_t written = Write(data, size);
+            if (written != size) {
+                throw EX::File_Error() << "Written " << written << " bytes instead of " << size;
             }
             return *this;
         }
 
-        template <typename T>
-        Output & operator<<(const T & data)
+        inline Output & operator<<(const Writeable & data)
         {
-            size_t written = Write(&data, sizeof data);
-            if (written != sizeof data) {
-                throw EX::File_Error() << "Written " << written << " bytes instead of " << sizeof data;
-            }
-            return *this;
+            return WriteChecked(data.GetData(), data.GetSize());
         }
+
+        Output & operator<<(const   int8_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const  uint8_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const  int16_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const uint16_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const  int32_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const uint32_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const  int64_t & data) { return WriteChecked(&data, sizeof data); }
+        Output & operator<<(const uint64_t & data) { return WriteChecked(&data, sizeof data); }
 
     }; // class FILES::Output
 

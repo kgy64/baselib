@@ -27,7 +27,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 template <size_t BITS, class ALLOC>
-class BitMapBase: public ALLOC
+class BitMapBase: public ALLOC, public FILES::Writeable
 {
  public:
     static constexpr size_t BYTES   =   (BITS+7)/8;
@@ -103,6 +103,16 @@ class BitMapBase: public ALLOC
         ASSERT(index <= BITS, "index overflow in BitMapBase::clear() (index=" << index << ", allocated=" << BITS << " bits)");
         bitMask m(index);
         getMyData()[m.offset] &= ~m.mask();
+    }
+
+    virtual const void * GetData(void) const override
+    {
+        return ALLOC::GetData();
+    }
+
+    virtual size_t GetSize(void) const override
+    {
+        return ALLOC::GetSize();
     }
 
 }; // class BitMapBase<>
