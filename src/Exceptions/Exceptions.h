@@ -90,7 +90,7 @@ namespace EX {
 }
 
 #define __DO_ASSERT(type, cond, message)  \
-    throw type("In '" __FILE__ "', assertion '" #cond "' failed", __LINE__) << message
+    throw type("assertion '" #cond "' failed in file " __FILE__ ", __LINE__) << message
 
 #define ASSERT_T(type, cond, message)   { if (!(cond)) { __DO_ASSERT(type, cond, message); } }
 
@@ -101,7 +101,7 @@ namespace EX {
 #define ASSERT_DBG(cond, message) \
     { \
         if (!(cond)) { \
-            SYS_DEBUG(DL_ASSERT, __FILE__ << ":" << __LINE__ << ": Assert '" #cond "' is failed: " << message); \
+            SYS_DEBUG(DL_ASSERT, "Assert '" #cond "' failed in file " __FILE__ << " at line " << __LINE__ << ": " << message); \
             __DO_ASSERT(::EX::Assert, cond, message); \
         } \
     }
