@@ -71,6 +71,7 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
     mapped = mmap(NULL, size, map_prot, map_mode, fd, 0);
     ASSERT(mapped != MAP_FAILED, "File '" << name << "' could not be mapped.");
     ende = reinterpret_cast<char*>(mapped) + size;
+    SYS_DEBUG(DL_INFO2, "File mapped from " << mapped << " to " << ende);
  }
 }
 

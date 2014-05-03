@@ -163,27 +163,32 @@ size_t FileHandler::Write(const void * p_data, size_t p_length)
     return 0;
  }
 
-do_again:;
- ssize_t result = write(fNo, p_data, p_length);
- if (result == -1) {
-    switch (errno) {
-        case EWOULDBLOCK:
-            BlockedIo();
-            goto do_again;
-        break;
+ SYS_DEBUG(DL_INFO3, "Writing " << p_length << " bytes to position " << Tell());
+
+ for (size_t size = p_length; size; ) {
+    ssize_t result = 0;
+    while (true) {
+        result = write(fNo, p_data, size);
+        if (result > 0) {
+            break;
+        }
+        switch (errno) {
+            case EWOULDBLOCK:
 #if EAGAIN != EWOULDBLOCK
-        case EAGAIN:
-            goto do_again;
-        break;
+            case EAGAIN:
 #endif
+                BlockedIo();
+            break;
+            default:
+                throw EX::File_Error() << "Error writing " << p_length << " bytes, fd=" << fNo << "; " << strerror(errno);
+            break;
+        }
     }
+    size -= result;
+    p_data = reinterpret_cast<const char *>(p_data) + result;
  }
 
- if (result < 0) {
-    throw EX::File_Error() << "Error writing " << p_length << " bytes, fd=" << fNo << "; " << strerror(errno);
- }
-
- return result;
+ return p_length;
 }
 
 bool FileHandler::Read(void * p_data, size_t p_length)
