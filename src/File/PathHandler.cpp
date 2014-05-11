@@ -21,11 +21,15 @@ PathHandler::PathHandler(const char * path):
  SYS_DEBUG_FUNCTION(DM_FILE);
 
  switch (path[0]) {
-    case DIR_SEPARATOR: // No break!
+    case DIR_SEPARATOR:
+        // Note: the tokenizer eats the leading separators, so add a slash at the beginning:
+        chunks.push_back(DIR_SEPARATOR_STR);
+    break;
     case '.':
         // Nothing to do here
     break;
     default:
+        // Relative to the current directory:
         chunks.push_back(".");
     break;
  }
@@ -35,20 +39,34 @@ PathHandler::PathHandler(const char * path):
     chunks.push_back(filename);
  }
 
+ // Note: the tokenizer eats the trailing separators, so check the slash at the end
+ //       to detect directory path:
+ if (*path && path[strlen(path)-1] == DIR_SEPARATOR) {
+    filename = "";
+    chunks.push_back(filename);
+ }
+
  SYS_DEBUG(DL_INFO1, "Path is '" << GetDirectoryPath() << "', Filename is '" << GetFilename() << "'");
 }
 
 std::string PathHandler::GetDirectoryPath(void) const
 {
+ SYS_DEBUG_FUNCTION(DM_FILE);
+
  std::string result;
 
  int end = size() - 1;
  for (int i = 0; ; ) {
-    result += (*this)[i];
+    const char * current = (*this)[i];
+    SYS_DEBUG(DL_INFO1, "Appending '" << current << "'");
+    result += current;
     if (++i >= end) {
         break;
     }
-    result += DIR_SEPARATOR_STR;
+    // Add a separator if it is not a slash:
+    if ((current[0] != DIR_SEPARATOR) && current[0] && !current[1]) {
+        result += DIR_SEPARATOR_STR;
+    }
  }
 
  return result;

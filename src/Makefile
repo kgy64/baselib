@@ -21,5 +21,5 @@ export LFLAGS       +=  $(MY_PROJECT_LIBS)
 .PHONY: clean
 clean:
 	@echo " - Cleaning basic library..."
-	@rm -f $(BINDIR)/* $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
+	@rm -rf $(BINDIR) $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
 

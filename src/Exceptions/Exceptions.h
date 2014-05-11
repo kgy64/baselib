@@ -101,7 +101,7 @@ namespace EX {
 #define ASSERT_DBG(cond, message) \
     { \
         if (!(cond)) { \
-            SYS_DEBUG(DL_ASSERT, "Assert '" #cond "' failed in file " __FILE__ << " at line " << __LINE__ << ": " << message); \
+            SYS_DEBUG(DL_ASSERT, "Assert '" #cond "' failed: " << message); \
             __DO_ASSERT(::EX::Assert, cond, message); \
         } \
     }
