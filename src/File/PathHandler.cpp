@@ -56,15 +56,12 @@ std::string PathHandler::GetDirectoryPath(void) const
  std::string result;
 
  int end = size() - 1;
- for (int i = 0; ; ) {
+ for (int i = 0; i < end; ++i) {
     const char * current = (*this)[i];
     SYS_DEBUG(DL_INFO1, "Appending '" << current << "'");
     result += current;
-    if (++i >= end) {
-        break;
-    }
-    // Add a separator if it is not a slash:
-    if ((current[0] != DIR_SEPARATOR) && current[0] && !current[1]) {
+    // Add a separator if it is not a single slash:
+    if ((current[0] != DIR_SEPARATOR) || current[1]) {
         result += DIR_SEPARATOR_STR;
     }
  }
