@@ -113,11 +113,11 @@ namespace FILES
             }
 
         private:
-            SYS_DEFINE_CLASS_NAME("DB::DatabaseIndexer::DirScanner");
+            SYS_DEFINE_CLASS_NAME("FILES::DirScanner");
 
             void workOnDir(void);
 
-    }; // class DB::DatabaseIndexer::DirScanner
+    }; // class FILES::DirScanner
 
 } // namespace FILES
 
