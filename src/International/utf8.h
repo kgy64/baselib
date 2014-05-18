@@ -80,7 +80,7 @@ namespace UTF8
 
         static WChar GetContinuationChar(const char *& p_str);
 
-    }; // class ToWstring
+    }; // class UTF8::ToWstring
 
     class WideStringIterator: public ToWstring
     {
@@ -119,7 +119,7 @@ namespace UTF8
      private:
         SYS_DEFINE_CLASS_NAME("UTF8::WideStringIterator");
 
-    }; // class WideStringIterator
+    }; // class UTF8::WideStringIterator
 
     class FromWstring
     {
@@ -189,10 +189,12 @@ namespace UTF8
         size_t myLength;
 
         boost::scoped_ptr<char> myStr;
-    };
+
+    }; // class UTF8::FromWstring
 
     const char * Seek(const char * p_str, int p_offset);
-};
+
+}; // namespace UTF8
 
 std::ostream & operator<<(std::ostream & os, const UTF8::WChar * st);
 std::ostream & operator<<(std::ostream & os, UTF8::WChar ch);
