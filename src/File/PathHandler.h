@@ -32,14 +32,14 @@ namespace FILES
         {
         }
 
-        inline int size(void) const
+        inline size_t size(void) const
         {
             return chunks.size();
         }
 
-        inline const char * operator[](int p_index) const
+        inline const char * operator[](unsigned p_index) const
         {
-            ASSERT(p_index >= 0 && p_index < size(), "access beyond limits: " << p_index << ", size=" << size());
+            ASSERT(p_index < size(), "access beyond limits: " << p_index << ", size=" << size());
             return chunks[p_index];
         }
 
