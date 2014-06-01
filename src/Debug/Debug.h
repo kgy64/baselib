@@ -71,22 +71,27 @@ namespace _Debug_Info_
             next = _All_Modules_::first;
             _All_Modules_::first = this;
         }
+
         void SetMode(bool mode)
         {
             is_on = mode;
         }
+
         bool IsOn(void)
         {
             return is_on;
         }
+
         void SetDebuglevel(unsigned int level)
         {
             debuglevel = level;
         }
+
         bool level_is_on(_GenericDebugLevels level)
         {
             return IsOn() && (debuglevel & level);
         }
+
      private:
         unsigned int debuglevel;
         _Debug_Module_ * next;
@@ -109,16 +114,16 @@ namespace _Debug_Info_
 {
     class PrintLock: public Threads::Lock
     {
-    public:
+     public:
         inline PrintLock(void):
             Threads::Lock(debugMutex)
         {
         }
 
-    private:
+     private:
         static Threads::Mutex debugMutex;
 
-    }; // class PrintLock
+    }; // class _Debug_Info_::PrintLock
 
     /// Debug message handler class
     /*! This class is responsible for handling debug messages. The messages can show
@@ -151,7 +156,17 @@ namespace _Debug_Info_
 
         /*! This function just decides if the message shall be printed or not. */
         inline bool level_is_on(_GenericDebugLevels level) {
-            return myModule.level_is_on(level);
+            return info->printlevel == 0 && myModule.level_is_on(level);
+        }
+
+        inline void EnterDebugPrint(void)
+        {
+            ++info->printlevel;
+        }
+
+        inline void LeaveDebugPrint(void)
+        {
+            --info->printlevel;
         }
 
         DebugPrint& operator<<(const std::ostringstream& p_string);
@@ -184,6 +199,10 @@ namespace _Debug_Info_
         {
          public:
             TabInfo(void);
+
+            /*! This variable is incremented when a DEBUG macro starts assembling its message to
+             *  prevent printing unnecessary debug messages during message assembly. */
+            int printlevel;
 
             /*! This variable stores the current tabulation level (the number of nested
                 function calls). */
@@ -231,7 +250,26 @@ namespace _Debug_Info_
             return **out_stream;
         }
 
-    }; // class DebugPrint
+    }; // class _Debug_Info_::DebugPrint
+
+    class DebugFilter
+    {
+     public:
+        inline DebugFilter(DebugPrint & parent):
+            parent(parent)
+        {
+            parent.EnterDebugPrint();
+        }
+
+        inline ~DebugFilter()
+        {
+            parent.LeaveDebugPrint();
+        }
+
+     private:
+        DebugPrint & parent;
+
+    }; // class _Debug_Info_::DebugFilter
 
 } // namespace _Debug_Info_
 
@@ -243,6 +281,13 @@ namespace _Debug_Info_
         Auton<I_DebugOut> __debug_out;                  \
         (*__debug_out) << __debug_temp_.str().c_str();  \
     }
+
+/*! This macro switches the debug output temporarily off. */
+#if SYS_DEBUG_ON
+#define SYS_DEBUG_OFF   _Debug_Info_::DebugFilter   __switch_debug_off(__debugprint)
+#else
+#define SYS_DEBUG_OFF   { }
+#endif
 
 /*! This macro can be used to display the debug messages.<br>
     The main usage is:<br>
@@ -257,7 +302,10 @@ namespace _Debug_Info_
 #define SYS_DEBUG(level, msg)   \
     if (__debugprint.level_is_on(level)) { \
         std::ostringstream __debug_temp_; \
-        __debug_temp_ << msg;   \
+        { \
+            SYS_DEBUG_OFF; \
+            __debug_temp_ << msg;   \
+        } \
         DEBUG_CRITICAL_SECTION; \
         __debugprint.draw_left(); \
         __debugprint << __debug_temp_; \

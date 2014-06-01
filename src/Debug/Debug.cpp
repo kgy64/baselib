@@ -77,7 +77,9 @@ const char DebugPrint::fill_left[] = " /";
 /*! \warning    Do <b>not</b> use this constructor directly, use the macro
                 ::SYS_DEBUG_STATIC instead. */
 DebugPrint::DebugPrint(const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module):
-    info((TabInfo*)0),
+    my_this(NULL),
+    my_lineno(lineno),
+    info(NULL),
     myModule(p_module)
 {
  if (!myModule.IsOn()) {
@@ -87,9 +89,8 @@ DebugPrint::DebugPrint(const char *name, const char *fname, int lineno, ::_Debug
 
  my_name.reset(StrDup(name));
  my_class.reset(StrDup(""));
- my_this = NULL;
  my_filename.reset(StrDup(fname));
- my_lineno = lineno;
+
  entering();
 }
 
@@ -106,6 +107,9 @@ DebugPrint::DebugPrint(const char *name, const char *fname, int lineno, ::_Debug
 /*! \warning    Do <b>not</b> use this constructor deirectly, use the macro
                 ::SYS_DEBUG_MEMBER instead. */
 DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module):
+    my_this(thisptr),
+    my_lineno(lineno),
+    info(NULL),
     myModule(p_module)
 {
  if (!myModule.IsOn()) {
@@ -115,9 +119,8 @@ DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *na
 
  my_name.reset(StrDup(name));
  my_class.reset(StrDup(classptr));
- my_this = thisptr;
  my_filename.reset(StrDup(fname));
- my_lineno = lineno;
+
  entering();
 }
 
@@ -172,8 +175,6 @@ void DebugPrint::leaving(void)
  }
 
  DEBUG_CRITICAL_SECTION;
-
- info = &levels[pthread_self()];
 
  I_DebugOut & out(GetOutStream());
 
@@ -270,6 +271,7 @@ DebugPrint& DebugPrint::operator<<(const std::ostringstream& p_string)
 int DebugPrint::TabInfo::next_id = 0;
 
 DebugPrint::TabInfo::TabInfo(void):
+    printlevel(0),
     tablevel(0),
     tabshift(0),
     id(next_id++)
