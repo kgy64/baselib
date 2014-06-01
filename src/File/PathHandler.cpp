@@ -69,4 +69,18 @@ std::string PathHandler::GetDirectoryPath(void) const
  return result;
 }
 
+std::string PathHandler::GetFullPath(void) const
+{
+ SYS_DEBUG_FUNCTION(DM_FILE);
+
+ std::string result = GetDirectoryPath();
+
+ if (*filename) {
+    result += DIR_SEPARATOR_STR;
+    result += filename;
+ }
+
+ return result;
+}
+
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

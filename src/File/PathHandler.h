@@ -49,6 +49,7 @@ namespace FILES
         }
 
         std::string GetDirectoryPath(void) const;
+        std::string GetFullPath(void) const;
 
      protected:
         Parser::Tokenizer tags;
