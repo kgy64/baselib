@@ -1,7 +1,7 @@
 #ifndef __CONFIGDRIVER_H__
 #define __CONFIGDRIVER_H__
 
-#include <File/FileMap.h>
+#include <File/FileMapTyped.h>
 #include <Debug/Debug.h>
 
 #include <boost/shared_ptr.hpp>
