@@ -14,11 +14,10 @@ export BASE_LIBRARIES    =
 
 .PHONY: all
 all:
-	@echo "Don't use this make directly, call it from the root of this project."
-	@exit 1
+	$(SILENT_MODE)echo "Don't use this make directly, call it from the root of this project."
+	$(SILENT_MODE)exit 1
 
 -include $(SCRIPTDIR)/makesource
--include $(SCRIPTDIR)/make.states
 
 export CXXFLAGS     +=  -DSYS_DEBUG_ON=1 -I$(PROJECT_ROOT)/tests/include -I$(PROJECT_ROOT)/opsys/unix
 export LFLAGS       +=  $(MY_PROJECT_LIBS)
@@ -27,25 +26,25 @@ $(MY_BASIC_LIB): _basic
 
 .PHONY: _basic
 _basic:
-	@(cd ../ && $(MAKE) all)
+	$(SILENT_MODE)(cd ../ && $(MAKE) all)
 
 .PHONY: test
 test: _everything
-	@echo "Running test:"
-	@$(BINDIR)/$(NAME)
+	$(SILENT_MODE)echo "Running test:"
+	$(SILENT_MODE)$(BINDIR)/$(NAME)
 
 .PHONY: clean
 clean:
-	@echo " - Cleanincs $(NAME)..."
-	@rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
+	$(SILENT_MODE)echo " - Cleaning $(NAME)..."
+	$(SILENT_MODE)rm -f $(OBJECTS) $(BINDIR)/$(NAME) $(DEPENDS)
 
 .PHONY: $(BINDIR)
 $(BINDIR):
-	@test -d "$@" || mkdir "$@"
+	$(SILENT_MODE)test -d "$@" || mkdir "$@"
 
 $(BINDIR)/$(NAME): $(BINDIR) $(OBJECTS_AND_LIBS)
-	@echo " o Linking executable '$(NAME)'..."
-	@$(CXX) -o "$@" $(OBJECTS_AND_LIBS) $(LFLAGS)
+	$(SILENT_MODE)echo " o Linking executable '$(NAME)'..."
+	$(SILENT_MODE)$(CXX) -o "$@" $(OBJECTS_AND_LIBS) $(LFLAGS)
 
 _everything: $(BINDIR)/$(NAME)
 

@@ -8,12 +8,11 @@ export SRCDIR              ?=  .
 all: _everything
 
 include $(SCRIPTDIR)/makesource
-include $(SCRIPTDIR)/make.states
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 .PHONY: clean
 clean:
-	@echo " - Cleaning $(NAME) objects..."
-	@rm -f $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
+	$(SILENT_MODE)echo " - Cleaning $(NAME) objects..."
+	$(SILENT_MODE)rm -f $(OBJECTS) $(Y_CPPFILES) $(Y_HEADERS) $(DEPENDS)
 

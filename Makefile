@@ -10,20 +10,20 @@ OPERATING_SYSTEM       ?=   unix
 
 .PHONY: all
 all:
-	@(cd src && $(MAKE) -s)
+	$(SILENT_MODE)cd src && $(MAKE)
 
 .PHONY: test
 test:
-	@(cd tests && $(MAKE) -s test)
+	$(SILENT_MODE)cd tests && $(MAKE) test)
 
 .PHONY: clean
 clean:
-	(cd src && $(MAKE) -s clean)
-	(cd opsys/$(OPERATING_SYSTEM) && $(MAKE) -s clean)
-	(cd tests && $(MAKE) -s clean)
-	rm -rf doc
+	$(SILENT_MODE)(cd src && $(MAKE) clean)
+	$(SILENT_MODE)(cd opsys/$(OPERATING_SYSTEM) && $(MAKE) clean)
+	$(SILENT_MODE)(cd tests && $(MAKE) clean)
+	$(SILENT_MODE)rm -rf doc
 
 .PHONY: doc
 doc:
-	@$(DOXYGEN) Doxyfile
+	$(SILENT_MODE)$(DOXYGEN) Doxyfile
 
