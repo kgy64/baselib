@@ -14,6 +14,7 @@
 #include <exception>
 #include <iostream>
 #include <sstream>
+#include <errno.h>
 
 #define DEFINE_EXCEPTION(NAME, MSG, BASE)   \
     class NAME: public BASE                 \
