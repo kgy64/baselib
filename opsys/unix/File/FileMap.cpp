@@ -54,7 +54,7 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
         return;
     }
  } else {
-    ASSERT_DBG(fd >= 0, "File '" << name << "' could not be opened.");
+    ASSERT_STRERROR(fd >= 0, "File '" << name << "' could not be opened: ");
  }
 
  if (p_size) {
