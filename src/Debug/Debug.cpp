@@ -198,11 +198,11 @@ void DebugPrint::shift_right(void)
         I_DebugOut & out(GetOutStream());
         for (int j = 0; j < 10; j++) {
             --info->tablevel;
-            header();
+            overture();
             out << "/";
             for (int i = 0; i<info->tablevel; i++) out << fill_left;
             endline();
-            header();
+            overture();
             for (int i = 0; i<info->tablevel; i++) out << fill_left;
             endline();
         }
@@ -219,11 +219,11 @@ void DebugPrint::shift_left(void)
     if (level_is_on(DL_CALLS)) {
         I_DebugOut & out(GetOutStream());
         for (int j = 0; j < 10; j++) {
-            header();
+            overture();
             out << "\\";
             for (int i = 0; i<info->tablevel; i++) out << fill_right;
             endline();
-            header();
+            overture();
             for (int i = -1; i<info->tablevel; i++) out << fill_right;
             endline();
             ++info->tablevel;
@@ -238,9 +238,10 @@ void DebugPrint::shift_left(void)
     DebugPrint::fill_2) TabInfo::tablevel times. */
 void DebugPrint::draw_left(void)
 {
- header();
+ overture();
  if (level_is_on(DL_CALLS)) {
     I_DebugOut & out(GetOutStream());
+    out.header();
     for (int i=0; i<info->tablevel; i++) {
         out << fill_2;
     }
@@ -248,7 +249,7 @@ void DebugPrint::draw_left(void)
 }
 
 
-void DebugPrint::header(void)
+void DebugPrint::overture(void)
 {
  char id_string[40];
  sprintf(id_string, "%4d: ", info->id);

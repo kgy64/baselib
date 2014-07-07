@@ -35,6 +35,10 @@ class I_DebugOut
     {
     }
 
+    virtual void header(void)
+    {
+    }
+
     virtual I_DebugOut & operator<<(const char *) =0;
     virtual I_DebugOut & operator<<(const void *);
     virtual I_DebugOut & operator<<(int);
@@ -176,7 +180,7 @@ namespace _Debug_Info_
         void leaving(void);
         void shift_right(void);
         void shift_left(void);
-        void header(void);
+        void overture(void);
 
         /*! This variable stores the copy of the function name. */
         boost::scoped_array<char> my_name;
