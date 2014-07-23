@@ -384,7 +384,7 @@ namespace _Debug_Info_
 
 #define SYS_DEBUG_ALL_MODULES_ON SYS_DEBUG_ALL_MODULES(true)
 
-#define SYS_DEBUG_ALL_MODULES_OFF SYS_DEBUG_ALL_MODULES_OFF(false)
+#define SYS_DEBUG_ALL_MODULES_OFF SYS_DEBUG_ALL_MODULES(false)
 
 #if SYS_DEBUG_ON
 #define SYS_DEFINE_MODULE(name) ::_Debug_Info_::_Debug_Module_ _SYS_DEBUG_MODULE_NAME(name)
