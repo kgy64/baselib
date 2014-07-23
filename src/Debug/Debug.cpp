@@ -114,6 +114,7 @@ DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *na
 {
  if (!myModule.IsOn()) {
     // Do not initialize anything: this class will do nothing (or at least as few as possible)
+    // Note that the member 'info' remains NULL in this case.
     return;
  }
 

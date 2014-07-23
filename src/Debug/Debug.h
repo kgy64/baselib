@@ -160,7 +160,11 @@ namespace _Debug_Info_
 
         /*! This function just decides if the message shall be printed or not. */
         inline bool level_is_on(_GenericDebugLevels level) {
-            return info->printlevel == 0 && myModule.level_is_on(level);
+            // Notes:
+            // - If the 'info' is NULL it means the corresponding module is disabled at all
+            // - If the printlevel is not zero it means the debug out is disabled by macro SYS_DEBUG_OFF
+            // - Otherwise check the level in the module
+            return info && info->printlevel == 0 && myModule.level_is_on(level);
         }
 
         inline void EnterDebugPrint(void)
