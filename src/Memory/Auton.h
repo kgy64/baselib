@@ -160,7 +160,7 @@ namespace _AutonPrivate
         /// This is the current Implementation
         /*! It can be NULL if it has not been instantiated yet, or has already been deleted.
          */
-        I * myInterface;
+        volatile I * myInterface;
 
         /// Reference counter for the Interface
         /*! \see AutonInterface::Drop()
@@ -443,11 +443,11 @@ namespace _AutonPrivate
     template <class I>
     inline I * AutonInterface<I>::GetImplementation(void)
     {
-        if (myInterface) return myInterface; // It is already created, nothing to do
+        if (myInterface) return (I*)myInterface; // It is already created, nothing to do
         Threads::Lock _l(myMutex);
-        if (myInterface) return myInterface; // Somebody else has just created it
+        if (myInterface) return (I*)myInterface; // Somebody else has just created it
         myInterface = CreateImplementation();
-        return myInterface;
+        return (I*)myInterface;
     }
 }
 
