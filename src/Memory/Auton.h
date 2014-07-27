@@ -102,8 +102,14 @@ namespace _AutonPrivate
             return implementation->Create();
         }
 
-        /// Checks if the Implementation is instantiated or not
+        /// Checks if the Implementation is available or not
         inline bool IsValid(void)
+        {
+            return implementation;
+        }
+
+        /// Checks if the Implementation is instantiated or not
+        inline bool IsInstantiated(void)
         {
             return myInterface;
         }

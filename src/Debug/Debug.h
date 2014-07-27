@@ -13,6 +13,7 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -312,7 +313,17 @@ namespace _Debug_Info_
         std::ostringstream __debug_temp_; \
         { \
             SYS_DEBUG_OFF; \
-            __debug_temp_ << msg;   \
+            try { \
+                __debug_temp_ << msg;   \
+            } catch (std::exception & ex) { \
+                __debug_temp_.str(""); \
+                __debug_temp_.clear(); \
+                __debug_temp_ << "**** message in line " << __LINE__ << " could not be displayed because " << ex.what() << " *****"; \
+            } catch (...) { \
+                __debug_temp_.str(""); \
+                __debug_temp_.clear(); \
+                __debug_temp_ << "**** message in line " << __LINE__ << " could not be displayed due to unknown exception *****"; \
+            } \
         } \
         DEBUG_CRITICAL_SECTION; \
         __debugprint.draw_left(); \
