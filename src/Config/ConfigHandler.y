@@ -7,7 +7,7 @@ static int yylex(yy::ConfParser::semantic_type * yylval, yy::ConfParser::locatio
 %skeleton "lalr1.cc"
 %defines
 
-%define "parser_class_name" "ConfParser"
+%define parser_class_name { ConfParser }
 %parse-param { class ConfDriver& driver }
 %lex-param { class ConfDriver& driver }
 %error-verbose
