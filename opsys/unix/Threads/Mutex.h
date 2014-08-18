@@ -11,8 +11,9 @@
 #ifndef __SRC_THREADS_MUTEX_H_INCLUDED__
 #define __SRC_THREADS_MUTEX_H_INCLUDED__
 
-#include <pthread.h>
 #include <Threads/Error.h>
+
+#include <pthread.h>
 
 namespace Threads
 {
