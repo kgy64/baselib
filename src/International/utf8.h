@@ -11,7 +11,7 @@
 #ifndef __SRC_INTERNATIONAL_UTF8_H_INCLUDED__
 #define __SRC_INTERNATIONAL_UTF8_H_INCLUDED__
 
-#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <string>
 
 #include <Exceptions/Exceptions.h>
@@ -76,7 +76,7 @@ namespace UTF8
 
         size_t myLength;
 
-        const std::auto_ptr<WChar> myStr;
+        const boost::scoped_array<WChar> myStr;
 
         static WChar GetContinuationChar(const char *& p_str);
 
@@ -188,7 +188,7 @@ namespace UTF8
 
         size_t myLength;
 
-        boost::scoped_ptr<char> myStr;
+        boost::scoped_array<char> myStr;
 
     }; // class UTF8::FromWstring
 
