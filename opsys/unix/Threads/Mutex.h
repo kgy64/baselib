@@ -14,6 +14,7 @@
 #include <Threads/Error.h>
 
 #include <pthread.h>
+#include <boost/shared_ptr.hpp>
 
 namespace Threads
 {
@@ -113,6 +114,8 @@ namespace Threads
         int myStatus;
 
     }; // class TryLock
+
+    typedef boost::shared_ptr<Lock> LockPtr;
 
 } // namespace Threads
 
