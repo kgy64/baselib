@@ -42,6 +42,18 @@ namespace Threads
             myUseCondition.Signal();
         }
 
+        inline void push_drop(const DataType & p_data)
+        {
+            Threads::Lock _l(myDataMutex);
+            while (currentSize >= maxSize) {
+                myData.pop_front();
+                --currentSize;
+            }
+            myData.push_back(p_data);
+            ++currentSize;
+            myUseCondition.Signal();
+        }
+
         inline DataType pop(void)
         {
             Threads::Lock _l(myDataMutex);
@@ -84,7 +96,7 @@ namespace Threads
 
         Threads::Condition myFreeCondition;
 
-    }; // class DataPipe
+    }; // class Threads::DataPipe
 
 } // namespace Threads
 
