@@ -32,12 +32,12 @@ bool SerialPort::Open(const char * DeviceName, int baud)
     struct stat file_stat;
 
     if (lstat(name.c_str(), &file_stat) < 0) {
-        SYS_DEBUG(DL_INFO1, "Cannot stat() file '" << name << "'");
+        SYS_DEBUG(DL_ERROR, "Cannot stat() file '" << name << "'");
         return false;
     }
 
     if (S_ISDIR(file_stat.st_mode)) {
-        SYS_DEBUG(DL_INFO1, "The given file '" << name << "' is a directory.");
+        SYS_DEBUG(DL_ERROR, "The given file '" << name << "' is a directory.");
         return false;
     }
 
@@ -45,13 +45,13 @@ bool SerialPort::Open(const char * DeviceName, int baud)
         is_device = S_ISCHR(file_stat.st_mode);
         fd = open(name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
         if (fd < 0) {
-            SYS_DEBUG(DL_INFO1, "Error opening serial port (or file) '" << name << "'");
+            SYS_DEBUG(DL_ERROR, "Error opening serial port (or file) '" << name << "'");
             return false;
         }
         if (is_device) {
             struct termios termio;
             if (tcgetattr(fd, &termio) < 0) {
-                SYS_DEBUG(DL_INFO1, "tcgetattr() failed on '" << name << "'");
+                SYS_DEBUG(DL_ERROR, "tcgetattr() failed on '" << name << "'");
                 Close();
                 return false;
             }
@@ -66,13 +66,13 @@ bool SerialPort::Open(const char * DeviceName, int baud)
             termio.c_iflag &=~ ICRNL;
             termio.c_iflag &=~ IGNBRK;
             termio.c_iflag &=~ IGNCR;
-            termio.c_iflag &=~ IGNPAR;	// TODO
+            termio.c_iflag &=~ IGNPAR;  // TODO
             termio.c_iflag &=~ INLCR;
-            termio.c_iflag &=~ INPCK;	// TODO
+            termio.c_iflag &=~ INPCK;   // TODO
             termio.c_iflag &=~ ISTRIP;
             termio.c_iflag &=~ IXOFF;
             termio.c_iflag &=~ IXON;
-            termio.c_iflag &=~ PARMRK;	// TODO
+            termio.c_iflag &=~ PARMRK;  // TODO
 
             termio.c_oflag &=~ OPOST;
 
@@ -94,7 +94,7 @@ bool SerialPort::Open(const char * DeviceName, int baud)
             // Throw away any old data
             tcflush(fd, TCIOFLUSH);
 
-            // Set set the serial port immediatly
+            // Set the serial port immediately
             tcsetattr(fd, TCSANOW, &termio);
         }
 
@@ -106,12 +106,12 @@ bool SerialPort::Open(const char * DeviceName, int baud)
     char * newname = (char*)alloca(file_stat.st_size+1);
     ssize_t r = readlink(name.c_str(), newname, file_stat.st_size+1);
     if (r < 0) {
-        SYS_DEBUG(DL_INFO1, "Cannot follow symbolic link '" << name << "'");
+        SYS_DEBUG(DL_ERROR, "Cannot follow symbolic link '" << name << "'");
         return false;
     }
 
     if (r > file_stat.st_size) {
-        SYS_DEBUG(DL_INFO1, "Symbolic link is changed during operation.");
+        SYS_DEBUG(DL_ERROR, "Symbolic link is changed during operation.");
         return false;
     }
 
@@ -123,15 +123,6 @@ bool SerialPort::Open(const char * DeviceName, int baud)
  SYS_DEBUG(DL_INFO1, "Symbolic link is too deep (>100)");
 
  return false;
-}
-
-void SerialPort::Wait(uint32_t time) const
-{
- SYS_DEBUG_MEMBER(DM_SERIAL);
- if (is_device)
-    return;
- SYS_DEBUG(DL_INFO1, "Sleeping for " << time << " ms...");
- usleep(time*1000);
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

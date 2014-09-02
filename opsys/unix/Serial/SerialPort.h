@@ -18,8 +18,6 @@ namespace SYS
 
         bool Open(const char * DeviceName, int baud = 9600);
 
-        void Wait(uint32_t time) const;
-
         void Close(void)
         {
             close(fd);
