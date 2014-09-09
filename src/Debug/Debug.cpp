@@ -7,9 +7,14 @@
  * Licence:     GPL
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "Debug.h"
+
+#include <Threads/Threads.h>
 #include <System/Generic.h>
-#include <Debug/Debug.h>
+
 #include <iomanip>
+
+::_Debug_Info_::_Debug_Module_ Debug::__builtin_debug_module(true);
 
 using namespace std;
 using namespace _Debug_Info_;
@@ -84,14 +89,21 @@ DebugPrint::DebugPrint(const char *name, const char *fname, int lineno, ::_Debug
 {
  if (!myModule.IsOn()) {
     // Do not initialize anything: this class will do nothing (or at least as few as possible)
+    // Note that the member 'info' remains NULL in this case.
     return;
  }
 
- my_name.reset(StrDup(name));
+ info = &levels[Threads::getTid()];
+
+ if (name) {
+    my_name.reset(StrDup(name));
+ }
  my_class.reset(StrDup(""));
  my_filename.reset(StrDup(fname));
 
- entering();
+ if (my_name) {
+    entering();
+ }
 }
 
 
@@ -118,11 +130,18 @@ DebugPrint::DebugPrint(const void *thisptr, const char *classptr, const char *na
     return;
  }
 
- my_name.reset(StrDup(name));
+ info = &levels[Threads::getTid()];
+
+ if (name) {
+    my_name.reset(StrDup(name));
+ }
+
  my_class.reset(StrDup(classptr));
  my_filename.reset(StrDup(fname));
 
- entering();
+ if (my_name) {
+    entering();
+ }
 }
 
 
@@ -134,7 +153,9 @@ DebugPrint::~DebugPrint()
     return;
  }
 
- leaving();
+ if (my_name) {
+    leaving();
+ }
 }
 
 
@@ -142,8 +163,6 @@ DebugPrint::~DebugPrint()
 void DebugPrint::entering(void)
 {
  DEBUG_CRITICAL_SECTION;
-
- info = &levels[pthread_self()];
 
  if (!level_is_on(DL_CALLS)) {
     return;
@@ -155,10 +174,12 @@ void DebugPrint::entering(void)
  draw_left();
  out << fill_1_begin;
 
- if (my_this != NULL) {
-    out << my_class.get() << "::" << my_name.get() << "(): this=" << my_this << ", ";
- } else {
-    out << my_name.get() << "(): ";
+ if (my_name) {
+    if (my_this != NULL) {
+        out << my_class.get() << "::" << my_name.get() << "(): this=" << my_this << ", ";
+    } else {
+        out << my_name.get() << "(): ";
+    }
  }
 
  out << my_filename.get() << ":" << my_lineno;
@@ -237,14 +258,16 @@ void DebugPrint::shift_left(void)
 
 /*! This function prints the separator string (stored in the
     DebugPrint::fill_2) TabInfo::tablevel times. */
-void DebugPrint::draw_left(void)
+void DebugPrint::draw_left(bool separators)
 {
  overture();
  if (level_is_on(DL_CALLS)) {
     I_DebugOut & out(GetOutStream());
     out.header();
-    for (int i=0; i<info->tablevel; i++) {
-        out << fill_2;
+    if (separators) {
+        for (int i=0; i<info->tablevel; i++) {
+            out << fill_2;
+        }
     }
  }
 }
@@ -253,7 +276,7 @@ void DebugPrint::draw_left(void)
 void DebugPrint::overture(void)
 {
  char id_string[40];
- sprintf(id_string, "%4d: ", info->id);
+ sprintf(id_string, " %5d: ", info->tid);
  GetOutStream() << id_string;
 }
 
@@ -276,7 +299,8 @@ DebugPrint::TabInfo::TabInfo(void):
     printlevel(0),
     tablevel(0),
     tabshift(0),
-    id(next_id++)
+    id(next_id++),
+    tid(Threads::getTid())
 {
 }
 

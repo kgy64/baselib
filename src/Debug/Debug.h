@@ -69,9 +69,9 @@ namespace _Debug_Info_
     {
      friend class _All_Modules_;
      public:
-        _Debug_Module_(void):
+        _Debug_Module_(bool on_state = false):
             debuglevel(0UL),
-            is_on(false)
+            is_on(on_state)
         {
             next = _All_Modules_::first;
             _All_Modules_::first = this;
@@ -156,7 +156,7 @@ namespace _Debug_Info_
         DebugPrint(const void *thisptr, const char *classptr, const char *name, const char *fname, int lineno, ::_Debug_Info_::_Debug_Module_ & p_module);
         ~DebugPrint();
 
-        void draw_left(void);
+        void draw_left(bool separators = true);
         void endline(void);
 
         /*! This function just decides if the message shall be printed or not. */
@@ -223,6 +223,9 @@ namespace _Debug_Info_
             /*! */
             int id;
 
+            /*! */
+            pid_t tid;
+
          private:
             static int next_id;
         };
@@ -285,10 +288,13 @@ namespace _Debug_Info_
 /// Print a message unconditionally
 #define DEBUG_OUT(msg)                                  \
     {                                                   \
+        ::_Debug_Info_::DebugPrint __debugprint_2(NULL, __FILE__, __LINE__, Debug::__builtin_debug_module); \
         std::ostringstream __debug_temp_;               \
-        __debug_temp_ << msg << std::endl;              \
-        Auton<I_DebugOut> __debug_out;                  \
-        (*__debug_out) << __debug_temp_.str().c_str();  \
+        __debug_temp_ << msg;                           \
+        DEBUG_CRITICAL_SECTION;                         \
+        __debugprint_2.draw_left(false);                \
+        __debugprint_2 << __debug_temp_;                \
+        __debugprint_2.endline();                       \
     }
 
 /*! This macro switches the debug output temporarily off. */
@@ -308,27 +314,27 @@ namespace _Debug_Info_
     \note   The message itself must be built before entering the critical section to prevent deadlock
             by calling member functions recursively from here. */
 #if SYS_DEBUG_ON
-#define SYS_DEBUG(level, msg)   \
-    if (__debugprint.level_is_on(level)) { \
-        std::ostringstream __debug_temp_; \
-        { \
-            SYS_DEBUG_OFF; \
-            try { \
-                __debug_temp_ << msg;   \
-            } catch (std::exception & ex) { \
-                __debug_temp_.str(""); \
-                __debug_temp_.clear(); \
+#define SYS_DEBUG(level, msg)                           \
+    if (__debugprint.level_is_on(level)) {              \
+        std::ostringstream __debug_temp_;               \
+        {                                               \
+            SYS_DEBUG_OFF;                              \
+            try {                                       \
+                __debug_temp_ << msg;                   \
+            } catch (std::exception & ex) {             \
+                __debug_temp_.str("");                  \
+                __debug_temp_.clear();                  \
                 __debug_temp_ << "**** message in line " << __LINE__ << " could not be displayed because " << ex.what() << " *****"; \
-            } catch (...) { \
-                __debug_temp_.str(""); \
-                __debug_temp_.clear(); \
+            } catch (...) {                             \
+                __debug_temp_.str("");                  \
+                __debug_temp_.clear();                  \
                 __debug_temp_ << "**** message in line " << __LINE__ << " could not be displayed due to unknown exception *****"; \
-            } \
-        } \
-        DEBUG_CRITICAL_SECTION; \
-        __debugprint.draw_left(); \
-        __debugprint << __debug_temp_; \
-        __debugprint.endline(); \
+            }                                           \
+        }                                               \
+        DEBUG_CRITICAL_SECTION;                         \
+        __debugprint.draw_left();                       \
+        __debugprint << __debug_temp_;                  \
+        __debugprint.endline();                         \
     }
 #else
 #define SYS_DEBUG(level, msg) { }
@@ -338,7 +344,7 @@ namespace _Debug_Info_
 /*! This macro defines a variable from the class ::_Debug_Info_::DebugPrint and
     passes the name of the function to the constructor. */
 #if SYS_DEBUG_ON
-#define SYS_DEBUG_FUNCTION(module_name) \
+#define SYS_DEBUG_FUNCTION(module_name)                 \
     ::_Debug_Info_::DebugPrint __debugprint(__FUNCTION__, __FILE__, __LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_FUNCTION(name) { }
@@ -353,7 +359,7 @@ namespace _Debug_Info_
 /*! This macro defines a variable from the class ::_Debug_Info_::DebugPrint and
     passes the name of the class and the function to the constructor. */
 #if SYS_DEBUG_ON
-#define SYS_DEBUG_MEMBER_NAME(name, module_name) \
+#define SYS_DEBUG_MEMBER_NAME(name, module_name)        \
     ::_Debug_Info_::DebugPrint __debugprint(this, name, __FUNCTION__, __FILE__, __LINE__, _SYS_DEBUG_MODULE_NAME(module_name))
 #else
 #define SYS_DEBUG_MEMBER_NAME(name, module_name) { }
@@ -414,6 +420,11 @@ namespace _Debug_Info_
 #else
 #define VIRTUAL_IF_DEBUG
 #endif
+
+namespace Debug
+{
+    extern ::_Debug_Info_::_Debug_Module_ __builtin_debug_module;
+}
 
 #define YESNO(value)    ((value) ? "yes" : "no")
 

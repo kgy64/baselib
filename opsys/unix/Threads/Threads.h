@@ -22,6 +22,8 @@ SYS_DECLARE_MODULE(DM_THREAD);
 
 namespace Threads
 {
+    pid_t getTid(void);
+
     class Thread
     {
      public:
@@ -78,7 +80,7 @@ namespace Threads
 
             inline void SetStackSize(size_t stack)
             {
-                ASSERT_THREAD(pthread_attr_setstacksize(&myAttrib, stack)==0, "pthread_attr_setstacksize() failed");
+                ASSERT_THREAD(pthread_attr_setstacksize(&myAttrib, stack)==0, "pthread_attr_setstacksize(" << stack << ") failed");
             }
 
             inline pthread_attr_t * get()

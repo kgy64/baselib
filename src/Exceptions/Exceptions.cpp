@@ -20,7 +20,7 @@ BaseException::BaseException(const char * msg, int line)
     busy = true;
  }
  if (line > 0) {
-    *this << (busy ? " at line " : "At line ");
+    *this << (busy ? ":" : "At line ");
     *this << line;
     busy = true;
  }

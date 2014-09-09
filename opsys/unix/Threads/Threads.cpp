@@ -9,10 +9,13 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "Threads.h"
+
+#include <Debug/Debug.h>
+
+#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h> // for setpriority()
-
-#include "Threads.h"
 
 SYS_DEFINE_MODULE(DM_THREAD);
 
@@ -89,8 +92,23 @@ void Thread::Start(size_t stack)
  */
 void * Thread::_main(void * thread_pointer)
 {
- Thread * th = reinterpret_cast<Thread*>(thread_pointer);
- th->atExit(th->main());
+ int status = 0;
+ Thread & th = *reinterpret_cast<Thread*>(thread_pointer);
+
+ try {
+    status = th.main();
+ } catch (std::exception & ex) {
+    DEBUG_OUT("Thread Execution Error in main(): " << ex.what());
+    return (void*)0;
+ }
+
+ try {
+    th.atExit(status);
+ } catch (std::exception & ex) {
+    DEBUG_OUT("Thread Execution Error in atExit(): " << ex.what());
+    return (void*)0;
+ }
+
  return (void*)0;
 }
 
@@ -105,6 +123,11 @@ bool Thread::SetPriority(int prio)
  SYS_DEBUG(DL_INFO1, "Priotiry is set to " << prio);
 
  return setpriority(PRIO_PROCESS, 0, prio) == 0;
+}
+
+pid_t Threads::getTid(void)
+{
+ return gettid();
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
