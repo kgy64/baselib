@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h> // for setpriority()
+#include <unistd.h>
+#include <sys/syscall.h>  // For SYS_xxx definitions
 
 SYS_DEFINE_MODULE(DM_THREAD);
 
@@ -127,7 +129,13 @@ bool Thread::SetPriority(int prio)
 
 pid_t Threads::getTid(void)
 {
+#ifdef SYS_gettid
+ // It is suitable for my Linux distributions
+ return syscall(SYS_gettid);
+#else
+ // It is suitable for Android
  return gettid();
+#endif
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
