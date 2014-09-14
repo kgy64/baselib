@@ -15,7 +15,9 @@
 
 namespace Threads
 {
-    using PTHREAD::Thread Thread;
+    class Thread: public PTHREAD::Thread
+    {
+    }; // class Threads::Thread
 
 } // namespace Threads
 
