@@ -21,7 +21,7 @@
 
 SYS_DEFINE_MODULE(DM_THREAD);
 
-using namespace Threads;
+using namespace PTHREAD;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
