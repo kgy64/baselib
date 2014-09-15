@@ -30,7 +30,7 @@ namespace AndroidAccess
 
     /// The JNIEnv pointer of the main thread
     /*! Note that every thread has its own JNIEnv, and it is especially for the main thread. For other
-     *  threads, call the function \ref AndroidAccess::GetJNIEnv()
+     *  threads, call the function \ref AndroidAccess::getJNIEnv() or \ref AndroidAccess::ThreadJNIEnv::getJNIEnv()
      */
     extern JNIEnv * jenv;
 
@@ -39,6 +39,10 @@ namespace AndroidAccess
     jint Initialize(JavaVM * vm);
 
     /// Fetch the JNIEnv pointer of the current thread
+    /*! This function can be used on any thread (including main one). Note that there is a more efficient way
+     *  to do it: see \ref AndroidAccess::jenv for main thread, and \ref AndroidAccess::ThreadJNIEnv::getJNIEnv()
+     *  for any other threads. However, calling this function needs only ~3 microseconds on my 1.7 GHz machine.
+     *  */
     inline JNIEnv * getJNIEnv(void)
     {
         JNIEnv * jni;
@@ -57,6 +61,8 @@ namespace AndroidAccess
         ThreadJNIEnv(void);
         virtual ~ThreadJNIEnv();
 
+        /// Get the JNIEnv pointer associated to this thread
+        /*! \note   For the main thread, use the function AndroidAccess::getJNIEnv() */
         inline JNIEnv * getJNIEnv(void) const
         {
             return jni;
