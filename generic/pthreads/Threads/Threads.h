@@ -102,6 +102,11 @@ namespace PTHREAD
      private:
         SYS_DEFINE_CLASS_NAME("PTHREAD::Thread");
 
+        /// A function called before \ref Thread::main()
+        virtual void before_main(void)
+        {
+        }
+
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 

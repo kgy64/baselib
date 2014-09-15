@@ -17,8 +17,14 @@
 namespace Threads
 {
     /// Android-specific thread
-    class Thread: public PTHREAD::Thread, public AndroidAccess::ThreadJNIEnv
+    class Thread: public AndroidAccess::ThreadJNIEnv, public PTHREAD::Thread
     {
+     private:
+        virtual void before_main(void) override
+        {
+            attachAndroidThread();
+        }
+
     }; // class AndroidAccess::Thread
 
 } // namespace AndroidAccess

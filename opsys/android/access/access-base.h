@@ -63,6 +63,8 @@ namespace AndroidAccess
         }
 
      protected:
+        void attachAndroidThread(void);
+
         JNIEnv * jni;
 
      private:

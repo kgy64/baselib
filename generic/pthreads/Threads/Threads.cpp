@@ -98,6 +98,7 @@ void * Thread::_main(void * thread_pointer)
  Thread & th = *reinterpret_cast<Thread*>(thread_pointer);
 
  try {
+    th.before_main();
     status = th.main();
  } catch (std::exception & ex) {
     DEBUG_OUT("Thread Execution Error in main(): " << ex.what());
