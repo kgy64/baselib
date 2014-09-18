@@ -22,6 +22,7 @@ using namespace AndroidAccess;
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 Gesture::Gesture(boost::shared_ptr<AndroidRenderThread> & parent):
+    Threads::Thread("Gesture"),
     parent(parent)
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);

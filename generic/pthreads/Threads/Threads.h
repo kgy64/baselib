@@ -31,7 +31,7 @@ namespace PTHREAD
     class Thread
     {
      public:
-        Thread(void);
+        Thread(const char * name);
         virtual ~Thread();
 
         void Start(size_t stack = 1024*1024);
@@ -61,6 +61,11 @@ namespace PTHREAD
         {
             SYS_DEBUG_STATIC(DM_THREAD);
             ASSERT_STD(sched_yield()==0);
+        }
+
+        inline const std::string & getThreadName(void) const
+        {
+            return myThreadName;
         }
 
      protected:
@@ -99,11 +104,20 @@ namespace PTHREAD
 
         pthread_t myThread;
 
+        /// The thread name
+        /*! \note   This is mainly for debug purposes. */
+        std::string myThreadName;
+
      private:
         SYS_DEFINE_CLASS_NAME("PTHREAD::Thread");
 
         /// A function called before \ref Thread::main()
         virtual void before_main(void)
+        {
+        }
+
+        /// A function called after \ref Thread::main()
+        virtual void after_main(void)
         {
         }
 

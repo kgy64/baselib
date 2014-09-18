@@ -85,18 +85,11 @@ ThreadJNIEnv::ThreadJNIEnv(void):
     jni(nullptr)
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
-
 }
 
 ThreadJNIEnv::~ThreadJNIEnv()
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
- if (jni) {
-    int status = jvm->DetachCurrentThread();
-    if (status < 0) {
-        __android_log_write(ANDROID_LOG_ERROR, myTag, "Android Access Library: could not detach thread");
-    }
- }
 }
 
 /// Attach the current thread to the Java VM
@@ -111,6 +104,20 @@ void ThreadJNIEnv::attachAndroidThread(void)
  ASSERT(status >= 0, "cannot attach thread to JVM");
 
  SYS_DEBUG(DL_INFO1, "Thread attached: JavaVM=" << jvm << ", JNIEnv=" << getJNIEnv());
+}
+
+/// Attach the current thread to the Java VM
+/*! This function must be called after each Android thread. */
+void ThreadJNIEnv::detachAndroidThread(void)
+{
+ SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+
+ if (jni) {
+    int status = jvm->DetachCurrentThread();
+    if (status < 0) {
+        __android_log_write(ANDROID_LOG_ERROR, myTag, "Android Access Library: could not detach thread");
+    }
+ }
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

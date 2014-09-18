@@ -70,6 +70,7 @@ namespace AndroidAccess
 
      protected:
         void attachAndroidThread(void);
+        void detachAndroidThread(void);
 
         JNIEnv * jni;
 

@@ -17,6 +17,21 @@ namespace Threads
 {
     class Thread: public PTHREAD::Thread
     {
+     public:
+        inline Thread(const char * name):
+            PTHREAD::Thread(name)
+        {
+            SYS_DEBUG_MEMBER(DM_THREAD);
+        }
+
+        virtual ~Thread()
+        {
+            SYS_DEBUG_MEMBER(DM_THREAD);
+        }
+
+     private:
+        SYS_DEFINE_CLASS_NAME("Threads::Thread");
+
     }; // class Threads::Thread
 
 } // namespace Threads

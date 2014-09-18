@@ -29,11 +29,14 @@ using namespace PTHREAD;
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-Thread::Thread(void):
+Thread::Thread(const char * name):
     myThread(0),
+    myThreadName(name),
     toBeFinished(true)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << getThreadName() << "' has been created");
 }
 
 Thread::~Thread(void)
@@ -87,6 +90,8 @@ void Thread::Start(size_t stack)
 
  // Create the thread:
  ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, this)==0, "pthread_create() failed");
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << getThreadName() << "' has been started");
 }
 
 /// The physical start of the thread
@@ -94,23 +99,32 @@ void Thread::Start(size_t stack)
  */
 void * Thread::_main(void * thread_pointer)
 {
+ SYS_DEBUG_STATIC(DM_THREAD);
+
  int status = 0;
  Thread & th = *reinterpret_cast<Thread*>(thread_pointer);
 
+ th.before_main();
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() started");
+
  try {
-    th.before_main();
     status = th.main();
  } catch (std::exception & ex) {
-    DEBUG_OUT("Thread Execution Error in main(): " << ex.what());
+    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main(): " << ex.what());
     return (void*)0;
  }
 
  try {
     th.atExit(status);
  } catch (std::exception & ex) {
-    DEBUG_OUT("Thread Execution Error in atExit(): " << ex.what());
+    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit(): " << ex.what());
     return (void*)0;
  }
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() exited with status " << status);
+
+ th.after_main();
 
  return (void*)0;
 }

@@ -91,9 +91,11 @@ namespace EX {
 }
 
 #define __DO_ASSERT(type, cond, message)  \
-    throw type("assertion '" #cond "' failed in " __FILE__, __LINE__) << message
+    { \
+        throw type("assertion '" #cond "' failed in " __FILE__, __LINE__) << message; \
+    }
 
-#define ASSERT_T(type, cond, message)   { if (!(cond)) { __DO_ASSERT(type, cond, message); } }
+#define ASSERT_T(type, cond, message)   { if (!(cond)) __DO_ASSERT(type, cond, message); }
 
 #define ASSERT(cond, message)   ASSERT_T(::EX::Assert, cond, message)
 
