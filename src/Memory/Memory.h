@@ -19,6 +19,9 @@ namespace MEM
     using shared_ptr = typename std::shared_ptr<T>;
 
     template <typename T>
+    using weak_ptr = typename std::weak_ptr<T>;
+
+    template <typename T>
     class scoped_ptr: public std::auto_ptr<T>
     {
      public:
@@ -62,6 +65,21 @@ namespace MEM
         }
 
     }; // class MEM::scoped_array
+
+    namespace noncopyable_
+    {
+        class noncopyable
+        {
+         protected:
+            noncopyable() {}
+
+         private:
+            noncopyable(const noncopyable &);
+            const noncopyable & operator=(const noncopyable &);
+        };
+    }
+
+    using noncopyable = noncopyable_::noncopyable;
 
 } // namespace MEM
 

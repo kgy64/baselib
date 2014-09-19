@@ -11,10 +11,12 @@
 #ifndef __SRC_THREADS_THREADARRAY_H_INCLUDED__
 #define __SRC_THREADS_THREADARRAY_H_INCLUDED__
 
-#include <Memory/Memory.h>
-
 #include <Threads/Threads.h>
 #include <Threads/Mutex.h>
+
+#include <Memory/Memory.h>
+
+#include <list>
 
 SYS_DECLARE_MODULE(DM_THREAD_ARRAY);
 
@@ -27,17 +29,15 @@ namespace Threads
     template <typename T, class U>
     class ThreadArray
     {
-        typedef MEM::intrusive::list_base_hook<MEM::intrusive::link_mode<MEM::intrusive::auto_unlink> > auto_unlink_hook;
-
      public:
         class Job;
         friend class Job;
 
         typedef MEM::shared_ptr<Job> JobPtr;
 
-        typedef MEM::intrusive::list<Job, MEM::intrusive::constant_time_size<false> > TaskList;
+        typedef std::list<Job> TaskList;
 
-        class Job: protected Threads::Thread, public auto_unlink_hook
+        class Job: protected Threads::Thread
         {
             friend class ThreadArray;
 
