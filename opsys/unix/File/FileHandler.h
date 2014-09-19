@@ -11,11 +11,13 @@
 #ifndef __OPSYS_UNIX_FILE_FILEHANDLER_H_INCLUDED__
 #define __OPSYS_UNIX_FILE_FILEHANDLER_H_INCLUDED__
 
-#include <string>
-
 #include <File/Base.h>
 #include <File/FileFunctions.h>
 #include <File/DirHandler.h>
+
+#include <string>
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace Threads
 {

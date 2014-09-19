@@ -8,11 +8,12 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <string.h>
+#include "Parser.h"
 
 #include <Exceptions/Exceptions.h>
 
-#include "Parser.h"
+#include <string.h>
+#include <stdlib.h>
 
 SYS_DEFINE_MODULE(DM_PARSER);
 

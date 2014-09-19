@@ -13,6 +13,8 @@
 
 #include <android-render.h>
 
+#include <unistd.h>
+
 using namespace AndroidAccess;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
