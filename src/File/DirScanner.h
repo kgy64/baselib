@@ -13,7 +13,7 @@
 
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <Memory/Memory.h>
 
 #include <Debug/Debug.h>
 
@@ -23,7 +23,7 @@ namespace FILES
 {
     class DirScanner;
 
-    typedef boost::shared_ptr<DirScanner> DirScanPtr;
+    typedef MEM::shared_ptr<DirScanner> DirScanPtr;
 
     /// Recursive directory scanner
     class DirScanner

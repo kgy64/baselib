@@ -14,7 +14,7 @@
 #include <Threads/Error.h>
 
 #include <pthread.h>
-#include <boost/shared_ptr.hpp>
+#include <Memory/Memory.h>
 
 namespace Threads
 {
@@ -115,7 +115,7 @@ namespace Threads
 
     }; // class TryLock
 
-    typedef boost::shared_ptr<Lock> LockPtr;
+    typedef MEM::shared_ptr<Lock> LockPtr;
 
 } // namespace Threads
 

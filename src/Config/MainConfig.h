@@ -68,7 +68,7 @@ class MainConfig
  protected:
     MainConfig(void);
 
-    static boost::shared_ptr<MainConfig> myself;
+    static MEM::shared_ptr<MainConfig> myself;
 
  private:
     SYS_DEFINE_CLASS_NAME("MainConfig");

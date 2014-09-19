@@ -11,8 +11,7 @@
 #ifndef __SRC_THREADS_THREADARRAY_H_INCLUDED__
 #define __SRC_THREADS_THREADARRAY_H_INCLUDED__
 
-#include <boost/shared_ptr.hpp>
-#include <boost/intrusive/list.hpp>
+#include <Memory/Memory.h>
 
 #include <Threads/Threads.h>
 #include <Threads/Mutex.h>
@@ -28,15 +27,15 @@ namespace Threads
     template <typename T, class U>
     class ThreadArray
     {
-        typedef boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::auto_unlink> > auto_unlink_hook;
+        typedef MEM::intrusive::list_base_hook<MEM::intrusive::link_mode<MEM::intrusive::auto_unlink> > auto_unlink_hook;
 
      public:
         class Job;
         friend class Job;
 
-        typedef boost::shared_ptr<Job> JobPtr;
+        typedef MEM::shared_ptr<Job> JobPtr;
 
-        typedef boost::intrusive::list<Job, boost::intrusive::constant_time_size<false> > TaskList;
+        typedef MEM::intrusive::list<Job, MEM::intrusive::constant_time_size<false> > TaskList;
 
         class Job: protected Threads::Thread, public auto_unlink_hook
         {

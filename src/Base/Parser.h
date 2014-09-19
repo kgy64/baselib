@@ -12,7 +12,7 @@
 #define __SRC_BASE_TOKENIZER_H_INCLUDED__
 
 #include <vector>
-#include <boost/scoped_ptr.hpp>
+#include <Memory/Memory.h>
 
 #include <Debug/Debug.h>
 
@@ -44,7 +44,7 @@ namespace Parser
         }
 
      protected:
-        boost::scoped_ptr<char> myText;
+        MEM::scoped_ptr<char> myText;
 
         std::vector<const char *> chunks;
 

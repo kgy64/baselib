@@ -23,7 +23,7 @@ using namespace AndroidAccess;
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-Gesture::Gesture(boost::shared_ptr<AndroidRenderThread> & parent):
+Gesture::Gesture(MEM::shared_ptr<AndroidRenderThread> & parent):
     Threads::Thread("Gesture"),
     parent(parent)
 {
@@ -69,7 +69,7 @@ void Gesture::Clicked(float x, float y, int number)
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
  SYS_DEBUG(DL_INFO2, "Clicked(" << x << ", " << y << ", " << number << ")");
 
- boost::shared_ptr<AndroidRenderThread> render = parent;
+ MEM::shared_ptr<AndroidRenderThread> render = parent;
 
  if (!render) {
     return;

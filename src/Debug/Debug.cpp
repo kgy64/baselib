@@ -49,7 +49,7 @@ void _All_Modules_::SetDebuglevel(unsigned int level)
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-boost::scoped_ptr<Auton<I_DebugOut> > _Debug_Info_::DebugPrint::out_stream;
+MEM::scoped_ptr<Auton<I_DebugOut> > _Debug_Info_::DebugPrint::out_stream;
 
 /*! */
 map<pthread_t, DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH DebugPrint::levels;

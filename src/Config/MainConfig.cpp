@@ -15,7 +15,7 @@ AUTON_INTERFACE(ConfigData);
 
 SYS_DEFINE_MODULE(DM_MAIN_CONFIG);
 
-boost::shared_ptr<MainConfig> MainConfig::myself;
+MEM::shared_ptr<MainConfig> MainConfig::myself;
 
 Threads::Mutex MainConfig::myMutex;
 

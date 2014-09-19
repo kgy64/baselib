@@ -74,7 +74,7 @@ namespace EX {
     DEFINE_EXCEPTION(Error, "Error", Fatal);
 
     /// Assert failed
-    /*! This exception is tied to boost assertion, if BOOST_ENABLE_ASSERT_HANDLER is defined.
+    /*! This exception is tied to MEM assertion, if BOOST_ENABLE_ASSERT_HANDLER is defined.
      *  Basically it is a fatal exception but can be caught in some special cases.<br>
      *  Also thrown by the macros \ref ASSERT and \ref ASSERT_DBG
      *  */

@@ -11,8 +11,7 @@
 #ifndef __SRC_DEBUG_DEBUG_H_INCLUDED__
 #define __SRC_DEBUG_DEBUG_H_INCLUDED__
 
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <Memory/Memory.h>
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -188,18 +187,18 @@ namespace _Debug_Info_
         void overture(void);
 
         /*! This variable stores the copy of the function name. */
-        boost::scoped_array<char> my_name;
+        MEM::scoped_array<char> my_name;
 
         /*! If the caller function is a class member, this is the copy of the
             class name. */
-        boost::scoped_array<char> my_class;
+        MEM::scoped_array<char> my_class;
 
         /*! If the caller function is a class member, this is the class pointer
             (this). */
         const void *my_this;
 
         /*! */
-        boost::scoped_array<char> my_filename;
+        MEM::scoped_array<char> my_filename;
 
         /*! */
         int my_lineno;
@@ -252,7 +251,7 @@ namespace _Debug_Info_
         static const char fill_right[];
         static const char fill_left[];
 
-        static boost::scoped_ptr<Auton<I_DebugOut> > out_stream;
+        static MEM::scoped_ptr<Auton<I_DebugOut> > out_stream;
 
         inline static I_DebugOut & GetOutStream(void)
         {

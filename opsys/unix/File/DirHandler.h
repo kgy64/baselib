@@ -183,10 +183,10 @@ namespace FILES
             iterator operator*() const;
 
             template <class C>
-            boost::shared_ptr<C> GetHandler(void) const
+            MEM::shared_ptr<C> GetHandler(void) const
             {
                 SYS_DEBUG_MEMBER(DM_FILE);
-                return boost::shared_ptr<C>(new C(*this));
+                return MEM::shared_ptr<C>(new C(*this));
             }
 
          private:

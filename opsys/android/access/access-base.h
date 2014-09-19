@@ -16,7 +16,7 @@
 #include <Debug/Debug.h>
 
 #include <android/native_window_jni.h>
-#include <boost/shared_ptr.hpp>
+#include <Memory/Memory.h>
 #include <string>
 
 SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
@@ -80,7 +80,7 @@ namespace AndroidAccess
     }; // class ThreadJNIEnv
 
     class JString;
-    typedef boost::shared_ptr<JString> JStringPtr;
+    typedef MEM::shared_ptr<JString> JStringPtr;
 
     /// Java String Accessor
     class JString
@@ -118,7 +118,7 @@ namespace AndroidAccess
     }; // class JString
 
     class JGlobalRef;
-    typedef boost::shared_ptr<JGlobalRef> JGlobalRefPtr;
+    typedef MEM::shared_ptr<JGlobalRef> JGlobalRefPtr;
 
     /// Holds a Global Reference for a Java Object
     class JGlobalRef
@@ -161,7 +161,7 @@ namespace AndroidAccess
     }; // class JGlobalRef
 
     class JClass;
-    typedef boost::shared_ptr<JClass> JClassPtr;
+    typedef MEM::shared_ptr<JClass> JClassPtr;
 
     /// Represents a Java class
     class JClass
@@ -246,7 +246,7 @@ namespace AndroidAccess
     }; // class JFunctionBase
 
     class JFuncVoid;
-    typedef boost::shared_ptr<JFuncVoid> JFuncVoidPtr;
+    typedef MEM::shared_ptr<JFuncVoid> JFuncVoidPtr;
 
     class JFuncVoid: public JFunctionBase
     {
@@ -279,7 +279,7 @@ namespace AndroidAccess
     }; // class JFuncVoid
 
     class JFuncObject;
-    typedef boost::shared_ptr<JFuncObject> JFuncObjectPtr;
+    typedef MEM::shared_ptr<JFuncObject> JFuncObjectPtr;
 
     class JFuncObject: public JFunctionBase
     {
@@ -313,7 +313,7 @@ namespace AndroidAccess
     }; // class JFuncObject
 
     class JFuncBoolean;
-    typedef boost::shared_ptr<JFuncBoolean> JFuncBooleanPtr;
+    typedef MEM::shared_ptr<JFuncBoolean> JFuncBooleanPtr;
 
     class JFuncBoolean: public JFunctionBase
     {
@@ -347,7 +347,7 @@ namespace AndroidAccess
     }; // class JFuncBoolean
 
     class JFuncByte;
-    typedef boost::shared_ptr<JFuncByte> JFuncBytePtr;
+    typedef MEM::shared_ptr<JFuncByte> JFuncBytePtr;
 
     class JFuncByte: public JFunctionBase
     {
@@ -376,7 +376,7 @@ namespace AndroidAccess
     }; // class JFuncByte
 
     class JFuncChar;
-    typedef boost::shared_ptr<JFuncChar> JFuncCharPtr;
+    typedef MEM::shared_ptr<JFuncChar> JFuncCharPtr;
 
     class JFuncChar: public JFunctionBase
     {
@@ -410,7 +410,7 @@ namespace AndroidAccess
     }; // class JFuncChar
 
     class JFuncShort;
-    typedef boost::shared_ptr<JFuncShort> JFuncShortPtr;
+    typedef MEM::shared_ptr<JFuncShort> JFuncShortPtr;
 
     class JFuncShort: public JFunctionBase
     {
@@ -444,7 +444,7 @@ namespace AndroidAccess
     }; // class JFuncShort
 
     class JFuncInt;
-    typedef boost::shared_ptr<JFuncInt> JFuncIntPtr;
+    typedef MEM::shared_ptr<JFuncInt> JFuncIntPtr;
 
     class JFuncInt: public JFunctionBase
     {
@@ -478,7 +478,7 @@ namespace AndroidAccess
     }; // class JFuncInt
 
     class JFuncLong;
-    typedef boost::shared_ptr<JFuncLong> JFuncLongPtr;
+    typedef MEM::shared_ptr<JFuncLong> JFuncLongPtr;
 
     class JFuncLong: public JFunctionBase
     {
@@ -512,7 +512,7 @@ namespace AndroidAccess
     }; // class JFuncLong
 
     class JFuncFloat;
-    typedef boost::shared_ptr<JFuncFloat> JFuncFloatPtr;
+    typedef MEM::shared_ptr<JFuncFloat> JFuncFloatPtr;
 
     class JFuncFloat: public JFunctionBase
     {
@@ -546,7 +546,7 @@ namespace AndroidAccess
     }; // class JFuncFloat
 
     class JFuncDouble;
-    typedef boost::shared_ptr<JFuncDouble> JFuncDoublePtr;
+    typedef MEM::shared_ptr<JFuncDouble> JFuncDoublePtr;
 
     class JFuncDouble: public JFunctionBase
     {

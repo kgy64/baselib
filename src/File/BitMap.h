@@ -18,7 +18,7 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <boost/scoped_array.hpp>
+#include <Memory/Memory.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *

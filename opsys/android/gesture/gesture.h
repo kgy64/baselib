@@ -15,7 +15,7 @@
 #include <Threads/Threads.h>
 #include <Debug/Debug.h>
 
-#include <boost/shared_ptr.hpp>
+#include <Memory/Memory.h>
 #include <map>
 
 SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
@@ -27,7 +27,7 @@ namespace AndroidAccess
     class Gesture: Threads::Thread
     {
      public:
-        Gesture(boost::shared_ptr<AndroidRenderThread> & parent);
+        Gesture(MEM::shared_ptr<AndroidRenderThread> & parent);
         virtual ~Gesture();
 
         void TouchData(int32_t index, int64_t time, float x, float y);
@@ -40,7 +40,7 @@ namespace AndroidAccess
         void CreateEvent_2(void);
         void Clicked(float x, float y, int number);
 
-        boost::shared_ptr<AndroidRenderThread> & parent;
+        MEM::shared_ptr<AndroidRenderThread> & parent;
 
         /// Android Touch Event Values
         /*! These are the raw events got from the Android system (see \ref AndroidAccess::Gesture::TouchEvent(int32_t)
@@ -113,7 +113,7 @@ namespace AndroidAccess
 
         }; // class AndroidAccess::Gesture::IState
 
-        typedef boost::shared_ptr<IState> StatePtr;
+        typedef MEM::shared_ptr<IState> StatePtr;
 
         StatePtr state;
 

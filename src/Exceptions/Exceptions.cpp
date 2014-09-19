@@ -34,15 +34,15 @@ BaseException::~BaseException() throw()
 }
 
 #ifdef BOOST_ENABLE_ASSERT_HANDLER
-namespace boost
+namespace MEM
 {
-    /// Called by boost BOOST_ASSERT() and BOOST_ASSERT_MSG() macros
+    /// Called by MEM BOOST_ASSERT() and BOOST_ASSERT_MSG() macros
     /*! \note   The compiler flag BOOST_ENABLE_ASSERT_HANDLER must be defined for this function to be called,
-                or else the boost assertion handler will terminate the operation.
+                or else the MEM assertion handler will terminate the operation.
      */
     void assertion_failed(char const * expr, char const * function, char const * file, long line)
     {
-        throw EX::Assert() << "boost: '" << expr << "' is failed in " << function << "; " << file << ":" << line;
+        throw EX::Assert() << "MEM: '" << expr << "' is failed in " << function << "; " << file << ":" << line;
     }
 }
 #endif
