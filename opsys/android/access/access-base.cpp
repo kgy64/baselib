@@ -41,11 +41,11 @@ jint AndroidAccess::Initialize(JavaVM * vm)
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-JClass::JClass(JNIEnv * env, const char * classPath, bool create_now):
+JClass::JClass(const char * classPath, bool create_now, JNIEnv * env):
     env(env),
     javaLocalRef(env->FindClass(classPath)),
     javaInstance(NULL),
-    globalClassObject(env, javaLocalRef)
+    globalClassObject(javaLocalRef, env)
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
  SYS_DEBUG(DL_INFO1, "Class '" << classPath << "': " << (const void *)getClass() << ", jni=" << env);
@@ -72,7 +72,7 @@ void JClass::instantiate(void)
  ASSERT(constructor, "could not get constructor '" << constructor_path << "'");
  javaInstance = env->NewObject(javaLocalRef, constructor);
 
- globalClassInstance = JGlobalRef::Create(env, javaInstance);
+ globalClassInstance = JGlobalRef::Create(javaInstance, env);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\

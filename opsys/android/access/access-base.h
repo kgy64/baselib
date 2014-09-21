@@ -124,7 +124,7 @@ namespace AndroidAccess
     class JGlobalRef
     {
      public:
-        inline JGlobalRef(JNIEnv * env, jobject obj):
+        inline JGlobalRef(jobject obj, JNIEnv * env = AndroidAccess::getJNIEnv()):
             env(env),
             globalObj(obj ? env->NewGlobalRef(obj) : NULL)
         {
@@ -140,9 +140,9 @@ namespace AndroidAccess
             }
         }
 
-        inline static JGlobalRefPtr Create(JNIEnv * env, jobject obj)
+        inline static JGlobalRefPtr Create(jobject obj, JNIEnv * env = AndroidAccess::getJNIEnv())
         {
-            return JGlobalRefPtr(new JGlobalRef(env, obj));
+            return JGlobalRefPtr(new JGlobalRef(obj, env));
         }
 
         inline jobject get(void) const
@@ -166,14 +166,14 @@ namespace AndroidAccess
     /// Represents a Java class
     class JClass
     {
-        JClass(JNIEnv * env, const char * classPath, bool create_now);
+        JClass(const char * classPath, bool create_now, JNIEnv * env = AndroidAccess::getJNIEnv());
 
      public:
         VIRTUAL_IF_DEBUG ~JClass();
 
-        inline static JClassPtr Create(JNIEnv * env, const char * classPath, bool create_now = false)
+        inline static JClassPtr Create(const char * classPath, bool create_now = false, JNIEnv * env = AndroidAccess::getJNIEnv())
         {
-            return JClassPtr(new JClass(env, classPath, create_now));
+            return JClassPtr(new JClass(classPath, create_now, env));
         }
 
         void instantiate(void);
