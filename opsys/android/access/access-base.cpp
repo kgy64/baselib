@@ -42,6 +42,7 @@ jint AndroidAccess::Initialize(JavaVM * vm)
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 JClass::JClass(const char * classPath, bool create_now, JNIEnv * env):
+    myClassPath(classPath),
     env(env),
     javaLocalRef(env->FindClass(classPath)),
     javaInstance(NULL),
@@ -53,6 +54,8 @@ JClass::JClass(const char * classPath, bool create_now, JNIEnv * env):
  ASSERT(javaLocalRef, "could not find Java class '" << classPath << "'");
  ASSERT(globalClassObject.get(), "could not make global reference for Java class '" << classPath << "'");
 
+ SYS_DEBUG(DL_INFO1, "Created " << myClassPath);
+
  if (create_now) {
     instantiate();
  }
@@ -61,18 +64,20 @@ JClass::JClass(const char * classPath, bool create_now, JNIEnv * env):
 JClass::~JClass()
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+
+ SYS_DEBUG(DL_INFO1, "Deleted " << myClassPath);
 }
 
 void JClass::instantiate(void)
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
 
- char constructor_path[300];
  jmethodID constructor = env->GetMethodID(javaLocalRef, "<init>", "()V");   // currently void constructor only (TODO)
- ASSERT(constructor, "could not get constructor '" << constructor_path << "'");
+ ASSERT(constructor, "could not get constructor for " << myClassPath);
  javaInstance = env->NewObject(javaLocalRef, constructor);
 
  globalClassInstance = JGlobalRef::Create(javaInstance, env);
+ SYS_DEBUG(DL_INFO1, "Instantiated " << myClassPath);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\

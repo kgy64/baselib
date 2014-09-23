@@ -104,7 +104,7 @@ void * Thread::_main(void * thread_pointer)
  int status = 0;
  Thread & th = *reinterpret_cast<Thread*>(thread_pointer);
 
- SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' has been started");
+ SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() will be started");
 
  th.before_main();
 

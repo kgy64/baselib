@@ -195,6 +195,8 @@ namespace AndroidAccess
         }
 
      protected:
+        const char * myClassPath;
+
         JNIEnv * env;
 
         jclass javaLocalRef;
