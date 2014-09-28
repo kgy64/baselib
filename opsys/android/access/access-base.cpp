@@ -35,6 +35,23 @@ jint AndroidAccess::Initialize(JavaVM * vm)
  return JNI_VERSION_1_6;
 }
 
+/// Converts Java exception to C++ exception
+void AndroidAccess::CheckJavaException(JNIEnv * env)
+{
+ if (!env->ExceptionCheck()) {
+    return;
+ }
+
+ jthrowable e = env->ExceptionOccurred();
+ env->ExceptionClear();
+ ASSERT(e, "got a Java Exception, but could not get detailed information");
+
+ jmethodID toString = env->GetMethodID(env->FindClass("java/lang/Object"), "toString", "()Ljava/lang/String;");
+ jstring estring = (jstring)env->CallObjectMethod(e, toString);
+
+ throw AndroidAccess::JavaException() << "Java Exception: " << env->GetStringUTFChars(estring, nullptr);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
  *       class JClass:                                                                   *
@@ -45,13 +62,16 @@ JClass::JClass(const char * classPath, bool create_now, JNIEnv * env):
     myClassPath(classPath),
     env(env),
     javaLocalRef(env->FindClass(classPath)),
-    javaInstance(NULL),
-    globalClassObject(javaLocalRef, env)
+    javaInstance(nullptr),
+    globalClassObject(nullptr, env)
 {
+ AndroidAccess::CheckJavaException(env);
+
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
  SYS_DEBUG(DL_INFO1, "Class '" << classPath << "': " << (const void *)getClass() << ", jni=" << env);
 
  ASSERT(javaLocalRef, "could not find Java class '" << classPath << "'");
+ globalClassObject = javaLocalRef;
  ASSERT(globalClassObject.get(), "could not make global reference for Java class '" << classPath << "'");
 
  SYS_DEBUG(DL_INFO1, "Created " << myClassPath);
@@ -82,6 +102,24 @@ void JClass::instantiate(void)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
+ *       class JFunctionBase:                                                            *
+ *                                                                                       *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+JFunctionBase::JFunctionBase(const JClass & jClass, const char * functionName, const char * signature):
+    jClass(jClass),
+    env(jClass.getEnv()),
+    javaFunction(env->GetMethodID(jClass.getClass(), functionName, signature))
+{
+ AndroidAccess::CheckJavaException(env);
+
+ SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+ SYS_DEBUG(DL_INFO1, "Function '" << functionName << "', signature: " << signature << ", id: " << (const void *)javaFunction);
+ ASSERT(javaFunction, "could not get Java function '" << functionName << ", signature: " << signature);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ *                                                                                       *
  *       class ThreadJNIEnv:                                                             *
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -105,7 +143,7 @@ void ThreadJNIEnv::attachAndroidThread(void)
 {
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
 
- int status = AndroidAccess::jvm->AttachCurrentThread(&jni, NULL);
+ int status = AndroidAccess::jvm->AttachCurrentThread(&jni, nullptr);
  ASSERT(status >= 0, "cannot attach thread to JVM");
 
  SYS_DEBUG(DL_INFO1, "Thread attached: JavaVM=" << jvm << ", JNIEnv=" << getJNIEnv());

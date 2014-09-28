@@ -17,12 +17,15 @@
 
 #include <android/native_window_jni.h>
 #include <Memory/Memory.h>
+#include <Exceptions/Exceptions.h>
 #include <string>
 
 SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
 
 namespace AndroidAccess
 {
+    DEFINE_EXCEPTION(JavaException, nullptr, EX::Fatal);
+
     /// The Java Virtual Machine
     /*! This pointer is set in the initialization (see \ref AndroidAccess::Initialize()) and can
      *  be used anywhere in the C++ program, from any thread. Note that the JavaVM is shared globally. */
@@ -50,6 +53,8 @@ namespace AndroidAccess
         ASSERT(status >= 0, "could not get JNIEnv pointer (thread not attached?)");
         return jni;
     }
+
+    void CheckJavaException(JNIEnv * env);
 
     /// Class to represent JNIEnv for a thread
     /*! The main purpose of this class is to attach the thread to the Java VM and handle the JNIEnv for this thread.
@@ -88,7 +93,7 @@ namespace AndroidAccess
         inline JString(JNIEnv * env, jobject obj):
             env(env),
             jstr(static_cast<jstring>(obj)),
-            cstr(env->GetStringUTFChars(jstr, NULL))
+            cstr(env->GetStringUTFChars(jstr, nullptr))
         {
         }
 
@@ -126,7 +131,7 @@ namespace AndroidAccess
      public:
         inline JGlobalRef(jobject obj, JNIEnv * env = AndroidAccess::getJNIEnv()):
             env(env),
-            globalObj(obj ? env->NewGlobalRef(obj) : NULL)
+            globalObj(obj ? env->NewGlobalRef(obj) : nullptr)
         {
             SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
             SYS_DEBUG(DL_INFO1, "Global ref is " << globalObj << " to ref " << obj);
@@ -135,9 +140,7 @@ namespace AndroidAccess
         VIRTUAL_IF_DEBUG inline ~JGlobalRef()
         {
             SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
-            if (globalObj) {
-                env->DeleteGlobalRef(globalObj);
-            }
+            Remove();
         }
 
         inline static JGlobalRefPtr Create(jobject obj, JNIEnv * env = AndroidAccess::getJNIEnv())
@@ -150,15 +153,71 @@ namespace AndroidAccess
             return globalObj;
         }
 
+        inline JGlobalRef & operator=(jobject obj)
+        {
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+            Remove();
+            globalObj = obj ? env->NewGlobalRef(obj) : nullptr;
+            SYS_DEBUG(DL_INFO1, "Global ref is " << globalObj << " to ref " << obj);
+            return *this;
+        }
+
      protected:
         JNIEnv * env;
 
         jobject globalObj;
 
+        inline void Remove(void)
+        {
+            if (globalObj) {
+                env->DeleteGlobalRef(globalObj);
+                SYS_DEBUG(DL_INFO1, "Global ref " << globalObj << " is removed");
+                globalObj = nullptr;
+            }
+        }
+
      private:
         SYS_DEFINE_CLASS_NAME("AndroidAccess::JGlobalRef");
 
     }; // class JGlobalRef
+
+    class JObject
+    {
+     public:
+        inline JObject(jobject jobj, JNIEnv * env = AndroidAccess::getJNIEnv()):
+            env(env),
+            obj(AndroidAccess::JGlobalRef::Create(jobj, env))
+        {
+            SYS_DEBUG_MEMBER(DM_PACALIB);
+            env->DeleteLocalRef(jobj);
+        }
+
+        inline JObject(AndroidAccess::JGlobalRefPtr obj, JNIEnv * env = AndroidAccess::getJNIEnv()):
+            env(env),
+            obj(obj)
+        {
+            SYS_DEBUG_MEMBER(DM_PACALIB);
+        }
+
+        VIRTUAL_IF_DEBUG inline ~JObject()
+        {
+            SYS_DEBUG_MEMBER(DM_PACALIB);
+        }
+
+        inline jobject get(void) const
+        {
+            return obj->get();
+        }
+
+     protected:
+        JNIEnv * env;
+
+        AndroidAccess::JGlobalRefPtr obj;
+
+     private:
+        SYS_DEFINE_CLASS_NAME("AndroidAccess::JObject");
+
+    }; // class AndroidAccess::JObject
 
     class JClass;
     typedef MEM::shared_ptr<JClass> JClassPtr;
@@ -166,12 +225,12 @@ namespace AndroidAccess
     /// Represents a Java class
     class JClass
     {
-        JClass(const char * classPath, bool create_now, JNIEnv * env = AndroidAccess::getJNIEnv());
+        JClass(const char * classPath, bool create_now, JNIEnv * env);
 
      public:
         VIRTUAL_IF_DEBUG ~JClass();
 
-        inline static JClassPtr Create(const char * classPath, bool create_now = false, JNIEnv * env = AndroidAccess::getJNIEnv())
+        inline static JClassPtr Create(const char * classPath, bool create_now = true, JNIEnv * env = AndroidAccess::jenv)
         {
             return JClassPtr(new JClass(classPath, create_now, env));
         }
@@ -216,15 +275,7 @@ namespace AndroidAccess
     class JFunctionBase
     {
      protected:
-        inline JFunctionBase(const JClass & jClass, const char * functionName, const char * signature):
-            jClass(jClass),
-            env(jClass.getEnv()),
-            javaFunction(env->GetMethodID(jClass.getClass(), functionName, signature))
-        {
-            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
-            SYS_DEBUG(DL_INFO1, "Function '" << functionName << "', signature: " << signature << ", id: " << (const void *)javaFunction);
-            ASSERT(javaFunction, "could not get Java function '" << functionName << ", signature: " << signature);
-        }
+        JFunctionBase(const JClass & jClass, const char * functionName, const char * signature);
 
         VIRTUAL_IF_DEBUG inline ~JFunctionBase()
         {
