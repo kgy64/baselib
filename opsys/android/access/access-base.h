@@ -204,7 +204,7 @@ namespace AndroidAccess
             SYS_DEBUG_MEMBER(DM_PACALIB);
         }
 
-        inline jobject get(void) const
+        inline jobject getObject(void) const
         {
             return obj->get();
         }
