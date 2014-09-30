@@ -169,6 +169,7 @@ namespace AndroidAccess
 
         inline void Remove(void)
         {
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
             if (globalObj) {
                 env->DeleteGlobalRef(globalObj);
                 SYS_DEBUG(DL_INFO1, "Global ref " << globalObj << " is removed");
@@ -188,7 +189,7 @@ namespace AndroidAccess
             env(env),
             obj(AndroidAccess::JGlobalRef::Create(jobj, env))
         {
-            SYS_DEBUG_MEMBER(DM_PACALIB);
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
             env->DeleteLocalRef(jobj);
         }
 
@@ -196,12 +197,12 @@ namespace AndroidAccess
             env(env),
             obj(obj)
         {
-            SYS_DEBUG_MEMBER(DM_PACALIB);
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
         }
 
         VIRTUAL_IF_DEBUG inline ~JObject()
         {
-            SYS_DEBUG_MEMBER(DM_PACALIB);
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
         }
 
         inline jobject getObject(void) const
@@ -225,24 +226,23 @@ namespace AndroidAccess
     /// Represents a Java class
     class JClass
     {
-        JClass(const char * classPath, bool create_now, JNIEnv * env);
+     protected:
+        JClass(const char * classPath, jobject instance, JNIEnv * env);
 
      public:
         VIRTUAL_IF_DEBUG ~JClass();
 
-        inline static JClassPtr Create(const char * classPath, bool create_now = true, JNIEnv * env = AndroidAccess::jenv)
+        inline static JClassPtr Create(const char * classPath, jobject instance = nullptr, JNIEnv * env = AndroidAccess::jenv)
         {
-            return JClassPtr(new JClass(classPath, create_now, env));
+            return JClassPtr(new JClass(classPath, instance, env));
         }
-
-        void instantiate(void);
 
         inline jclass getClass(void) const
         {
             return javaLocalRef;
         }
 
-        inline jobject get(void) const
+        inline jobject getInstance(void) const
         {
             ASSERT(globalClassInstance, "java class is not instantiated yet");
             return globalClassInstance->get();
@@ -254,13 +254,13 @@ namespace AndroidAccess
         }
 
      protected:
+        void instantiate(jobject instance);
+
         const char * myClassPath;
 
         JNIEnv * env;
 
         jclass javaLocalRef;
-
-        jobject javaInstance;
 
         JGlobalRef globalClassObject;
 
@@ -322,7 +322,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jenv->CallVoidMethodV(jClass.get(), javaFunction, args);
+            jenv->CallVoidMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
         }
 
@@ -355,7 +355,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jobject obj = jenv->CallObjectMethodV(jClass.get(), javaFunction, args);
+            jobject obj = jenv->CallObjectMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -389,7 +389,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jboolean obj = jenv->CallBooleanMethodV(jClass.get(), javaFunction, args);
+            jboolean obj = jenv->CallBooleanMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -418,7 +418,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jbyte obj = jenv->CallByteMethodV(jClass.get(), javaFunction, args);
+            jbyte obj = jenv->CallByteMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -452,7 +452,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jchar obj = jenv->CallCharMethodV(jClass.get(), javaFunction, args);
+            jchar obj = jenv->CallCharMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -486,7 +486,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jshort obj = jenv->CallShortMethodV(jClass.get(), javaFunction, args);
+            jshort obj = jenv->CallShortMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -520,7 +520,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jint obj = jenv->CallIntMethodV(jClass.get(), javaFunction, args);
+            jint obj = jenv->CallIntMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -554,7 +554,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jlong obj = jenv->CallLongMethodV(jClass.get(), javaFunction, args);
+            jlong obj = jenv->CallLongMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -588,7 +588,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jfloat obj = jenv->CallFloatMethodV(jClass.get(), javaFunction, args);
+            jfloat obj = jenv->CallFloatMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -622,7 +622,7 @@ namespace AndroidAccess
         {
             va_list args;
             va_start(args, jenv);
-            jdouble obj = jenv->CallDoubleMethodV(jClass.get(), javaFunction, args);
+            jdouble obj = jenv->CallDoubleMethodV(jClass.getInstance(), javaFunction, args);
             va_end(args);
             return obj;
         }
@@ -631,6 +631,37 @@ namespace AndroidAccess
         SYS_DEFINE_CLASS_NAME("AndroidAccess::JFuncDouble");
 
     }; // class JFuncDouble
+
+    class JavaString
+    {
+     public:
+        inline JavaString(const char * text, JNIEnv * env = AndroidAccess::getJNIEnv()):
+            myJNIenv(env),
+            myString(myJNIenv->NewStringUTF(text))
+        {
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+        }
+
+        inline ~JavaString()
+        {
+            SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
+
+            myJNIenv->DeleteLocalRef(myString);
+        }
+
+        inline const jstring & get(void) const
+        {
+            return myString;
+        }
+
+     private:
+        SYS_DEFINE_CLASS_NAME("PaCaAndroid::JavaString");
+
+        JNIEnv * myJNIenv;
+
+        jstring myString;
+
+    }; // class PaCaAndroid::JavaString
 
 } // namespace AndroidAccess
 
