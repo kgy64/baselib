@@ -10,8 +10,8 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef __SRC_ACCESS_BASE_H_INCLUDED__
-#define __SRC_ACCESS_BASE_H_INCLUDED__
+#ifndef __ANDROID_ACCESS_BASE_H_INCLUDED__
+#define __ANDROID_ACCESS_BASE_H_INCLUDED__
 
 #include <Debug/Debug.h>
 
@@ -26,10 +26,11 @@ SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
 /*! This macro must be used for all user classes which must be accessed from any non-main thread.
  *  It is necessary because they can be reached only from the main thread, and this macro
  *  is responsible to cache their references.
- *  \param  var         This is a unique name: just must be different for each macro in the same cpp file.
- *                      Can contain letter, number, and underscore.
+ *  \param  var         This is a unique name: just must be different for each macro in the same cpp file.<br>
+ *                      It can contain letter, number, and underscore.
  *  \param  class_name  The Java class name, such as "com/mypackage/myclass"
  *  \note   It is not necessary to use it for system classes, however, it is not an error.
+ *  \note   This macro generates definitions.
  *  */
 #define DEFINE_JAVA_CLASS(var, class_name)      \
     namespace {                                 \
@@ -715,6 +716,6 @@ namespace AndroidAccess
 
 } // namespace AndroidAccess
 
-#endif /* __SRC_ACCESS_BASE_H_INCLUDED__ */
+#endif /* __ANDROID_ACCESS_BASE_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
