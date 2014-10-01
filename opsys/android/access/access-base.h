@@ -22,6 +22,15 @@
 
 SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
 
+/// Register Java class name
+/*! This macro must be used for all user classes which must be accessed from any non-main thread.
+ *  It is necessary because they can be reached only from the main thread, and this macro
+ *  is responsible to cache their references.
+ *  \param  var         This is a unique name: just must be different for each macro in the same cpp file.
+ *                      Can contain letter, number, and underscore.
+ *  \param  class_name  The Java class name, such as "com/mypackage/myclass"
+ *  \note   It is not necessary to use it for system classes, however, it is not an error.
+ *  */
 #define DEFINE_JAVA_CLASS(var, class_name)      \
     namespace {                                 \
         AndroidAccess::ClassAccess::ClassGetter __java_class_loader##var(class_name);   \
