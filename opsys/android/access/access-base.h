@@ -22,6 +22,11 @@
 
 SYS_DECLARE_MODULE(DM_ANDROID_ACCESS);
 
+#define DEFINE_JAVA_CLASS(var, class_name)      \
+    namespace {                                 \
+        AndroidAccess::ClassAccess::ClassGetter __java_class_loader##var(class_name);   \
+    }
+
 namespace AndroidAccess
 {
     DEFINE_EXCEPTION(JavaException, nullptr, EX::Fatal);
@@ -55,6 +60,42 @@ namespace AndroidAccess
     }
 
     void CheckJavaException(JNIEnv * env);
+    jclass getClass(const char * name, JNIEnv * env);
+
+    namespace ClassAccess
+    {
+        struct ClassGetter;
+
+        struct ClassGetter
+        {
+            inline ClassGetter(const char * name):
+                name(name)
+            {
+                next = first;
+                first = this;
+            }
+
+            static inline void Scan(void)
+            {
+                for (ClassGetter * i = first; i; i = i->next) {
+                    i->Register();
+                }
+            }
+
+            inline void Register(void)
+            {
+                AndroidAccess::getClass(name, AndroidAccess::jenv);
+            }
+
+            const char * name;
+
+            ClassGetter * next;
+
+            static ClassGetter * first;
+
+        }; // struct AndroidAccess::ClassAccess::ClassGetter
+
+    } // namespace AndroidAccess::ClassAccess
 
     /// Class to represent JNIEnv for a thread
     /*! The main purpose of this class is to attach the thread to the Java VM and handle the JNIEnv for this thread.
@@ -239,7 +280,7 @@ namespace AndroidAccess
 
         inline jclass getClass(void) const
         {
-            return javaLocalRef;
+            return javaClassRef;
         }
 
         inline jobject getInstance(void) const
@@ -260,7 +301,7 @@ namespace AndroidAccess
 
         JNIEnv * env;
 
-        jclass javaLocalRef;
+        jclass javaClassRef;
 
         JGlobalRef globalClassObject;
 

@@ -15,6 +15,9 @@
 #include <android/log.h>
 #include <stdio.h>
 
+#include <string>
+#include <map>
+
 SYS_DEFINE_MODULE(DM_ANDROID_ACCESS);
 
 static const char myTag[] = "Ducktor Navi Access";
@@ -23,12 +26,18 @@ JavaVM * AndroidAccess::jvm;
 
 JNIEnv * AndroidAccess::jenv;
 
+AndroidAccess::ClassAccess::ClassGetter * AndroidAccess::ClassAccess::ClassGetter::first = nullptr;
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 using namespace AndroidAccess;
 
 jint AndroidAccess::Initialize(JavaVM * vm)
 {
  jvm = vm;
  jenv = getJNIEnv();
+
+ ClassAccess::ClassGetter::Scan();
 
  __android_log_write(ANDROID_LOG_INFO, myTag, "Android Access Library has been initialized");
 
@@ -52,6 +61,30 @@ void AndroidAccess::CheckJavaException(JNIEnv * env)
  throw AndroidAccess::JavaException() << "Java Exception: " << env->GetStringUTFChars(estring, nullptr);
 }
 
+jclass AndroidAccess::getClass(const char * name, JNIEnv * env)
+{
+ SYS_DEBUG_FUNCTION(DM_ANDROID_ACCESS);
+
+ static std::map<std::string, jclass> classes;
+
+ std::map<std::string, jclass>::const_iterator i = classes.find(name);
+ if (i != classes.end()) {
+    return i->second;
+ }
+
+ jclass result = env->FindClass(name);
+ ASSERT(result, "Java class '" << name << "' is not found");
+
+ jobject global_result = env->NewGlobalRef(result);
+ env->DeleteLocalRef(result);
+
+ classes[std::string(name)] = static_cast<jclass>(global_result);
+
+ SYS_DEBUG(DL_INFO1, "Java Class '" << name << "' found by system: " << result << " and global ref: " << global_result);
+
+ return static_cast<jclass>(global_result);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
  *       class JClass:                                                                   *
@@ -61,7 +94,7 @@ void AndroidAccess::CheckJavaException(JNIEnv * env)
 JClass::JClass(const char * classPath, jobject instance, JNIEnv * env):
     myClassPath(classPath),
     env(env),
-    javaLocalRef(env->FindClass(classPath)),
+    javaClassRef(static_cast<jclass>(AndroidAccess::getClass(classPath, env))),
     globalClassObject(nullptr, env)
 {
  AndroidAccess::CheckJavaException(env);
@@ -69,8 +102,8 @@ JClass::JClass(const char * classPath, jobject instance, JNIEnv * env):
  SYS_DEBUG_MEMBER(DM_ANDROID_ACCESS);
  SYS_DEBUG(DL_INFO1, "Class '" << myClassPath << "': " << (const void *)getClass() << ", jni=" << env);
 
- ASSERT(javaLocalRef, "could not find Java class '" << myClassPath << "'");
- globalClassObject = javaLocalRef;
+ ASSERT(javaClassRef, "could not find Java class '" << myClassPath << "'");
+ globalClassObject = javaClassRef;
  ASSERT(globalClassObject.get(), "could not make global reference for Java class '" << myClassPath << "'");
 
  instantiate(instance);
@@ -93,9 +126,9 @@ void JClass::instantiate(jobject instance)
     globalClassInstance = JGlobalRef::Create(instance, env);
     env->DeleteLocalRef(instance);
  } else {
-    jmethodID constructor = env->GetMethodID(javaLocalRef, "<init>", "()V");   // currently void constructor only (TODO)
+    jmethodID constructor = env->GetMethodID(javaClassRef, "<init>", "()V");   // currently void constructor only (TODO)
     ASSERT(constructor, "could not get constructor for " << myClassPath);
-    jobject javaInstance = env->NewObject(javaLocalRef, constructor);
+    jobject javaInstance = env->NewObject(javaClassRef, constructor);
     globalClassInstance = JGlobalRef::Create(javaInstance, env);
  }
  SYS_DEBUG(DL_INFO1, "Instantiated " << myClassPath);
