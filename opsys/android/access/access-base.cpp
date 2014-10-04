@@ -124,12 +124,12 @@ void JClass::instantiate(jobject instance)
 
  if (instance) {
     globalClassInstance = JGlobalRef::Create(instance, env);
-    env->DeleteLocalRef(instance);
  } else {
     jmethodID constructor = env->GetMethodID(javaClassRef, "<init>", "()V");   // currently void constructor only (TODO)
     ASSERT(constructor, "could not get constructor for " << myClassPath);
     jobject javaInstance = env->NewObject(javaClassRef, constructor);
     globalClassInstance = JGlobalRef::Create(javaInstance, env);
+    env->DeleteLocalRef(javaInstance);
  }
  SYS_DEBUG(DL_INFO1, "Instantiated " << myClassPath);
 }
