@@ -12,9 +12,10 @@
 
 #include "access-base.h"
 
+#include <glesly/format.h>
+
 #include <android/log.h>
 #include <stdio.h>
-
 #include <string>
 #include <map>
 
@@ -38,6 +39,9 @@ jint AndroidAccess::Initialize(JavaVM * vm)
  jenv = getJNIEnv();
 
  ClassAccess::ClassGetter::Scan();
+
+ // Set up the correct pixel format used in Android:
+ Glesly::PIXEL32FORMAT = GL_BGRA_EXT;
 
  __android_log_write(ANDROID_LOG_INFO, myTag, "Android Access Library has been initialized");
 
