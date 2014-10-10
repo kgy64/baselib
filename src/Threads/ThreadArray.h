@@ -13,10 +13,9 @@
 
 #include <Threads/Threads.h>
 #include <Threads/Mutex.h>
-
 #include <Memory/Memory.h>
 
-#include <list>
+#include <boost/intrusive/list.hpp>
 
 SYS_DECLARE_MODULE(DM_THREAD_ARRAY);
 
@@ -29,15 +28,17 @@ namespace Threads
     template <typename T, class U>
     class ThreadArray
     {
+        typedef boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::auto_unlink> > auto_unlink_hook;
+
      public:
         class Job;
         friend class Job;
 
         typedef MEM::shared_ptr<Job> JobPtr;
 
-        typedef std::list<Job> TaskList;
+        typedef boost::intrusive::list<Job, boost::intrusive::constant_time_size<false> > TaskList;
 
-        class Job: protected Threads::Thread
+        class Job: protected Threads::Thread, public auto_unlink_hook
         {
             friend class ThreadArray;
 
@@ -71,7 +72,8 @@ namespace Threads
             }
 
          protected:
-            inline Job(ThreadArray & parent):
+            inline Job(ThreadArray & parent, const char * thread_name):
+                Threads::Thread(thread_name),
                 myParent(parent)
             {
                 SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
