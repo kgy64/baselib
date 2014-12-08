@@ -98,7 +98,7 @@ namespace _AutonPrivate
          */
         inline I * CreateImplementation(void)
         {
-            ASSERT_FATAL(implementation, "Interface class '" << myTypeName << "' is not defined");
+            ASSERT_FATAL(implementation, "Interface class '" << myTypeName << "' is not implemented");
             return implementation->Create();
         }
 
