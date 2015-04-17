@@ -23,6 +23,87 @@ const ConfigValue ConfigStore::GetConfig(const std::string & key) const
  return theConfig->GetConfig(key);
 }
 
+const std::string & ConfigStore::GetConfig(const std::string & key, const std::string & def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ return val->GetString();
+}
+
+int ConfigStore::GetConfig(const std::string & key, int def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const int * ip = val->ToInt();
+ if (!ip) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to int");
+ }
+ return *ip;
+}
+
+float ConfigStore::GetConfig(const std::string & key, float def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const float * fp = val->ToFloat();
+ if (!fp) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to float");
+ }
+ return *fp;
+}
+
+double ConfigStore::GetConfig(const std::string & key, double def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const double * dp = val->ToDouble();
+ if (!dp) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to double float");
+ }
+ return *dp;
+}
+
+void ConfigStore::AddConfig(const std::string & key, const std::string & value)
+{
+ if (!theConfig) {  // Hopefully it runs on one thread yet
+    theConfig.reset(new AssignmentSet());   // Add an empty set
+ }
+
+ theConfig->AppendValue(key, ConfigValue(new ConfExpression(value)));
+}
+
+std::string ConfigStore::GetPath(const std::string & key)
+{
+ const ConfigValue value = GetConfig(key);
+ ASSERT(value, "path entry missing from config: '" << key << "'");
+ return FullPathOf(value->GetString());
+}
+
+std::string ConfigStore::GetRootDir(void)
+{
+ const ConfigValue path = GetConfig("RootDir");
+ ASSERT(path, "root entry 'RootDir' is missing from config");
+ return path->GetString();
+}
+
+std::string ConfigStore::FullPathOf(const std::string & rel_path)
+{
+ if (rel_path[0] == DIR_SEPARATOR) {
+    return rel_path;
+ }
+ std::string result = GetRootDir();
+ result += DIR_SEPARATOR_STR;
+ result += rel_path;
+ return result;
+}
+
 /// Prints the whole config (for debug purpose)
 void ConfigStore::List(void) const
 {
@@ -313,7 +394,7 @@ AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *assignment);
- assigns[assignment->GetName()->GetString()] = assignment->GetValue();
+ AppendValue(assignment->GetName()->GetString(), assignment->GetValue());
  delete assignment; // due to bison's stupidity :-)
  return this;
 }
@@ -322,7 +403,7 @@ AssignmentSet * AssignmentSet::Append(ConfigLevel * conf)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *conf);
- subConfigs[conf->GetName()] = MEM::shared_ptr<ConfigLevel>(conf);
+ AppendSubconfig(conf->GetName(), ConfPtr(conf));
  return this;
 }
 
@@ -331,10 +412,10 @@ AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *other);
  for (AssignContainer::iterator i = other->assigns.begin(); i != other->assigns.end(); ++i) {
-    assigns[i->first] = i->second;
+    AppendValue(i->first, i->second);
  }
  for (ConfigContainer::iterator i = other->subConfigs.begin(); i != other->subConfigs.end(); ++i) {
-    subConfigs[i->first] = i->second;
+    AppendSubconfig(i->first, i->second);
  }
  delete other; // Due to bison's stupidity :-)
  return this;
@@ -372,15 +453,18 @@ const ConfPtr AssignmentSet::GetSubconfig(const std::string & name)
 /// Prints the whole config (for debug purpose)
 void AssignmentSet::List(int level) const
 {
+ static const char separators[] = "                                                ";
  for (AssignContainer::const_iterator i = assigns.begin(); i != assigns.end(); ++i) {
-    for (int j = 0; j < level; ++j)
-        std::cout << "  ";
-    std::cout << "\"" << i->first << "\"=\"" << i->second << "\";" << std::endl;
+    int position = sizeof(separators) - level - 1;
+    if (position >= 0) {
+        DEBUG_OUT(separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";");
+    }
  }
  for (ConfigContainer::const_iterator i = subConfigs.begin(); i != subConfigs.end(); ++i) {
-    for (int j = 0; j < level; ++j)
-        std::cout << "  ";
-    std::cout << "/* " << i->first << ": */" << std::endl;
+    int position = sizeof(separators) - level - 1;
+    if (position >= 0) {
+        DEBUG_OUT(separators+position << "/* " << i->first << ": */");
+    }
     i->second->List(level);
  }
 }

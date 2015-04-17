@@ -38,7 +38,7 @@ namespace FILES
         {
         }
 
-        FileMap(FileMap & other);
+        FileMap(FileMap && other);
 
         virtual ~FileMap();
 
@@ -58,6 +58,8 @@ namespace FILES
         OpenMode myMode;
 
      private:
+        FileMap(FileMap & other);
+
         SYS_DEFINE_CLASS_NAME("FileMap");
 
     }; // class FIELS::FileMap
