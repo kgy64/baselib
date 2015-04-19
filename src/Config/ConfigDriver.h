@@ -6,6 +6,7 @@
 
 #include <Memory/Memory.h>
 #include <map>
+#include <string>
 
 class ConfExpression;
 class AssignmentSet;
@@ -26,6 +27,10 @@ class ConfigStore
     {
     }
 
+    VIRTUAL_IF_DEBUG ~ConfigStore()
+    {
+    }
+
     inline void SetConfig(AssignmentSet * assigns)
     {
         theConfig = MEM::shared_ptr<AssignmentSet>(assigns);
@@ -38,14 +43,34 @@ class ConfigStore
     float GetConfig(const std::string & key, float def_val);
     double GetConfig(const std::string & key, double def_val);
     std::string GetPath(const std::string & key);
-    std::string GetRootDir(void);
+    const std::string & GetRootDir(void);
     std::string FullPathOf(const std::string & rel_path);
     void AddConfig(const std::string & key, const std::string & value);
+
+    inline const std::string & GetDefaultRootDirecories(void) const
+    {
+        return default_root_directory_list;
+    }
+
+    inline void SetDefaultRootDirecories(const char * dirs)
+    {
+        default_root_directory_list = dirs;
+    }
+
+    inline void SetDefaultRootDirecories(const std::string & dirs)
+    {
+        default_root_directory_list = dirs;
+    }
 
  private:
     SYS_DEFINE_CLASS_NAME("ConfigStore");
 
+ protected:
     MEM::shared_ptr<AssignmentSet> theConfig;
+
+    std::string root_directory;
+
+    std::string default_root_directory_list;
 
 }; // class ConfigStore
 

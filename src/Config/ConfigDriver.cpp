@@ -1,5 +1,7 @@
 #include "ConfigDriver.h"
 
+#include <Base/Parser.h>
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <iostream>
@@ -72,6 +74,8 @@ double ConfigStore::GetConfig(const std::string & key, double def_val)
 
 void ConfigStore::AddConfig(const std::string & key, const std::string & value)
 {
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
  if (!theConfig) {  // Hopefully it runs on one thread yet
     theConfig.reset(new AssignmentSet());   // Add an empty set
  }
@@ -86,11 +90,39 @@ std::string ConfigStore::GetPath(const std::string & key)
  return FullPathOf(value->GetString());
 }
 
-std::string ConfigStore::GetRootDir(void)
+const std::string & ConfigStore::GetRootDir(void)
 {
- const ConfigValue path = GetConfig("RootDir");
- ASSERT(path, "root entry 'RootDir' is missing from config");
- return path->GetString();
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
+ if (root_directory.empty()) {
+    SYS_DEBUG(DL_INFO1, "Calculating root directory...");
+    root_directory = ".";   // default value
+    const ConfigValue chain = GetConfig("SuperConfig");
+    if (chain) {
+        std::string root_dirs = GetConfig("RootDirectories", GetDefaultRootDirecories());
+        Parser::Tokenizer tok(root_dirs);
+        for (int i = 0; i < tok.size(); ++i) {
+            std::string super_config_path = std::string(tok[i]) + "/" + chain->GetString();
+            SYS_DEBUG(DL_INFO1, "Android Config: Trying to read Super Config from '" << super_config_path << "'");
+            try {
+                FILES::FileMap_char configFile(super_config_path.c_str());
+                SYS_DEBUG(DL_INFO1, "Super Config file: size=" << configFile.GetSize());
+                ConfDriver super_parser(configFile, *this);
+                if (super_parser.parse() != 0) {
+                    SYS_DEBUG(DL_ERROR, "Error parsing Super Config file " << super_config_path << ", some settings may be incorrect.");
+                }
+                root_directory = tok[i];
+                SYS_DEBUG(DL_INFO1, "Super Config file " << super_config_path << " parsed.");
+                break;  // Only one Super Config file expected
+            } catch (EX::Assert & ex) {
+                SYS_DEBUG(DL_WARNING, "Warning: could not parse the Super Config file beracuse " << ex.what());
+            }
+        }
+    }
+    SYS_DEBUG(DL_INFO1, "Root directory is '" << root_directory << "'");
+ }
+
+ return root_directory;
 }
 
 std::string ConfigStore::FullPathOf(const std::string & rel_path)

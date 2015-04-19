@@ -319,7 +319,7 @@ I_DebugOut & I_DebugOut::operator<<(const void * p)
 
 I_DebugOut & I_DebugOut::operator<<(int data)
 {
- char tmp[30];
+ char tmp[100];
  sprintf(tmp, "%d", (unsigned)data);
  return *this << tmp;
 }
