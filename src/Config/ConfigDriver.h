@@ -2,9 +2,9 @@
 #define __SRC_CONFIG_CONFIGDRIVER_H_INCLUDED__
 
 #include <File/FileMapTyped.h>
+#include <Memory/Memory.h>
 #include <Debug/Debug.h>
 
-#include <Memory/Memory.h>
 #include <map>
 #include <string>
 

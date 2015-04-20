@@ -18,6 +18,8 @@ include $(SCRIPTDIR)/makelib
 
 export LFLAGS       +=  $(MY_PROJECT_LIBS)
 
+YACC_PREFIX          =  yy
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 .PHONY: clean
