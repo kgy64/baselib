@@ -1,11 +1,12 @@
-#ifndef __CONFIGDRIVER_H__
-#define __CONFIGDRIVER_H__
+#ifndef __SRC_CONFIG_CONFIGDRIVER_H_INCLUDED__
+#define __SRC_CONFIG_CONFIGDRIVER_H_INCLUDED__
 
 #include <File/FileMapTyped.h>
 #include <Debug/Debug.h>
 
 #include <Memory/Memory.h>
 #include <map>
+#include <string>
 
 class ConfExpression;
 class AssignmentSet;
@@ -26,19 +27,52 @@ class ConfigStore
     {
     }
 
-    void SetConfig(AssignmentSet * assigns)
+    VIRTUAL_IF_DEBUG ~ConfigStore()
+    {
+    }
+
+    inline void SetConfig(AssignmentSet * assigns)
     {
         theConfig = MEM::shared_ptr<AssignmentSet>(assigns);
     }
 
     void List(void) const;
     const ConfigValue GetConfig(const std::string & key) const;
+    const std::string & GetConfig(const std::string & key, const std::string & def_val);
+    int GetConfig(const std::string & key, int def_val);
+    float GetConfig(const std::string & key, float def_val);
+    double GetConfig(const std::string & key, double def_val);
+    std::string GetPath(const std::string & key);
+    const std::string & GetRootDir(void);
+    std::string FullPathOf(const std::string & rel_path);
+    void AddConfig(const std::string & key, const std::string & value);
+
+    inline const std::string & GetDefaultRootDirecories(void) const
+    {
+        return default_root_directory_list;
+    }
+
+    inline void SetDefaultRootDirecories(const char * dirs)
+    {
+        default_root_directory_list = dirs;
+    }
+
+    inline void SetDefaultRootDirecories(const std::string & dirs)
+    {
+        default_root_directory_list = dirs;
+    }
 
  private:
     SYS_DEFINE_CLASS_NAME("ConfigStore");
 
+ protected:
     MEM::shared_ptr<AssignmentSet> theConfig;
-};
+
+    std::string root_directory;
+
+    std::string default_root_directory_list;
+
+}; // class ConfigStore
 
 class ConfDriver
 {
@@ -73,7 +107,8 @@ class ConfDriver
     int column;
 
     ConfigStore & configStore;
-};
+
+}; // class ConfDriver
 
 typedef MEM::shared_ptr<ConfDriver> ConfDriverPtr;
 
@@ -145,7 +180,8 @@ class ConfExpression
     Value_t<double> dValue;
 
     int reference_counter;
-};
+
+}; // class ConfExpression
 
 static inline std::ostream & operator<<(std::ostream & os, const ConfExpression & ex)
 {
@@ -202,7 +238,8 @@ class ConfAssign
 
     ConfigValue myName;
     ConfigValue myValue;
-};
+
+}; // class ConfAssign
 
 static inline std::ostream & operator<<(std::ostream & os, const ConfAssign & as)
 {
@@ -239,6 +276,16 @@ class AssignmentSet
     const ConfPtr GetSubconfig(const std::string & name);
     void List(int level) const;
 
+    inline void AppendValue(const std::string & key, ConfigValue value)
+    {
+        assigns[key] = value;
+    }
+
+    inline void AppendSubconfig(const std::string & key, ConfPtr conf)
+    {
+        subConfigs[key] = conf;
+    }
+
     size_t noOfAssignments(void) const
     {
         return assigns.size();
@@ -274,12 +321,13 @@ class AssignmentSet
 
     AssignContainer assigns;
 
-    typedef std::map<std::string, MEM::shared_ptr<ConfigLevel> > ConfigContainer;
+    typedef std::map<std::string, ConfPtr> ConfigContainer;
 
     ConfigContainer subConfigs;
 
     int reference_counter;
-};
+
+}; // class AssignmentSet
 
 static inline std::ostream & operator<<(std::ostream & os, const AssignmentSet & body)
 {
@@ -331,7 +379,7 @@ class ConfigLevel
             return;
         }
         SYS_DEBUG(DL_INFO2, "To be deleted...");
-        delete this;
+        delete this;    // Ugly (TODO: do it in a better way)
     }
 
  private:
@@ -341,7 +389,8 @@ class ConfigLevel
     MEM::shared_ptr<AssignmentSet> assignments;
 
     int reference_counter;
-};
+
+}; // class ConfigLevel
 
 static inline std::ostream & operator<<(std::ostream & os, const ConfigLevel & conf)
 {
@@ -350,6 +399,6 @@ static inline std::ostream & operator<<(std::ostream & os, const ConfigLevel & c
  return os;
 }
 
-#endif /* __CONFIGDRIVER_H__ */
+#endif /* __SRC_CONFIG_CONFIGDRIVER_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

@@ -40,9 +40,6 @@ jint AndroidAccess::Initialize(JavaVM * vm)
 
  ClassAccess::ClassGetter::Scan();
 
- // Set up the correct pixel format used in Android:
- Glesly::PIXEL32FORMAT = GL_BGRA_EXT;
-
  __android_log_write(ANDROID_LOG_INFO, myTag, "Android Access Library has been initialized");
 
  return JNI_VERSION_1_6;

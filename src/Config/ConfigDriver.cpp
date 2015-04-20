@@ -1,5 +1,7 @@
 #include "ConfigDriver.h"
 
+#include <Base/Parser.h>
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <iostream>
@@ -21,6 +23,117 @@ const ConfigValue ConfigStore::GetConfig(const std::string & key) const
     return ConfigValue(); // NULL
  }
  return theConfig->GetConfig(key);
+}
+
+const std::string & ConfigStore::GetConfig(const std::string & key, const std::string & def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ return val->GetString();
+}
+
+int ConfigStore::GetConfig(const std::string & key, int def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const int * ip = val->ToInt();
+ if (!ip) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to int");
+ }
+ return *ip;
+}
+
+float ConfigStore::GetConfig(const std::string & key, float def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const float * fp = val->ToFloat();
+ if (!fp) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to float");
+ }
+ return *fp;
+}
+
+double ConfigStore::GetConfig(const std::string & key, double def_val)
+{
+ ConfigValue val = GetConfig(key);
+ if (!val)
+    return def_val;
+ const double * dp = val->ToDouble();
+ if (!dp) {
+    // This is really an error: requested something which has wrong type:
+    throw EX::Error("Value cannot be converted to double float");
+ }
+ return *dp;
+}
+
+void ConfigStore::AddConfig(const std::string & key, const std::string & value)
+{
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
+ if (!theConfig) {  // Hopefully it runs on one thread yet
+    theConfig.reset(new AssignmentSet());   // Add an empty set
+ }
+
+ theConfig->AppendValue(key, ConfigValue(new ConfExpression(value)));
+}
+
+std::string ConfigStore::GetPath(const std::string & key)
+{
+ const ConfigValue value = GetConfig(key);
+ ASSERT(value, "path entry missing from config: '" << key << "'");
+ return FullPathOf(value->GetString());
+}
+
+const std::string & ConfigStore::GetRootDir(void)
+{
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
+ if (root_directory.empty()) {
+    SYS_DEBUG(DL_INFO1, "Calculating root directory...");
+    root_directory = ".";   // default value
+    const ConfigValue chain = GetConfig("SuperConfig");
+    if (chain) {
+        std::string root_dirs = GetConfig("RootDirectories", GetDefaultRootDirecories());
+        Parser::Tokenizer tok(root_dirs);
+        for (int i = 0; i < tok.size(); ++i) {
+            std::string super_config_path = std::string(tok[i]) + "/" + chain->GetString();
+            SYS_DEBUG(DL_INFO1, "Android Config: Trying to read Super Config from '" << super_config_path << "'");
+            try {
+                FILES::FileMap_char configFile(super_config_path.c_str());
+                SYS_DEBUG(DL_INFO1, "Super Config file: size=" << configFile.GetSize());
+                ConfDriver super_parser(configFile, *this);
+                if (super_parser.parse() != 0) {
+                    SYS_DEBUG(DL_ERROR, "Error parsing Super Config file " << super_config_path << ", some settings may be incorrect.");
+                }
+                root_directory = tok[i];
+                SYS_DEBUG(DL_INFO1, "Super Config file " << super_config_path << " parsed.");
+                break;  // Only one Super Config file expected
+            } catch (EX::Assert & ex) {
+                SYS_DEBUG(DL_WARNING, "Warning: could not parse the Super Config file beracuse " << ex.what());
+            }
+        }
+    }
+    SYS_DEBUG(DL_INFO1, "Root directory is '" << root_directory << "'");
+ }
+
+ return root_directory;
+}
+
+std::string ConfigStore::FullPathOf(const std::string & rel_path)
+{
+ if (rel_path[0] == DIR_SEPARATOR) {
+    return rel_path;
+ }
+ std::string result = GetRootDir();
+ result += DIR_SEPARATOR_STR;
+ result += rel_path;
+ return result;
 }
 
 /// Prints the whole config (for debug purpose)
@@ -313,7 +426,7 @@ AssignmentSet * AssignmentSet::Append(ConfAssign * assignment)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *assignment);
- assigns[assignment->GetName()->GetString()] = assignment->GetValue();
+ AppendValue(assignment->GetName()->GetString(), assignment->GetValue());
  delete assignment; // due to bison's stupidity :-)
  return this;
 }
@@ -322,7 +435,7 @@ AssignmentSet * AssignmentSet::Append(ConfigLevel * conf)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *conf);
- subConfigs[conf->GetName()] = MEM::shared_ptr<ConfigLevel>(conf);
+ AppendSubconfig(conf->GetName(), ConfPtr(conf));
  return this;
 }
 
@@ -331,10 +444,10 @@ AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
  SYS_DEBUG_MEMBER(DM_CONFIG);
  SYS_DEBUG(DL_INFO1, "Appended " << *other);
  for (AssignContainer::iterator i = other->assigns.begin(); i != other->assigns.end(); ++i) {
-    assigns[i->first] = i->second;
+    AppendValue(i->first, i->second);
  }
  for (ConfigContainer::iterator i = other->subConfigs.begin(); i != other->subConfigs.end(); ++i) {
-    subConfigs[i->first] = i->second;
+    AppendSubconfig(i->first, i->second);
  }
  delete other; // Due to bison's stupidity :-)
  return this;
@@ -372,15 +485,18 @@ const ConfPtr AssignmentSet::GetSubconfig(const std::string & name)
 /// Prints the whole config (for debug purpose)
 void AssignmentSet::List(int level) const
 {
+ static const char separators[] = "                                                ";
  for (AssignContainer::const_iterator i = assigns.begin(); i != assigns.end(); ++i) {
-    for (int j = 0; j < level; ++j)
-        std::cout << "  ";
-    std::cout << "\"" << i->first << "\"=\"" << i->second << "\";" << std::endl;
+    int position = sizeof(separators) - level - 1;
+    if (position >= 0) {
+        DEBUG_OUT(separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";");
+    }
  }
  for (ConfigContainer::const_iterator i = subConfigs.begin(); i != subConfigs.end(); ++i) {
-    for (int j = 0; j < level; ++j)
-        std::cout << "  ";
-    std::cout << "/* " << i->first << ": */" << std::endl;
+    int position = sizeof(separators) - level - 1;
+    if (position >= 0) {
+        DEBUG_OUT(separators+position << "/* " << i->first << ": */");
+    }
     i->second->List(level);
  }
 }

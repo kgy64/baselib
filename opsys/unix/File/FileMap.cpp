@@ -75,8 +75,10 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
  }
 }
 
-FileMap::FileMap(FileMap & other)
+FileMap::FileMap(FileMap && other)
 {
+ SYS_DEBUG_MEMBER(DM_FILE);
+
  fd = other.fd;
  mapped = other.mapped;
  ende = other.ende;
@@ -84,6 +86,7 @@ FileMap::FileMap(FileMap & other)
  myMode = other.myMode;
 
  other.mapped = 0;
+ other.ende = 0;
  other.fd = -1;
 }
 

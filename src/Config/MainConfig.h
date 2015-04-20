@@ -40,30 +40,63 @@ class MainConfig
 
     static MainConfig & Get(void)
     {
-        if (!myself) {
+        MainConfig * me = myself.get();
+        if (!me) {
             Threads::Lock _l(myMutex);
-            if (!myself) {
-                myself.reset(new MainConfig());
+            me = myself.get();
+            if (!me) {
+                me = new MainConfig();
+                myself.reset(me);
             }
         }
-        return *myself;
+        return *me;
     }
 
     /// Prints the whole config (for debug purpose)
-    void List(void) const
+    inline void List(void) const
     {
         theConfig.List();
     }
 
-    static const ConfigValue GetConfig(const std::string & key)
+    /// Generic function, getting any kind of config entry
+    inline static const ConfigValue GetConfig(const std::string & key)
     {
         return Get().theConfig.GetConfig(key);
     }
 
-    static const std::string & GetConfig(const std::string & key, const std::string & def_val);
-    static int GetConfig(const std::string & key, int def_val);
-    static float GetConfig(const std::string & key, float def_val);
-    static double GetConfig(const std::string & key, double def_val);
+    /// Gets a string entry from the config
+    /*! This is a specific case to prevent using temporary variables in a wrong way: the second argument
+     *  is intentionally not 'const' to prevent converting 'const char *' or 'char *' to 'std::string' and
+     *  returning its reference. So, if you got a "using temporary..." or "cannot convert const char *..."
+     *  error message during build, probably it means your code is wrong. Use 'std::string' parameter for
+     *  the default value. */
+    inline static const std::string & GetConfig(const std::string & key, std::string & def_val)
+    {
+        return Get().theConfig.GetConfig(key, def_val);
+    }
+
+    inline static std::string FullPathOf(const std::string & rel_path)
+    {
+        return Get().theConfig.FullPathOf(rel_path);
+    }
+
+    inline static std::string GetRootDir(void)
+    {
+        return Get().theConfig.GetRootDir();
+    }
+
+    /// Gets any kind of config entry by type
+    /*! \see    class \ref ConfigStore for the possible data types. */
+    template <typename T>
+    inline static T GetConfig(const std::string & key, T def_val)
+    {
+        return Get().theConfig.GetConfig(key, def_val);
+    }
+
+    inline static std::string GetPath(const std::string & key)
+    {
+        return Get().theConfig.GetPath(key);
+    }
 
  protected:
     MainConfig(void);

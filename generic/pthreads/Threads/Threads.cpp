@@ -91,6 +91,11 @@ void Thread::Start(size_t stack)
  // Create the thread:
  ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, this)==0, "pthread_create() failed");
 
+ // Set the thread name:
+ if (pthread_setname_np(myThread, getThreadName().c_str()) != 0) {
+    DEBUG_OUT("Could not set name of thread " << getThreadName());
+ }
+
  SYS_DEBUG(DL_INFO1, "Thread '" << getThreadName() << "' has been started");
 }
 
@@ -115,12 +120,18 @@ void * Thread::_main(void * thread_pointer)
  } catch (std::exception & ex) {
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main(): " << ex.what());
     return (void*)0;
+ } catch (...) {
+    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main() (unknown exception)");
+    return (void*)0;
  }
 
  try {
     th.atExit(status);
  } catch (std::exception & ex) {
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit(): " << ex.what());
+    return (void*)0;
+ } catch (...) {
+    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit() (unknown exception)");
     return (void*)0;
  }
 
