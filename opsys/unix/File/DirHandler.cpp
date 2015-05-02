@@ -30,7 +30,7 @@ using namespace FILES;
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void DirHandler::_DirHandler(const char * p_path)
+DirHandler::DirHandler(const char * p_path)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 

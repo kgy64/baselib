@@ -34,33 +34,19 @@ namespace FILES
 {
     class DirHandler
     {
-        // Some constructor-like functions, to be compatible with older
-        // compilers without c++11 support (instead of delegating these
-        // constructors):
-
-        void _DirHandler(const char * p_path);
-
-        inline void _DirHandler(const std::string & p_path)
-        {
-            _DirHandler(p_path.c_str());
-        }
-
      public:
         class iterator;
 
-        inline DirHandler(const char * p_path)
+        DirHandler(const char * p_path);
+
+        inline DirHandler(const std::string & p_path):
+            DirHandler(p_path.c_str())
         {
-            _DirHandler(p_path);
         }
 
-        inline DirHandler(const std::string & p_path)
+        inline DirHandler(const DirHandler::iterator & p_iter):
+            DirHandler(p_iter.Pathname())
         {
-            _DirHandler(p_path);
-        }
-
-        inline DirHandler(const DirHandler::iterator & p_iter)
-        {
-            _DirHandler(p_iter.Pathname());
         }
 
         VIRTUAL_IF_DEBUG ~DirHandler();
