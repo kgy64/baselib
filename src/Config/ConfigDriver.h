@@ -256,13 +256,13 @@ class AssignmentSet
  friend std::ostream & operator<<(std::ostream & os, const AssignmentSet & body);
 
  public:
-    AssignmentSet(void):
+    inline AssignmentSet(void):
         reference_counter(1)
     {
         SYS_DEBUG_MEMBER(DM_CONFIG);
     }
 
-    VIRTUAL_IF_DEBUG ~AssignmentSet()
+    VIRTUAL_IF_DEBUG inline ~AssignmentSet()
     {
         SYS_DEBUG_MEMBER(DM_CONFIG);
         SYS_DEBUG(DL_INFO2, "Size was " << assigns.size() << "/" << subConfigs.size());
@@ -272,6 +272,7 @@ class AssignmentSet
     AssignmentSet * Append(ConfAssign * assignment);
     AssignmentSet * Append(ConfigLevel * conf);
     AssignmentSet * Append(AssignmentSet * other);
+    AssignmentSet * AddConfig(const std::string & key, const std::string & value);
     const std::string * GetValue(const std::string & name);
     const ConfPtr GetSubconfig(const std::string & name);
     void List(int level) const;
@@ -338,10 +339,15 @@ static inline std::ostream & operator<<(std::ostream & os, const AssignmentSet &
 class ConfigLevel
 {
  public:
-    ConfigLevel(ConfigValue & name, AssignmentSet * body):
-        levelName(name->GetString()),
+    ConfigLevel(const std::string & name, AssignmentSet * body):
+        levelName(name),
         assignments(body),
         reference_counter(1)
+    {
+    }
+
+    ConfigLevel(ConfigValue & name, AssignmentSet * body):
+        ConfigLevel(name->GetString(), body)
     {
     }
 
@@ -354,6 +360,11 @@ class ConfigLevel
     const std::string & GetName(void) const
     {
         return levelName;
+    }
+
+    AssignmentSet & GetAssignments(void)
+    {
+        return *assignments;
     }
 
     const AssignmentSet & GetAssignments(void) const

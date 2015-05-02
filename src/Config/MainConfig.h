@@ -98,6 +98,11 @@ class MainConfig
         return Get().theConfig.GetPath(key);
     }
 
+    inline static void AddConfig(const std::string & key, const std::string & value)
+    {
+        Get().theConfig.AddConfig(key, value);
+    }
+
  protected:
     MainConfig(void);
 

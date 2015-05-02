@@ -80,7 +80,7 @@ void ConfigStore::AddConfig(const std::string & key, const std::string & value)
     theConfig.reset(new AssignmentSet());   // Add an empty set
  }
 
- theConfig->AppendValue(key, ConfigValue(new ConfExpression(value)));
+ theConfig->AddConfig(key, value);
 }
 
 std::string ConfigStore::GetPath(const std::string & key)
@@ -450,6 +450,27 @@ AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
     AppendSubconfig(i->first, i->second);
  }
  delete other; // Due to bison's stupidity :-)
+ return this;
+}
+
+AssignmentSet * AssignmentSet::AddConfig(const std::string & key, const std::string & value)
+{
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
+ std::string::size_type pos = key.find('/');
+ if (pos == std::string::npos) {
+    AppendValue(key, ConfigValue(new ConfExpression(value)));
+ } else {
+    std::string path = key.substr(0, pos);
+    std::string subkey = key.substr(pos+1);
+    ConfPtr subconfig = GetSubconfig(path);
+    if (subconfig) {
+        subconfig->GetAssignments().AddConfig(subkey, value);
+    } else {
+        Append(new ConfigLevel(path, (new AssignmentSet())->AddConfig(subkey, value)));
+    }
+ }
+
  return this;
 }
 
