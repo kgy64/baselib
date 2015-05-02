@@ -133,7 +133,7 @@ namespace Threads
                 } else {
                     if (no_of_threads < max_no_of_threads) {
                         // Create a new thread:
-                        SYS_DEBUG(DL_INFO2, "Creating '" << index << "' [" << no_of_threads << "]");
+                        SYS_DEBUG(DL_INFO2, "Creating '" << index << "' [" << no_of_threads << " threads]");
                         *th = CreateJob();
                         (*th)->Start(myStack);
                     } else {
