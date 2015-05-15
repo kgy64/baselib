@@ -13,10 +13,21 @@
 
 #include <System/TimeDelay.h>
 
+#include <ostream>
+
+namespace SYS
+{
+    class TimeElapsed;
+}
+
+std::ostream & operator<<(std::ostream & os, const SYS::TimeElapsed & time);
+
 namespace SYS
 {
     class TimeElapsed
     {
+        friend std::ostream & ::operator<<(std::ostream & os, const SYS::TimeElapsed & time);
+
      public:
         inline TimeElapsed(const SYS::TimeDelay & start):
             myTime(TimeDelay().SetNow() - start)
@@ -38,12 +49,25 @@ namespace SYS
             return myTime.ToMicrosecond();
         }
 
+        void toStream(std::ostream & os);
+
      private:
+        inline void toStream(std::ostream & os) const
+        {
+            os << myTime;
+        }
+
         SYS::TimeDelay myTime;
 
     }; // class TimeElapsed;
 
 } // namespace SYS
+
+inline std::ostream & operator<<(std::ostream & os, const SYS::TimeElapsed & time)
+{
+ time.toStream(os);
+ return os;
+}
 
 #endif /* __BASELIB_INCLUDE_PUBLIC_SYSTEM_TIMEELAPSED_H_INCLUDED__ */
 

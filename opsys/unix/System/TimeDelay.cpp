@@ -49,13 +49,28 @@ void TimeDelay::AddMicrosecond(int delta)
  }
 }
 
-std::ostream & operator<<(std::ostream & os, const SYS::TimeDelay & time)
+void SYS::TimeDelay::toStream(std::ostream & os) const
 {
- int days = time.myTime.tv_sec / (24*60*60);
- int seconds = time.myTime.tv_sec % (24*60*60);
- float ftime = seconds + time.myTime.tv_nsec / 1e9;
- os << days << "_" << ftime;
- return os;
+ uint32_t seconds = myTime.tv_sec;
+ uint32_t minutes = seconds / 60;
+ seconds %= 60;
+ uint32_t hours = minutes / 60;
+ minutes %= 60;
+ uint32_t days = hours / 24;
+ hours %= 24;
+ double ftime = (double)seconds + myTime.tv_nsec / 1e9;
+
+ char result[100];
+
+ if (days > 0) {
+    snprintf(result, sizeof result, "%d:%02d:%02d:%02.6f", days, hours, minutes, ftime);
+ } else if (hours > 0) {
+    snprintf(result, sizeof result, "%02d:%02d:%02.6f", hours, minutes, ftime);
+ } else {
+    snprintf(result, sizeof result, "%02d:%02.6f", minutes, ftime);
+ }
+
+ os << result;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

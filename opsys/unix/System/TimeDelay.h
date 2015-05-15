@@ -25,7 +25,7 @@ namespace SYS
 {
     class TimeDelay
     {
-     friend std::ostream & ::operator<<(std::ostream & os, const SYS::TimeDelay & time);
+        friend std::ostream & ::operator<<(std::ostream & os, const SYS::TimeDelay & time);
 
      public:
         inline TimeDelay(void)
@@ -35,9 +35,9 @@ namespace SYS
         inline TimeDelay & SetNow(void)
         {
 #ifdef CLOCK_MONOTONIC_RAW
-            static const clockid_t clock_type = CLOCK_MONOTONIC_RAW;
+            static constexpr clockid_t clock_type = CLOCK_MONOTONIC_RAW;
 #else
-            static const clockid_t clock_type = CLOCK_MONOTONIC;
+            static constexpr clockid_t clock_type = CLOCK_MONOTONIC;
 #endif
             clock_gettime(clock_type, &myTime);
             return *this;
@@ -76,11 +76,19 @@ namespace SYS
         void AddMicrosecond(int delta);
 
      private:
+        void toStream(std::ostream & os) const;
+
         struct timespec myTime;
 
     }; // class TimeDelay
 
 } // namespace SYS
+
+inline std::ostream & operator<<(std::ostream & os, const SYS::TimeDelay & time)
+{
+ time.toStream(os);
+ return os;
+}
 
 #endif /* __BASELIB_OPSYS_UNIX_SYSTEM_TIMEDELAY_H_INCLUDED__ */
 
