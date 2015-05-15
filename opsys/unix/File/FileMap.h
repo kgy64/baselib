@@ -15,14 +15,31 @@ namespace FILES
         enum OpenMode {
             Read_Only,
             Read_Unsafe,
-            Read_Write
+            Read_Write,
+            Map_Shared      = 0x1000,
+            Map_Nonblock    = 0x2000,
+            _OPEN_MASK      = 0x0fff
         };
 
         enum AdviseMode {
+            /*! No special treatment.  This is the default. */
             Adv_Normal,
+
+            /*! Expect page references in random order.  (Hence, read ahead may be less useful than normally.) */
             Adv_Random,
+
+            /*! Expect page references in sequential order.  (Hence, pages in the given range can be
+             *  aggressively read ahead, and may be freed soon after they are accessed.) */
             Adv_Sequential,
+
+            /*! Expect access in the near future.  (Hence, it might be a good idea to read some pages ahead.) */
             Adv_Willneed,
+
+            /*! Do  not expect access in the near future.  (For the time being, the application is finished with
+             *  the given range, so the kernel can free resources associated with it.)  Subsequent accesses of
+             *  pages in this range will succeed, but will result either in reloading of the memory contents from
+             *  the underlying mapped file (see mmap(2)) or zero-fill-on-demand pages for mappings without an
+             *  underlying file. */
             Adv_Dontneed
         };
 
@@ -49,6 +66,8 @@ namespace FILES
         inline size_t GetSize(void) const { return size; }
 
         void Advise(AdviseMode mode);
+        void Sync(bool wait = true);
+        void Populate(void);
 
      protected:
         int fd;
