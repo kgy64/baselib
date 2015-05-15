@@ -152,7 +152,7 @@ size_t FileHandler::Write(const void * p_data, size_t p_length)
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (fNo < 0) {
-    throw EX::File_Error() << "File not opened to write";
+    throw EX::File_Error() << "file '" << GetFullPath() << "' not opened for writing";
  }
 
  if (fNo == 0) {
@@ -196,7 +196,7 @@ bool FileHandler::Read(void * p_data, size_t p_length)
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (fNo < 0) {
-    throw EX::File_Error() << "File not opened to read";
+    throw EX::File_Error() << "file '" << GetFullPath() << "' not opened for reading";
  }
 
  if (fNo == 1 || fNo == 2) {
@@ -227,7 +227,7 @@ do_again:;
         if (offset == 0) {
             return false;
         }
-        throw EX::File_EOF(offset) << "EOF reached while reading " << p_length << " bytes, got " << offset << ", fd=" << fNo;
+        throw EX::File_EOF(offset) << "EOF reached while reading " << p_length << " bytes from '" << GetFullPath() << "', got " << offset << " (fd=" << fNo << ")";
     }
     p_length -= result;
     offset += result;

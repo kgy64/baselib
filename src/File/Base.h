@@ -18,13 +18,12 @@
 
 namespace EX
 {
-    DEFINE_EXCEPTION(File_Error, "File", Error);
+    DEFINE_EXCEPTION(File_Error, NULL, Error);
 
     class File_EOF: public File_Error
     {
      public:
         File_EOF(size_t p_bytes_read):
-            File_Error("EOF Exception"),
             myBytes(p_bytes_read)
         {
         }
