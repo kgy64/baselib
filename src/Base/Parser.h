@@ -8,8 +8,8 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef __SRC_BASE_TOKENIZER_H_INCLUDED__
-#define __SRC_BASE_TOKENIZER_H_INCLUDED__
+#ifndef __SRC_BASE_PARSER_H_INCLUDED__
+#define __SRC_BASE_PARSER_H_INCLUDED__
 
 #include <vector>
 #include <Memory/Memory.h>
@@ -53,6 +53,6 @@ namespace Parser
     };
 } // namespace Parser
 
-#endif /* __SRC_BASE_TOKENIZER_H_INCLUDED__ */
+#endif /* __SRC_BASE_PARSER_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
