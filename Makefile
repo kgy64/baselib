@@ -3,9 +3,6 @@
 
 DOXYGEN                 =   $(shell which doxygen)
 
-# The operating system in use. Default value is given here.
-OPERATING_SYSTEM       ?=   unix
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 .PHONY: all
