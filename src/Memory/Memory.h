@@ -15,36 +15,36 @@
 
 namespace MEM
 {
-    template <typename T>
+    template <typename T = void>
     using shared_ptr = typename std::shared_ptr<T>;
 
-    template <typename T>
+    template <typename T = void>
     using weak_ptr = typename std::weak_ptr<T>;
 
-    template <typename T>
+    template <typename T = void>
     class scoped_ptr: public std::auto_ptr<T>
     {
      public:
-        scoped_ptr(void)
+        inline scoped_ptr(void)
         {
         }
 
-        scoped_ptr(T * ptr):
+        inline scoped_ptr(T * ptr):
             std::auto_ptr<T>(ptr)
         {
         }
 
-        T * get(void)
+        inline T * get(void)
         {
             return std::auto_ptr<T>::get();
         }
 
-        const T * get(void) const
+        inline const T * get(void) const
         {
             return std::auto_ptr<T>::get();
         }
 
-        operator bool()
+        inline operator bool()
         {
             return get();
         }
@@ -55,11 +55,11 @@ namespace MEM
     class scoped_array: public std::shared_ptr<T>
     {
      public:
-        scoped_array(void)
+        inline scoped_array(void)
         {
         }
 
-        scoped_array(T * ptr):
+        inline scoped_array(T * ptr):
             std::shared_ptr<T>(ptr, std::default_delete<T[]>())
         {
         }
@@ -71,7 +71,7 @@ namespace MEM
         class noncopyable
         {
          protected:
-            noncopyable() {}
+            inline noncopyable() {}
 
          private:
             noncopyable(const noncopyable &);
