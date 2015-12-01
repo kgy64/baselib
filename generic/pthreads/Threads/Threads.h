@@ -14,6 +14,7 @@
 #include <Threads/Error.h>
 #include <Debug/Debug.h>
 
+#include <exception>
 #include <pthread.h>
 #include <sched.h>
 #include <errno.h>
@@ -116,16 +117,17 @@ namespace PTHREAD
         {
         }
 
-        /// A function called after \ref Thread::main()
-        virtual void after_main(void)
-        {
-        }
-
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
-        /// Called after main()
+        /// Called after main() has exited normally
         virtual void atExit(int p_exitCode)
+        {
+        }
+
+        /// Called after main() has exited with exception
+        /*! \param  ex  Pointer to the exception, or NULL if it was other than std::exception */
+        virtual void atExit(std::exception * ex = nullptr)
         {
         }
 

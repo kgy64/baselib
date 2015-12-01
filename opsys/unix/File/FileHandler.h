@@ -132,7 +132,7 @@ namespace FILES
 
         virtual Threads::Mutex & GetMutex(void)
         {
-            throw EX::File_Error() << "FileHandler::GetLock() is called on a non-lockable handler";
+            throw EX::File_Error() << "FileHandler::GetMutex() is called on a non-lockable handler";
         }
 
      protected:

@@ -62,15 +62,6 @@ namespace Threads
                 GetParent().Advance(*this);
             }
 
-            /// Signals the Thread Server not to use this thread any more and stops the thread
-            /*! \warning    This function must be called instead of \ref Threads::Thread::Kill() to force this
-                            thread to exit. Need not be used anyway. */
-            inline void Kill(void)
-            {
-                GetParent().Deleted(*this);
-                Threads::Thread::Kill();
-            }
-
          protected:
             inline Job(ThreadArray & parent, const char * thread_name):
                 Threads::Thread(thread_name),
@@ -100,6 +91,12 @@ namespace Threads
 
             T myIndex;
 
+            /// Signals the Thread Server not to use this thread any more and stops the thread
+            virtual void KillSignal(void) override
+            {
+                GetParent().Deleted(*this);
+            }
+
             /// This virtual function is called before the thread is accessed by \ref Threads::ThreadArray
             /*! Optional function, not necessary to be reimplemented.
                 \note   If the thread is just created, or recycled for other target, then the function
@@ -115,7 +112,9 @@ namespace Threads
                                 the index has the old value (or uninitialized) during this function.
                 \note           It is also called just after the constructor.
                 \warning        We must also wait for finish here to prevent creating more threads for the same target. */
-            virtual void Initialize(const T & index) =0;
+            virtual void Initialize(const T & index)
+            {
+            }
 
         }; // class ThreadArray::Job
 

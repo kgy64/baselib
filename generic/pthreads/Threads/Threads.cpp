@@ -69,7 +69,6 @@ void Thread::Kill(void)
     return;
 
  pthread_join(myThread, NULL);  // Wait until exited
- myThread = 0;                  // The thread is already exited
 }
 
 /// Start the thread
@@ -117,13 +116,20 @@ void * Thread::_main(void * thread_pointer)
 
  try {
     status = th.main();
+    th.myThread = 0;
  } catch (std::exception & ex) {
+    th.myThread = 0;
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main(): " << ex.what());
+    th.atExit(&ex);
     return (void*)0;
  } catch (...) {
+    th.myThread = 0;
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main() (unknown exception)");
+    th.atExit();
     return (void*)0;
  }
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() has exited with status " << status);
 
  try {
     th.atExit(status);
@@ -134,10 +140,6 @@ void * Thread::_main(void * thread_pointer)
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit() (unknown exception)");
     return (void*)0;
  }
-
- SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() exited with status " << status);
-
- th.after_main();
 
  return (void*)0;
 }
