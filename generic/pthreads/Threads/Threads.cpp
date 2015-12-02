@@ -56,8 +56,9 @@ void Thread::Kill(void)
  SYS_DEBUG_MEMBER(DM_THREAD);
 
  // If it has already been stopped, do nothing:
- if (toBeFinished)
+ if (toBeFinished || !myThread) {
     return;
+ }
 
  toBeFinished = true;           // Flag it to be stopped
 
@@ -65,8 +66,9 @@ void Thread::Kill(void)
 
  // If it is called from the thread itself, then it is not necessary at all. Calling
  // the join() is a bad idea in this case.
- if (pthread_equal(myThread, pthread_self()))
+ if (!pthread_equal(myThread, pthread_self())) {
     return;
+ }
 
  pthread_join(myThread, NULL);  // Wait until exited
 }
