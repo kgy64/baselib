@@ -26,18 +26,27 @@ void DirScanner::workOnDir(void)
     std::string entry_name = i.Name();
     switch (CheckName(entry_name)) {
         case T_SCAN_NOW:
+            SYS_DEBUG(DL_INFO2, "Subdirectory '" << entry_name << "' is scanned now");
             CreateSubdir(i.Pathname(), entry_name)->Scan();
         break;
         case T_SCAN_SORT:
+            SYS_DEBUG(DL_INFO2, "Subdirectory '" << entry_name << "' is to be scanned");
             subdirs[entry_name] = i.Pathname();
         break;
         case T_GOT_NOW:
+            SYS_DEBUG(DL_INFO2, "File '" << entry_name << "' is processed now");
             GotEntry(i.Pathname(), entry_name);
         break;
         case T_GOT_SORT:
+            SYS_DEBUG(DL_INFO2, "File '" << entry_name << "' is to be processed");
             names[entry_name] = i.Pathname();
         break;
+        case T_IGNORE:
+            SYS_DEBUG(DL_INFO2, "Name '" << entry_name << "' is ignored");
+            continue;
+        break;
         default:
+            DEBUG_OUT("Wrong return value from CheckName() at path '" << i.Pathname() << "'");
             continue;
         break;
     }
