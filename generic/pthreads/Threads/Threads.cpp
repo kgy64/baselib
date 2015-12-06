@@ -50,6 +50,8 @@ Thread::~Thread(void)
  *  \note   This is a collaborative exit, the thread must poll the function \ref Threads::Finished() and/or
  *          the function \ref Threads::KillSignal() must be used.<br>
  *          If this function is called from another thread, then it does not return while the thread is running.
+ *          It is recommended to call it only from the parent thread, because it returns immediately if called
+ *          from more threads.
  */
 void Thread::Kill(void)
 {
@@ -93,7 +95,7 @@ void Thread::Start(size_t stack)
  ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, this)==0, "pthread_create() failed");
 
  // Set the thread name:
- if (pthread_setname_np(myThread, getThreadName().c_str()) != 0) {
+ if (!setThreadName()) {
     DEBUG_OUT("Could not set name of thread " << getThreadName());
  }
 
@@ -122,26 +124,14 @@ void * Thread::_main(void * thread_pointer)
  } catch (std::exception & ex) {
     th.myThread = 0;
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main(): " << ex.what());
-    th.atExit(&ex);
     return (void*)0;
  } catch (...) {
     th.myThread = 0;
     DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main() (unknown exception)");
-    th.atExit();
     return (void*)0;
  }
 
  SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() has exited with status " << status);
-
- try {
-    th.atExit(status);
- } catch (std::exception & ex) {
-    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit(): " << ex.what());
-    return (void*)0;
- } catch (...) {
-    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/atExit() (unknown exception)");
-    return (void*)0;
- }
 
  return (void*)0;
 }

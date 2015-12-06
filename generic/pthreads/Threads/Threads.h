@@ -69,6 +69,29 @@ namespace PTHREAD
             return myThreadName;
         }
 
+        inline bool setThreadName(const char * name)
+        {
+            if (pthread_setname_np(myThread, name) != 0) {
+                return false;
+            }
+            myThreadName = name;
+            return true;
+        }
+
+        inline bool setThreadName(const std::string & name)
+        {
+            if (pthread_setname_np(myThread, name.c_str()) != 0) {
+                return false;
+            }
+            myThreadName = name;
+            return true;
+        }
+
+        inline bool setThreadName(void)
+        {
+            return pthread_setname_np(myThread, myThreadName.c_str()) == 0;
+        }
+
      protected:
         class Attribute
         {
@@ -119,17 +142,6 @@ namespace PTHREAD
 
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
-
-        /// Called after main() has exited normally
-        virtual void atExit(int p_exitCode)
-        {
-        }
-
-        /// Called after main() has exited with exception
-        /*! \param  ex  Pointer to the exception, or NULL if it was other than std::exception */
-        virtual void atExit(std::exception * ex = nullptr)
-        {
-        }
 
         /// Called to signal the thread to exit
         /*! This default implementation does nothing, see the reimplementations for details. */
