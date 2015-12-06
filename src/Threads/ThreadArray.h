@@ -38,11 +38,22 @@ namespace Threads
 
         typedef boost::intrusive::list<Job, boost::intrusive::constant_time_size<false> > TaskList;
 
+        virtual ~ThreadArray()
+        {
+            SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
+        }
+
         class Job: protected Threads::Thread, public auto_unlink_hook
         {
             friend class ThreadArray;
 
          public:
+            virtual ~Job()
+            {
+                SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
+                GetParent().Deleted(*this);
+            }
+
             /// The main function of the job
             virtual void Work(U task) =0;
 
@@ -71,11 +82,12 @@ namespace Threads
                 GetParent().Created(*this);
             }
 
-            virtual ~Job()
-            {
-                SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
-                GetParent().Deleted(*this);
-            }
+         private:
+            SYS_DEFINE_CLASS_NAME("Threads::ThreadArray::Job");
+
+            ThreadArray & myParent;
+
+            T myIndex;
 
             /// Sets new index
             inline void Reindex(const T & new_index)
@@ -83,13 +95,6 @@ namespace Threads
                 SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
                 myIndex = new_index;
             }
-
-         private:
-            SYS_DEFINE_CLASS_NAME("Threads::ThreadArray::Job");
-
-            ThreadArray & myParent;
-
-            T myIndex;
 
             /// Signals the Thread Server not to use this thread any more and stops the thread
             virtual void KillSignal(void) override
@@ -183,15 +188,16 @@ namespace Threads
             AdvanceLocked(job);
         }
 
+        /// Locks the access to \ref ThreadArray::myThreads
+        mutable Threads::Mutex myThreadMutex;
+
         ThreadsType myThreads;
 
+        /*! \warning    Its destructor uses \ref myThreadMutex, so the mutex must be defined earlier. */
         TaskList task_order;
 
      private:
         SYS_DEFINE_CLASS_NAME("Threads/ThreadArray");
-
-        /// Locks the access to \ref ThreadArray::myThreads
-        mutable Threads::Mutex myThreadMutex;
 
         /// Size of the stack for threads
         size_t myStack;
@@ -209,7 +215,7 @@ namespace Threads
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
             typename ThreadsType::iterator i = myThreads.find(index);
-            ASSERT (i != myThreads.end(), "Thread index '" << index << "' is missing from thread list");
+            ASSERT (i != myThreads.end(), "cannot remove thread index '" << index << "' from thread list, it is missing");
             JobPtr retval = i->second;
             myThreads.erase(i); // Invalidates 'i'
             return retval;      // The smart pointer holds the old thread yet
