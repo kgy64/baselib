@@ -13,10 +13,11 @@
 
 #include <Debug/Debug.h>
 
+#include <string>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h> // for setpriority()
-#include <unistd.h>
 #include <sys/syscall.h>  // For SYS_xxx definitions
 
 SYS_DEFINE_MODULE(DM_THREAD);
@@ -116,22 +117,24 @@ void * Thread::_main(void * thread_pointer)
 
  th.before_main();
 
- SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() started");
+ std::string thread_name = th.getThreadName();
+
+ SYS_DEBUG(DL_INFO1, "Thread '" << thread_name << "' main() started");
 
  try {
     status = th.main();
     th.myThread = 0;
  } catch (std::exception & ex) {
     th.myThread = 0;
-    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main(): " << ex.what());
+    DEBUG_OUT("Thread Execution Error in " << thread_name << "/main(): " << ex.what());
     return (void*)0;
  } catch (...) {
     th.myThread = 0;
-    DEBUG_OUT("Thread Execution Error in " << th.getThreadName() << "/main() (unknown exception)");
+    DEBUG_OUT("Thread Execution Error in " << thread_name << "/main() (unknown exception)");
     return (void*)0;
  }
 
- SYS_DEBUG(DL_INFO1, "Thread '" << th.getThreadName() << "' main() has exited with status " << status);
+ SYS_DEBUG(DL_INFO1, "Thread '" << thread_name << "' main() has exited with status " << status);
 
  return (void*)0;
 }
