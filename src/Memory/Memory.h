@@ -66,6 +66,12 @@ namespace MEM
 
     }; // class MEM::scoped_array
 
+    template <typename T, typename U>
+    inline shared_ptr<T> static_pointer_cast(const shared_ptr<U> & p)
+    {
+        return std::static_pointer_cast<T>(p);
+    }
+
     namespace noncopyable_
     {
         class noncopyable

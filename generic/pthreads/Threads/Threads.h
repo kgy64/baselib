@@ -12,6 +12,7 @@
 #define __SRC_THREADS_THREADS_H_INCLUDED__
 
 #include <Threads/Error.h>
+#include <Memory/Memory.h>
 #include <Debug/Debug.h>
 
 #include <exception>
@@ -21,6 +22,8 @@
 
 SYS_DECLARE_MODULE(DM_THREAD);
 
+struct ThreadInfo;
+
 namespace Threads
 {
     pid_t getTid(void);
@@ -29,13 +32,28 @@ namespace Threads
 
 namespace PTHREAD
 {
+    class Thread;
+}
+
+using ThreadPtr = MEM::shared_ptr<PTHREAD::Thread>;
+using ThreadWeak = MEM::weak_ptr<PTHREAD::Thread>;
+
+namespace PTHREAD
+{
     class Thread
     {
      public:
-        Thread(const char * name);
+        Thread(const char * name = "unknown");
         virtual ~Thread();
 
-        void Start(size_t stack = 1024*1024);
+        template <typename T>
+        inline static void Start(MEM::shared_ptr<T> & thread, size_t stack = 1024*1024)
+        {
+            ThreadPtr p = MEM::static_pointer_cast<Thread>(thread);
+            Start(p, stack);
+        }
+
+        static void Start(ThreadPtr & thread, size_t stack = 1024*1024);
         void Kill(void);
         bool SetPriority(int prio);
         int GetPriority(void) const;
@@ -87,12 +105,21 @@ namespace PTHREAD
             return true;
         }
 
+        /// Returns the smart pointer of itself
+        template <class C = Thread>
+        inline auto self(void) -> MEM::shared_ptr<C>
+        {
+            MEM::shared_ptr<C> me = MEM::static_pointer_cast<C>(mySelf.lock());
+            ASSERT(me, "thread is instantiated in wrong way");
+            return me;
+        }
+
+     protected:
         inline bool setThreadName(void)
         {
             return pthread_setname_np(myThread, myThreadName.c_str()) == 0;
         }
 
-     protected:
         class Attribute
         {
          public:
@@ -143,17 +170,34 @@ namespace PTHREAD
         /// This function is the startpoint of this thread
         virtual int main(void) =0;
 
+        /// Called when the thread has exited successfully
+        /*! \param status   The return value of \ref Threads::main()
+         *  \warning    This function is not called if the thread has exited with exception, see \ref Threads::error() */
+        virtual void exited(int status)
+        {
+        }
+
+        /// Called when the thread has exited with exception
+        /*! \param  ex  Pointer to the exception, or nullptr if it has an unknown type (other than std::exception). */
+        virtual void error(std::exception * ex)
+        {
+        }
+
         /// Called to signal the thread to exit
         /*! This default implementation does nothing, see the reimplementations for details. */
         virtual void KillSignal(void)
         {
         }
 
-        static void * _main(void * thread_pointer);
+        void Start(ThreadInfo & info, size_t stack);
+
+        static void * _main(void * info);
 
         bool toBeFinished;
 
         Attribute myAttr;
+
+        ThreadWeak mySelf;
 
     }; // class PTHREAD::Thread
 
