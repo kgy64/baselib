@@ -36,14 +36,12 @@ namespace Threads
 
         typedef MEM::shared_ptr<Job> JobPtr;
 
-        typedef boost::intrusive::list<Job, boost::intrusive::constant_time_size<false> > TaskList;
-
         virtual ~ThreadArray()
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
         }
 
-        class Job: protected Threads::Thread, public auto_unlink_hook
+        class Job: public Threads::Thread, public auto_unlink_hook
         {
             friend class ThreadArray;
 
@@ -102,14 +100,6 @@ namespace Threads
                 GetParent().Deleted(*this);
             }
 
-            /// This virtual function is called before the thread is accessed by \ref Threads::ThreadArray
-            /*! Optional function, not necessary to be reimplemented.
-                \note   If the thread is just created, or recycled for other target, then the function
-                        \ref ThreadArray::Job::Initialize() is called before being used (instead of this function). */
-            virtual void BeforeUse(void)
-            {
-            }
-
             /// This virtual function initializes a new or re-used thread
             /*! \param  index   This is the new index to be used. Note that it differs from the old one
                                 (see \ref ThreadArray::Job::index) for sure when this function is called.
@@ -127,35 +117,41 @@ namespace Threads
         JobPtr operator[](const T & index)
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
-            JobPtr * th; // Just a reference, but must be initialized later
+            ThreadPtr * th; // Just a reference, but must be initialized later
+            JobPtr jp;
             bool must_be_inited = false;
             {
                 Threads::Lock _l(myThreadMutex);
                 th = &myThreads[index];
-                if (th->get()) {
-                    SYS_DEBUG(DL_INFO2, "Using existing '" << task_order.back().GetIndex() << "' for '" << index << "' [" << no_of_threads << "]");
+                if (*th) {
+                    jp = (*th)->self<Job>();
+                    SYS_DEBUG(DL_INFO2, "Using existing '" << index << "' [" << no_of_threads << " threads]");
+                    jp->unlink();
                 } else {
                     if (no_of_threads < max_no_of_threads) {
                         // Create a new thread:
-                        SYS_DEBUG(DL_INFO2, "Creating '" << index << "' [" << no_of_threads << " threads]");
-                        *th = CreateJob();
-                        (*th)->Start(myStack);
+                        SYS_DEBUG(DL_INFO2, "Creating new '" << index << "' [" << no_of_threads << " threads]");
+                        jp = CreateJob();
+                        *th = jp;
+                        Threads::Thread::Start(*th, myStack);
                     } else {
-                        SYS_DEBUG(DL_INFO2, "Re-using '" << task_order.back().GetIndex() << "' for '" << index << "' [" << no_of_threads << "]");
+                        // Get the oldest index:
+                        const T & idx = static_cast<Job &>(task_order.back()).GetIndex();
+                        SYS_DEBUG(DL_INFO2, "Re-using '" << idx << "' for '" << index << "' [" << no_of_threads << "]");
                         // Remove and re-use the oldest existing thread:
-                        *th = Remove(task_order.back().GetIndex());
+                        jp = RemoveLocked(idx);
+                        // Store it back:
+                        *th = jp;
                     }
                     must_be_inited = true; // Must be initialized after unlock
                 }
-                AdvanceLocked(**th);
+                task_order.push_front(*jp);
             }
             if (must_be_inited) {
-                (*th)->Initialize(index);
-                (*th)->Reindex(index);
-            } else {
-                (*th)->BeforeUse();
+                reinterpret_cast<Job &>(**th).Initialize(index);
+                reinterpret_cast<Job &>(**th).Reindex(index);
             }
-            return *th;
+            return jp;
         }
 
      protected:
@@ -173,25 +169,21 @@ namespace Threads
             return myThreads.size();
         }
 
-        typedef std::map<T, JobPtr> ThreadsType;
-
-        inline void AdvanceLocked(Job & job)
-        {
-            SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
-            const_cast<Job&>(job).unlink();
-            task_order.push_front(job);
-        }
+        typedef std::map<T, ThreadPtr> ThreadsType;
 
         inline void Advance(Job & job)
         {
             Threads::Lock _l(myThreadMutex);
-            AdvanceLocked(job);
+            job.unlink();
+            task_order.push_front(job);
         }
 
-        /// Locks the access to \ref ThreadArray::myThreads
+        /// Locks the access to \ref ThreadArray::myThreads and \ref ThreadArray::task_order
         mutable Threads::Mutex myThreadMutex;
 
         ThreadsType myThreads;
+
+        typedef boost::intrusive::list<Job, boost::intrusive::constant_time_size<false> > TaskList;
 
         /*! \warning    Its destructor uses \ref myThreadMutex, so the mutex must be defined earlier. */
         TaskList task_order;
@@ -211,13 +203,15 @@ namespace Threads
 
         /// Removes and returns the requested entry
         /*! \warning    It must be called in locked state! (see the caller function(s) for details) */
-        JobPtr Remove(const T & index)
+        JobPtr RemoveLocked(const T & index)
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
-            typename ThreadsType::iterator i = myThreads.find(index);
+            auto i = myThreads.find(index);
             ASSERT (i != myThreads.end(), "cannot remove thread index '" << index << "' from thread list, it is missing");
-            JobPtr retval = i->second;
+            ThreadPtr & p = i->second;
+            JobPtr retval = p->self<Job>();
             myThreads.erase(i); // Invalidates 'i'
+            retval->unlink();
             return retval;      // The smart pointer holds the old thread yet
         }
 

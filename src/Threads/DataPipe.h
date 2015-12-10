@@ -74,7 +74,7 @@ namespace Threads
 
         inline bool busy(void) const
         {
-            return currentSize > 0;
+            return currentSize > 0; // assuming it is atomic
         }
 
         inline void finish(void)
