@@ -160,10 +160,8 @@ DebugPrint::~DebugPrint()
 
 
 /*! This function prints a message for entering into a new function. */
-void DebugPrint::entering(void)
+void DebugPrint::entering_safe(void)
 {
- DEBUG_CRITICAL_SECTION;
-
  if (!level_is_on(DL_CALLS)) {
     return;
  }
@@ -188,16 +186,9 @@ void DebugPrint::entering(void)
  info->tablevel++;
 }
 
-
 /*! This function prints a message for leaving the current function. */
-void DebugPrint::leaving(void)
+void DebugPrint::leaving_safe(void)
 {
- if (!level_is_on(DL_CALLS)) {
-    return;
- }
-
- DEBUG_CRITICAL_SECTION;
-
  I_DebugOut & out(GetOutStream());
 
  shift_left();
@@ -210,6 +201,49 @@ void DebugPrint::leaving(void)
 
  out << my_name.get() << "()";
  endline();
+}
+
+void DebugPrint::entering(void)
+{
+ try {
+    DEBUG_CRITICAL_SECTION;
+    entering_safe();
+    return;
+ } catch (std::exception & ex) {
+    I_DebugOut & out(GetOutStream());
+    out << "Got exception during debug log: '" << ex.what() << "', displaying it directly.";
+    endline();
+ } catch (...) {
+    I_DebugOut & out(GetOutStream());
+    out << "Got unknown exception during debug log, displaying it directly.";
+    endline();
+ }
+
+ entering_safe();
+}
+
+
+void DebugPrint::leaving(void)
+{
+ if (!level_is_on(DL_CALLS)) {
+    return;
+ }
+
+ try {
+    DEBUG_CRITICAL_SECTION;
+    leaving_safe();
+    return;
+ } catch (std::exception & ex) {
+    I_DebugOut & out(GetOutStream());
+    out << "Got exception during debug log: '" << ex.what() << "', displaying it directly.";
+    endline();
+ } catch (...) {
+    I_DebugOut & out(GetOutStream());
+    out << "Got unknown exception during debug log, displaying it directly.";
+    endline();
+ }
+
+ leaving_safe();
 }
 
 

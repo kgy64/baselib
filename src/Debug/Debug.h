@@ -181,7 +181,9 @@ namespace _Debug_Info_
 
      private:
         void entering(void);
+        void entering_safe(void);
         void leaving(void);
+        void leaving_safe(void);
         void shift_right(void);
         void shift_left(void);
         void overture(void);
