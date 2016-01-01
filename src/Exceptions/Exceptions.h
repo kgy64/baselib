@@ -38,7 +38,8 @@
                                             \
     };
 
-namespace EX {
+namespace EX
+{
     class BaseException: public std::exception
     {
      public:

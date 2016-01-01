@@ -79,6 +79,7 @@ FileHandler::~FileHandler()
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (fNo > 2) {
+    SYS_DEBUG(DL_INFO3, "Closing file number=" << fNo);
     ASSERT_STD(close(fNo) == 0);
  }
 }
@@ -94,23 +95,26 @@ void FileHandler::Open(FILES::FileMode flag)
 
  int open_flags = O_RDONLY;
 
+ std::string full_path(GetFullPath());
+
  switch (flag) {
     case READ_ONLY:
         // Nothing to do here
+        SYS_DEBUG(DL_INFO3, "Opening " << full_path << " for read-only");
     break;
 
     case READ_WRITE:
         open_flags = O_RDWR | O_CREAT;
         GetDirHandler()->Create(true);
+        SYS_DEBUG(DL_INFO3, "Opening " << full_path << " for read-write");
     break;
 
     case APPEND_WRITE:
         open_flags = O_RDWR | O_APPEND | O_CREAT;
         GetDirHandler()->Create(true);
+        SYS_DEBUG(DL_INFO3, "Opening " << full_path << " for append-write");
     break;
  }
-
- std::string full_path(GetFullPath());
 
  open_flags |= O_LARGEFILE;
 
@@ -119,6 +123,8 @@ void FileHandler::Open(FILES::FileMode flag)
  if (fNo < 0) {
     throw EX::File_Error() << "Could not open '" << full_path << "': " << strerror(errno);
  }
+
+ SYS_DEBUG(DL_INFO3, "File " << full_path << " is opened: file number=" << fNo << ", pos=" << Tell());
 }
 
 void FileHandler::OpenSpecial(FILES::FileMode flag)
