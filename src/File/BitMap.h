@@ -11,7 +11,6 @@
 #ifndef __BASELIB_SRC_FILE_BITMAP_H_INCLUDED__
 #define __BASELIB_SRC_FILE_BITMAP_H_INCLUDED__
 
-#include <File/Base.h>
 #include <File/FileMap.h>
 #include <Memory/InlineData.h>
 #include <Exceptions/Exceptions.h>
@@ -27,7 +26,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 template <size_t BITS, class ALLOC>
-class BitMapBase: public ALLOC, public FILES::Writeable
+class BitMapBase: public ALLOC
 {
  public:
     static constexpr size_t BYTES   =   (BITS+7)/8;
@@ -80,7 +79,7 @@ class BitMapBase: public ALLOC, public FILES::Writeable
     {
     }
 
-    virtual ~BitMapBase()
+    ~BitMapBase()
     {
     }
 
@@ -105,17 +104,7 @@ class BitMapBase: public ALLOC, public FILES::Writeable
         getMyData()[m.offset] &= ~m.mask();
     }
 
-    virtual const void * GetData(void) const override
-    {
-        return ALLOC::GetData();
-    }
-
-    virtual size_t GetSize(void) const override
-    {
-        return ALLOC::GetSize();
-    }
-
-}; // class BitMapBase<>
+} PACKED; // class BitMapBase<>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
@@ -149,7 +138,7 @@ class BitMapMem: public BitMapBase<BITS, InlineData<(BITS+7)/8> >
         memset(BitMapBase<BITS, InlineData<(BITS+7)/8> >::getMyData(), 0, BitMapBase<BITS, InlineData<(BITS+7)/8> >::GetSize());
     }
 
-}; // BitMapMem<>
+} PACKED; // BitMapMem<>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  *                                                                                       *
