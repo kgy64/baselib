@@ -28,7 +28,7 @@ ToWstring::ToWstring(const char * p_str):
  SYS_DEBUG_MEMBER(DM_UTF8);
 
  size_t i;
- for (i = 0; (myStr.get()[i] = GetChar(p_str)) != 0; ++i) ;     // FIXME(KGy): use new array class
+ for (i = 0; (myStr[i] = GetChar(p_str)) != 0; ++i) ;
 
  SYS_DEBUG(DL_INFO1, "String length set to " << i << ", was " << myLength);
  myLength = i;

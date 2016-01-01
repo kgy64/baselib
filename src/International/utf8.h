@@ -76,7 +76,7 @@ namespace UTF8
 
         size_t myLength;
 
-        const MEM::scoped_array<WChar> myStr;
+        MEM::scoped_array<WChar> myStr;
 
         static WChar GetContinuationChar(const char *& p_str);
 

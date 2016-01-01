@@ -52,7 +52,7 @@ namespace MEM
     }; // class MEM::scoped_ptr
 
     template <typename T>
-    class scoped_array: public std::shared_ptr<T>
+    class scoped_array: public MEM::scoped_ptr<T>
     {
      public:
         inline scoped_array(void)
@@ -60,11 +60,76 @@ namespace MEM
         }
 
         inline scoped_array(T * ptr):
-            std::shared_ptr<T>(ptr, std::default_delete<T[]>())
+            MEM::scoped_ptr<T>(ptr)
         {
         }
 
+        inline T & operator[](size_t index)
+        {
+            return get()[index];
+        }
+
+        inline const T & operator[](size_t index) const
+        {
+            return get()[index];
+        }
+
+        inline T * get(void)
+        {
+            return MEM::scoped_ptr<T>::get();
+        }
+
+        inline const T * get(void) const
+        {
+            return MEM::scoped_ptr<T>::get();
+        }
+
+        inline operator bool()
+        {
+            return get();
+        }
+
     }; // class MEM::scoped_array
+
+    template <typename T>
+    class shared_array: public MEM::shared_ptr<T>
+    {
+     public:
+        inline shared_array(void)
+        {
+        }
+
+        inline shared_array(T * ptr):
+            MEM::shared_ptr<T>(ptr)
+        {
+        }
+
+        inline T & operator[](size_t index)
+        {
+            return get()[index];
+        }
+
+        inline const T & operator[](size_t index) const
+        {
+            return get()[index];
+        }
+
+        inline T * get(void)
+        {
+            return MEM::shared_ptr<T>::get();
+        }
+
+        inline const T * get(void) const
+        {
+            return MEM::shared_ptr<T>::get();
+        }
+
+        inline operator bool()
+        {
+            return get();
+        }
+
+    }; // class MEM::shared_array
 
     template <typename T, typename U>
     inline shared_ptr<T> static_pointer_cast(const shared_ptr<U> & p)
