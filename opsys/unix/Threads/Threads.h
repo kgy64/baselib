@@ -18,7 +18,7 @@ namespace Threads
     class Thread: public PTHREAD::Thread
     {
      public:
-        inline Thread(const char * name):
+        inline Thread(const char * name = "unknown"):
             PTHREAD::Thread(name)
         {
             SYS_DEBUG_MEMBER(DM_THREAD);

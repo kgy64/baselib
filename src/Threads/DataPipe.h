@@ -58,15 +58,15 @@ namespace Threads
         {
             Threads::Lock _l(myDataMutex);
             while (true) {
-                if (isFinished) {
-                    return DataType();
-                }
                 if (!myData.empty()) {
                     DataType result = myData.front();
                     myData.pop_front();
                     --currentSize;
                     myFreeCondition.Signal();
                     return result;
+                }
+                if (isFinished) {
+                    return DataType();
                 }
                 myUseCondition.Wait(myDataMutex);
             }
@@ -79,8 +79,9 @@ namespace Threads
 
         inline void finish(void)
         {
+            Threads::Lock _l(myDataMutex);
             isFinished = true;
-            myUseCondition.Signal(myDataMutex);
+            myUseCondition.Signal();
         }
 
      protected:

@@ -49,19 +49,18 @@ namespace PTHREAD
         template <typename T>
         inline static void Start(MEM::shared_ptr<T> & thread, size_t stack = 1024*1024)
         {
+            SYS_DEBUG_STATIC(DM_THREAD);
             ThreadPtr p = MEM::static_pointer_cast<Thread>(thread);
-            Start(p, stack);
+            StartInternal(p, stack);
         }
 
-        static void Start(ThreadPtr & thread, size_t stack = 1024*1024);
         void Kill(void);
         bool SetPriority(int prio);
         int GetPriority(void) const;
 
-        /*! This function can be called by the main function to get the exit status. The thread
-         *  must exit if it returns true.
-         *  \note   The virtual function \ref Thread::KillSignal() is also called when this
-         *          flag is just set to signal the thread if necessary. */
+        /*! This function can be called by the main function to get the exit request.
+         *  \note   The virtual function \ref Thread::KillSignal() is also called when this flag
+         *          is set to signal the thread if necessary. That may be a better solution. */
         inline bool ToBeFinished(void) const
         {
             SYS_DEBUG_MEMBER(DM_THREAD);
@@ -72,7 +71,7 @@ namespace PTHREAD
          *  not started yet. */
         inline bool IsFinished(void) const
         {
-            return !myThread;
+            return isFinished;
         }
 
         /// Allows other processes to run
@@ -110,7 +109,7 @@ namespace PTHREAD
         inline auto self(void) -> MEM::shared_ptr<C>
         {
             MEM::shared_ptr<C> me = MEM::static_pointer_cast<C>(mySelf.lock());
-            ASSERT(me, "thread is instantiated in wrong way");
+            ASSERT(me, "function Thread::self() is called before Thread::Start()");
             return me;
         }
 
@@ -162,6 +161,7 @@ namespace PTHREAD
      private:
         SYS_DEFINE_CLASS_NAME("PTHREAD::Thread");
 
+     protected:
         /// A function called before \ref Thread::main()
         virtual void before_main(void)
         {
@@ -189,11 +189,15 @@ namespace PTHREAD
         {
         }
 
-        void Start(ThreadInfo & info, size_t stack);
+        void StartInternal(ThreadInfo & info, size_t stack);
+        static void StartInternal(ThreadPtr & thread, size_t stack = 1024*1024);
 
         static void * _main(void * info);
 
+     private:
         bool toBeFinished;
+
+        bool isFinished;
 
         Attribute myAttr;
 

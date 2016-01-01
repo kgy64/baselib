@@ -16,6 +16,8 @@
 #include <pthread.h>
 #include <Memory/Memory.h>
 
+#include <iostream>
+
 namespace Threads
 {
     class Lock;
@@ -43,9 +45,26 @@ namespace Threads
         {
         }
 
-        inline ~Mutex()
+        inline ~Mutex() throw()
         {
-            ASSERT_THREAD_STD(pthread_mutex_destroy(&myMutex));
+            int errorcode = pthread_mutex_destroy(&myMutex);
+            switch (errorcode) {
+                case 0:
+                    // Success
+                break;
+
+                case EBUSY:
+                    std::cerr << "ERROR: Could not destroy locked mutex" << std::endl;
+                break;
+
+                case EINVAL:
+                    std::cerr << "ERROR: Trying to destroy invalid mutex" << std::endl;
+                break;
+
+                default:
+                    std::cerr << "ERROR: Could not destroy mutex: " << strerror(errorcode) << std::endl;
+                break;
+            }
         }
 
      private:

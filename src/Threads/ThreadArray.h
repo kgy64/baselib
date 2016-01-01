@@ -36,9 +36,20 @@ namespace Threads
 
         typedef MEM::shared_ptr<Job> JobPtr;
 
-        virtual ~ThreadArray()
+        virtual ~ThreadArray() throw()
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
+            Finish();
+            SYS_DEBUG(DL_INFO1, "Threads have been stopped.");
+        }
+
+        inline void Finish(void)
+        {
+            SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
+            for (auto i = myThreads.begin(); i != myThreads.end(); ++i) {
+                SYS_DEBUG(DL_INFO2, "Stopping thread " << i->first);
+                i->second->Kill();
+            }
         }
 
         class Job: public Threads::Thread, public auto_unlink_hook
@@ -80,6 +91,12 @@ namespace Threads
                 GetParent().Created(*this);
             }
 
+            /// Signals the Thread Server not to use this thread any more and stops the thread
+            virtual void KillSignal(void) override
+            {
+                GetParent().Deleted(*this);
+            }
+
          private:
             SYS_DEFINE_CLASS_NAME("Threads::ThreadArray::Job");
 
@@ -92,12 +109,6 @@ namespace Threads
             {
                 SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
                 myIndex = new_index;
-            }
-
-            /// Signals the Thread Server not to use this thread any more and stops the thread
-            virtual void KillSignal(void) override
-            {
-                GetParent().Deleted(*this);
             }
 
             /// This virtual function initializes a new or re-used thread
@@ -117,39 +128,33 @@ namespace Threads
         JobPtr operator[](const T & index)
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);
-            ThreadPtr * th; // Just a reference, but must be initialized later
             JobPtr jp;
-            bool must_be_inited = false;
             {
                 Threads::Lock _l(myThreadMutex);
-                th = &myThreads[index];
-                if (*th) {
-                    jp = (*th)->self<Job>();
-                    SYS_DEBUG(DL_INFO2, "Using existing '" << index << "' [" << no_of_threads << " threads]");
+                ThreadPtr & th = myThreads[index];
+                if (th) {
+                    jp = th->self<Job>();
+                    SYS_DEBUG(DL_INFO2, "Using existing " << index << " [" << no_of_threads << " threads]");
                     jp->unlink();
                 } else {
                     if (no_of_threads < max_no_of_threads) {
                         // Create a new thread:
-                        SYS_DEBUG(DL_INFO2, "Creating new '" << index << "' [" << no_of_threads << " threads]");
+                        SYS_DEBUG(DL_INFO2, "Creating new thread for " << index << " [" << no_of_threads << " threads]");
                         jp = CreateJob();
-                        *th = jp;
-                        Threads::Thread::Start(*th, myStack);
+                        Threads::Thread::Start(jp, myStack);
                     } else {
                         // Get the oldest index:
                         const T & idx = static_cast<Job &>(task_order.back()).GetIndex();
                         SYS_DEBUG(DL_INFO2, "Re-using '" << idx << "' for '" << index << "' [" << no_of_threads << "]");
                         // Remove and re-use the oldest existing thread:
                         jp = RemoveLocked(idx);
-                        // Store it back:
-                        *th = jp;
                     }
-                    must_be_inited = true; // Must be initialized after unlock
+                    // Store it back:
+                    th = jp;
+                    jp->Initialize(index);
+                    jp->Reindex(index);
                 }
                 task_order.push_front(*jp);
-            }
-            if (must_be_inited) {
-                reinterpret_cast<Job &>(**th).Initialize(index);
-                reinterpret_cast<Job &>(**th).Reindex(index);
             }
             return jp;
         }
@@ -215,7 +220,7 @@ namespace Threads
             return retval;      // The smart pointer holds the old thread yet
         }
 
-        /*! \warning    The constructor is called in locked state (from function \ref ThreadArray::CreateJob()) */
+        /*! \warning    The constructor Job::Job() is called in locked state (from function \ref ThreadArray::CreateJob()) */
         void Created(Job & job)
         {
             SYS_DEBUG_MEMBER(DM_THREAD_ARRAY);

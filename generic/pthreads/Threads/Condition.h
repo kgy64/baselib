@@ -40,7 +40,7 @@ namespace Threads
         inline void Signal(Threads::Mutex & mutex)
         {
             Threads::Lock _l(mutex);
-            ASSERT_THREAD_STD(pthread_cond_signal(&myCond));
+            Signal();
         }
 
         /// Waits for the Signal

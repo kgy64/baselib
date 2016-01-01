@@ -39,11 +39,10 @@ struct ThreadInfo
         startCondition.Wait(startMutex);
     }
 
-    inline ThreadPtr getThread(void)
+    inline void Signal(void)
     {
-        ThreadPtr p = thread;       // Must be copied before Signal()
-        startCondition.Signal();    // Smart pointer has been instantiated, caller may continue
-        return p;
+        Threads::Lock _l(startMutex);
+        startCondition.Signal();
     }
 
     ThreadPtr & thread;
@@ -63,7 +62,8 @@ struct ThreadInfo
 Thread::Thread(const char * name):
     myThread(0),
     myThreadName(name),
-    toBeFinished(true)
+    toBeFinished(true),
+    isFinished(true)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
 
@@ -90,6 +90,7 @@ void Thread::Kill(void)
 
  // If it has already been stopped, do nothing:
  if (toBeFinished || !myThread) {
+    SYS_DEBUG(DL_INFO2, "Nothing to be done");
     return;
  }
 
@@ -99,44 +100,49 @@ void Thread::Kill(void)
 
  // If it is called from the thread itself, then it is not necessary at all. Calling
  // the join() is a bad idea in this case.
- if (!pthread_equal(myThread, pthread_self())) {
+ if (pthread_equal(myThread, pthread_self())) {
+    SYS_DEBUG(DL_INFO2, "Self thread is not joined");
     return;
  }
 
+ SYS_DEBUG(DL_INFO2, "Joining thread...");
  pthread_join(myThread, NULL);  // Wait until exited
+ SYS_DEBUG(DL_INFO2, "Joined, OK.");
 }
 
 /// (re)start the thread (public version, static)
 /*! \note   Smart pointer <b>must</b> be created to prevent race between threads. It can be deleted when this
  *          function has returned, or can be stored for later inspection. */
-void Thread::Start(ThreadPtr & thread, size_t stack)
+void Thread::StartInternal(ThreadPtr & thread, size_t stack)
 {
  SYS_DEBUG_STATIC(DM_THREAD);
+
+ ThreadInfo info(thread);               // For inter-thread communication
+
+ Threads::Lock _l(info.startMutex);
 
  // If it has already been started, do nothing:
  if (!thread->IsFinished()) {
     return;
  }
 
- ThreadInfo info(thread);       // For inter-thread communication
- thread->Start(info, stack);   // Start the thread
+ thread->StartInternal(info, stack);    // Start the thread
 }
 
 /// Start the thread (internal version)
-void Thread::Start(ThreadInfo & info, size_t stack)
+void Thread::StartInternal(ThreadInfo & info, size_t stack)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
 
  // It is in running state:
  toBeFinished = false;
+ isFinished = false;
 
  // Set the attributes
  myAttr.SetStackSize(stack);
  myAttr.SetJoinable(true);
 
- //
- Threads::Lock _l(info.startMutex);
-
+ SYS_DEBUG(DL_INFO1, "Creating Thread '" << getThreadName() << "' ...");
  // Create the thread:
  ASSERT_THREAD(pthread_create(&myThread, myAttr.get(), &Thread::_main, &info)==0, "pthread_create() failed");
 
@@ -149,14 +155,18 @@ void Thread::Start(ThreadInfo & info, size_t stack)
 /// The physical start of the thread
 /*! This is just a helper function, calling the real main() function.
  */
-void * Thread::_main(void * info)
+void * Thread::_main(void * p_info)
 {
  SYS_DEBUG_STATIC(DM_THREAD);
 
- // Keep itself alive while main() is running:
- ThreadPtr self = reinterpret_cast<ThreadInfo *>(info)->getThread();
+ ThreadInfo & info = *reinterpret_cast<ThreadInfo *>(p_info);
 
+ // Keep itself alive while main() is running:
+ ThreadPtr self = info.thread;
+ // Also store the self pointer:
  self->mySelf = self;
+
+ info.Signal();         // Smart pointers have been updated, caller may continue
 
  int status = 0;
 
@@ -172,7 +182,7 @@ void * Thread::_main(void * info)
  try {
     status = self->main();
     self->exited(status);
-    self->myThread = 0;
+    self->toBeFinished = true;
 
  } catch (std::exception & ex) {
     DEBUG_OUT("Thread Execution Error in " << self->getThreadName() << "/main(): " << ex.what());
@@ -181,8 +191,6 @@ void * Thread::_main(void * info)
     } catch (...) {
         DEBUG_OUT("Thread '" << self->getThreadName() << "': error() got exception!");
     }
-    self->myThread = 0;
-    return (void*)0;
 
  } catch (...) {
     DEBUG_OUT("Thread Execution Error in " << self->getThreadName() << "/main() (unknown exception)");
@@ -191,11 +199,11 @@ void * Thread::_main(void * info)
     } catch (...) {
         DEBUG_OUT("Thread '" << self->getThreadName() << "': error() got exception!");
     }
-    self->myThread = 0;
-    return (void*)0;
  }
 
  SYS_DEBUG(DL_INFO1, "Thread '" << self->getThreadName() << "' has exited normally, status=" << status);
+
+ self->isFinished = true;
 
  return (void*)0;
 }
