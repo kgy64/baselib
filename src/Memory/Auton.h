@@ -394,6 +394,13 @@ class Auton
         return _AutonPrivate::AutonInterface<I>::myStaticImplementation.GetImplementation();
     }
 
+    /*! This function creates the Implementation on-demand and return the pointer.
+     */
+    inline const I * Instance(void) const
+    {
+        return _AutonPrivate::AutonInterface<I>::myStaticImplementation.GetImplementation();
+    }
+
     /*! The pointer operator creates the Implementation on-demand.
      */
     inline I * operator->()
@@ -401,9 +408,23 @@ class Auton
         return Instance();
     }
 
+    /*! The pointer operator creates the Implementation on-demand.
+     */
+    inline const I * operator->() const
+    {
+        return Instance();
+    }
+
     /*! The reference operator creates the Implementation on-demand.
      */
     inline I & operator*()
+    {
+        return *Instance();
+    }
+
+    /*! The reference operator creates the Implementation on-demand.
+     */
+    inline const I & operator*() const
     {
         return *Instance();
     }
