@@ -22,7 +22,7 @@ namespace MEM
     using weak_ptr = typename std::weak_ptr<T>;
 
     template <typename T = void>
-    class scoped_ptr: public std::auto_ptr<T>
+    class scoped_ptr: public std::unique_ptr<T>
     {
      public:
         inline scoped_ptr(void)
@@ -30,18 +30,18 @@ namespace MEM
         }
 
         inline scoped_ptr(T * ptr):
-            std::auto_ptr<T>(ptr)
+            std::unique_ptr<T>(ptr)
         {
         }
 
         inline T * get(void)
         {
-            return std::auto_ptr<T>::get();
+            return std::unique_ptr<T>::get();
         }
 
         inline const T * get(void) const
         {
-            return std::auto_ptr<T>::get();
+            return std::unique_ptr<T>::get();
         }
 
         inline operator bool()
