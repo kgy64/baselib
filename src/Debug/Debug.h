@@ -325,11 +325,11 @@ namespace _Debug_Info_
             } catch (std::exception & ex) {             \
                 __debug_temp_.str("");                  \
                 __debug_temp_.clear();                  \
-                __debug_temp_ << "**** Message in line " << __LINE__ << " could not be displayed because " << ex.what() << " *****"; \
+                __debug_temp_ << "**** Message in " << __FILE__ << ":" << __LINE__ << " could not be displayed because " << ex.what() << " *****"; \
             } catch (...) {                             \
                 __debug_temp_.str("");                  \
                 __debug_temp_.clear();                  \
-                __debug_temp_ << "**** Message in line " << __LINE__ << " could not be displayed due to unknown exception *****"; \
+                __debug_temp_ << "**** Message in " << __FILE__ << ":" << __LINE__ << " could not be displayed due to unknown exception *****"; \
             }                                           \
         }                                               \
         DEBUG_CRITICAL_SECTION;                         \
