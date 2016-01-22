@@ -28,6 +28,7 @@ namespace FILES
         virtual const void * GetData(void) const override;
         virtual size_t GetSize(void) const override;
         virtual off_t Tell(void) const override;
+        virtual std::string GetFullPath(void) const override;
 
      protected:
         size_t position;

@@ -51,6 +51,7 @@ namespace FILES
     {
      public:
         virtual off_t Tell(void) const =0;
+        virtual std::string GetFullPath(void) const =0;
 
     }; // class FILES::Generic
 

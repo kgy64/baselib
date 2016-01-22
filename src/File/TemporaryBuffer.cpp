@@ -62,4 +62,9 @@ off_t Buffer::Tell(void) const
  return position;
 }
 
+std::string Buffer::GetFullPath(void) const
+{
+ return "Memory-Buffer";
+}
+
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
