@@ -25,7 +25,7 @@ const ConfigValue ConfigStore::GetConfig(const std::string & key) const
  return theConfig->GetConfig(key);
 }
 
-const std::string & ConfigStore::GetConfig(const std::string & key, const std::string & def_val)
+const std::string & ConfigStore::GetConfig(const std::string & key, const std::string & def_val) const
 {
  ConfigValue val = GetConfig(key);
  if (!val)
@@ -33,7 +33,7 @@ const std::string & ConfigStore::GetConfig(const std::string & key, const std::s
  return val->GetString();
 }
 
-int ConfigStore::GetConfig(const std::string & key, int def_val)
+int ConfigStore::GetConfig(const std::string & key, int def_val) const
 {
  ConfigValue val = GetConfig(key);
  if (!val)
@@ -46,7 +46,7 @@ int ConfigStore::GetConfig(const std::string & key, int def_val)
  return *ip;
 }
 
-float ConfigStore::GetConfig(const std::string & key, float def_val)
+float ConfigStore::GetConfig(const std::string & key, float def_val) const
 {
  ConfigValue val = GetConfig(key);
  if (!val)
@@ -59,7 +59,7 @@ float ConfigStore::GetConfig(const std::string & key, float def_val)
  return *fp;
 }
 
-double ConfigStore::GetConfig(const std::string & key, double def_val)
+double ConfigStore::GetConfig(const std::string & key, double def_val) const
 {
  ConfigValue val = GetConfig(key);
  if (!val)
@@ -90,7 +90,7 @@ std::string ConfigStore::GetPath(const std::string & key)
  return FullPathOf(value->GetString());
 }
 
-const std::string & ConfigStore::GetRootDir(void)
+const std::string & ConfigStore::GetRootDir(void) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
@@ -107,7 +107,7 @@ const std::string & ConfigStore::GetRootDir(void)
             try {
                 FILES::FileMap_char configFile(super_config_path.c_str());
                 SYS_DEBUG(DL_INFO1, "Super Config file: size=" << configFile.GetSize());
-                ConfDriver super_parser(configFile, *this);
+                ConfDriver super_parser(configFile, const_cast<ConfigStore&>(*this));
                 if (super_parser.parse() != 0) {
                     SYS_DEBUG(DL_ERROR, "Error parsing Super Config file " << super_config_path << ", some settings may be incorrect.");
                 }

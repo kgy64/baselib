@@ -38,12 +38,12 @@ class ConfigStore
 
     void List(void) const;
     const ConfigValue GetConfig(const std::string & key) const;
-    const std::string & GetConfig(const std::string & key, const std::string & def_val);
-    int GetConfig(const std::string & key, int def_val);
-    float GetConfig(const std::string & key, float def_val);
-    double GetConfig(const std::string & key, double def_val);
+    const std::string & GetConfig(const std::string & key, const std::string & def_val) const;
+    int GetConfig(const std::string & key, int def_val) const;
+    float GetConfig(const std::string & key, float def_val) const;
+    double GetConfig(const std::string & key, double def_val) const;
     std::string GetPath(const std::string & key);
-    const std::string & GetRootDir(void);
+    const std::string & GetRootDir(void) const;
     std::string FullPathOf(const std::string & rel_path);
     void AddConfig(const std::string & key, const std::string & value);
 
@@ -68,7 +68,7 @@ class ConfigStore
  protected:
     MEM::shared_ptr<AssignmentSet> theConfig;
 
-    std::string root_directory;
+    mutable std::string root_directory;
 
     std::string default_root_directory_list;
 
