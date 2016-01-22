@@ -84,6 +84,21 @@ FileHandler::~FileHandler()
  }
 }
 
+std::string FileHandler::GetFullPath(void) const
+{
+ std::string full_path(myDir);
+ full_path += DIR_SEPARATOR_STR;
+ full_path += myName;
+ return full_path;
+}
+
+off_t FileHandler::Tell(void) const
+{
+ off_t result = lseek(fNo, 0, SEEK_CUR);
+ ASSERT(result != (off_t)-1, "cannot seek");
+ return result;
+}
+
 void FileHandler::Open(FILES::FileMode flag)
 {
  SYS_DEBUG_MEMBER(DM_FILE);

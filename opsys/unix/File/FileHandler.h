@@ -82,26 +82,13 @@ namespace FILES
             return DirPtr(new DirHandler(GetDir()));
         }
 
-        inline std::string GetFullPath(void) const
-        {
-            std::string full_path(myDir);
-            full_path += DIR_SEPARATOR_STR;
-            full_path += myName;
-            return full_path;
-        }
-
         void Open(FileMode flag = READ_ONLY);
         void OpenSpecial(FileMode flag);
 
         virtual bool Read(void * p_data, size_t p_length) override;
         virtual size_t Write(const void * p_data, size_t p_length) override;
-
-        virtual off_t Tell(void) const override
-        {
-            off_t result = lseek(fNo, 0, SEEK_CUR);
-            ASSERT(result != (off_t)-1, "Cannot seek");
-            return result;
-        }
+        virtual std::string GetFullPath(void) const override;
+        virtual off_t Tell(void) const override;
 
         inline off_t Seek(off_t p_seek, int p_whence = SEEK_SET) const
         {
