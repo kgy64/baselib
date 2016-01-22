@@ -54,6 +54,7 @@ uint64_t MemInfo::getMemoryHugePageSize(void)
 {
  updateInfo();
 
+ // TODO!
 }
 
 void MemInfo::updateInfo(void)
@@ -63,7 +64,7 @@ void MemInfo::updateInfo(void)
  }
 
  char tmp[10000];
- memset(tmp, sizeof tmp, 0);
+ memset(tmp, 0, sizeof tmp);
 
  FILES::FileHandler mem_status("/proc/meminfo");
  mem_status.Open();
