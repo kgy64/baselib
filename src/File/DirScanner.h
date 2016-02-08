@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     Ducktor Navi: The Navigation Project
+ * Project:     Baselib - Basic System Access Library
  * Purpose:     class DirScanner: scans a given path recursively
  * Author:      György Kövesdi <kgy@teledigit.eu>
  * License:     GPL (see file 'COPYING' in the project root for more details)

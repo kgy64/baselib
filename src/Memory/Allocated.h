@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     OSM Database converter
- * Purpose:     Create my own binary database for Ducktor Navi Project out of OSM Database
+ * Project:     Baselib - Basic System Access Library
+ * Purpose:     Dynamically allocated byte buffer
  * Author:      Copyright (c) 2015 - Gyorgy Kovesdi <kgy@teledigit.eu>
  * License:     GPLv2
  * Comments:    

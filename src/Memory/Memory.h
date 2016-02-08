@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     Ducktor Navi - my Navigation Project
+ * Project:     Baselib - Basic System Access Library
  * Purpose:     
  * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@teledigit.eu>
  * License:     GPLv2

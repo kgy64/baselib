@@ -21,7 +21,7 @@
 
 SYS_DEFINE_MODULE(DM_ANDROID_ACCESS);
 
-static const char myTag[] = "Ducktor Navi Access";
+static const char myTag[] = "C++/Java Interface";
 
 JavaVM * AndroidAccess::jvm;
 
