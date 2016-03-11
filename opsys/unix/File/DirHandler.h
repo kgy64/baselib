@@ -27,7 +27,7 @@ SYS_DECLARE_MODULE(DM_FILE);
 
 namespace EX
 {
-    DEFINE_EXCEPTION(DIR_Exception, "Dir", Error);
+    DEFINE_EXCEPTION(DIR_Exception, "directory", Error);
 }
 
 namespace FILES
