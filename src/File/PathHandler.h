@@ -13,6 +13,7 @@
 
 #include <Base/Parser.h>
 #include <Debug/Debug.h>
+#include <Exceptions/Exceptions.h>
 
 #include <string>
 

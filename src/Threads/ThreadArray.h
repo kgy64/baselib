@@ -15,6 +15,7 @@
 #include <Threads/Mutex.h>
 #include <Memory/Memory.h>
 
+#include <map>
 #include <boost/intrusive/list.hpp>
 
 SYS_DECLARE_MODULE(DM_THREAD_ARRAY);

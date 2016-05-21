@@ -8,6 +8,10 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <Debug/Debug.h>
+
+#if DEBUG_IS_ON
+
 #include "DebugOutput.h"
 
 // Putting this function here forces this object to be linked. It is necessary
@@ -32,5 +36,7 @@ I_DebugOut & DefaultDebugOutput::operator<<(const char * msg)
  std::cerr << msg;
  return *this;
 }
+
+#endif // DEBUG_IS_ON
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

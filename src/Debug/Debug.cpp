@@ -9,6 +9,8 @@
 
 #include "Debug.h"
 
+#if DEBUG_IS_ON
+
 #include <Threads/Threads.h>
 #include <System/Generic.h>
 
@@ -357,5 +359,7 @@ I_DebugOut & I_DebugOut::operator<<(int data)
  sprintf(tmp, "%d", (unsigned)data);
  return *this << tmp;
 }
+
+#endif // DEBUG_IS_ON
 
 /* ------------------------- End - of - file --------------------------- */

@@ -11,8 +11,6 @@
 #ifndef __BASELIB_SRC_DEBUG_DEBUGOUTPUT_H_INCLUDED__
 #define __BASELIB_SRC_DEBUG_DEBUGOUTPUT_H_INCLUDED__
 
-#include <Debug/Debug.h>
-
 class DefaultDebugOutput: public I_DebugOut
 {
  private:
