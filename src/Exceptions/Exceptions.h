@@ -20,7 +20,7 @@
     class NAME: public BASE                 \
     {                                       \
      public:                                \
-        NAME(const char * msg = MSG, int line = -1): \
+        inline NAME(const char * msg = MSG, int line = -1): \
             BASE(msg, line)                 \
         {                                   \
         }                                   \
@@ -89,11 +89,31 @@ namespace EX
     /*! This exception means that the current operation must be stopped, but it is not really
      *  an error and no further actions needed. The operation can continue. */
     DEFINE_EXCEPTION(Continue, NULL, Warning);
-}
+
+    /// Assert with standard 'errno'
+    class AssertWithErrno: public Assert
+    {
+     public:
+        inline AssertWithErrno(const char * msg, int error, int line = -1):
+            EX::Assert(msg, line),
+            error(error)
+        {
+        }
+
+        const int error;
+
+    }; // class EX::ErrorWithErrno
+
+} // namespace EX
 
 #define __DO_ASSERT(type, cond, message)  \
     { \
         throw type("assertion '" #cond "' failed in " __FILE__, __LINE__) << message; \
+    }
+
+#define __DO_ASSERT_WITH_ERRNO(error, cond, message)  \
+    { \
+        throw EX::AssertWithErrno("assertion '" #cond "' failed in " __FILE__, error, __LINE__) << message; \
     }
 
 #define ASSERT_T(type, cond, message)   { if (!(cond)) __DO_ASSERT(type, cond, message); }
@@ -110,13 +130,13 @@ namespace EX
         } \
     }
 
-#define ASSERT_STD(cond)                    { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(errno)); }
+#define ASSERT_STD(cond)                    { if (!(cond)) __DO_ASSERT_WITH_ERRNO(errno, cond, strerror(errno)); }
 
-#define ASSERT_STD_ERRNO(cond, error_code)  { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, strerror(error_code)); }
+#define ASSERT_STD_ERRNO(cond, error_code)  { if (!(cond)) __DO_ASSERT_WITH_ERRNO(error_code, cond, strerror(error_code)); }
 
-#define ASSERT_STRERROR(cond, message)      { if (!(cond)) __DO_ASSERT(::EX::Assert, cond, message << strerror(errno)); }
+#define ASSERT_STRERROR(cond, message)      { if (!(cond)) __DO_ASSERT_WITH_ERRNO(errno, cond, message << strerror(errno)); }
 
-#define ASSERT_STD_ZERO(cond)               { int e = (cond); if (e) __DO_ASSERT(::EX::Assert, cond, strerror(e)); }
+#define ASSERT_STD_ZERO(cond)               { int e = (cond); if (e) __DO_ASSERT_WITH_ERRNO(e, cond, strerror(e)); }
 
 #endif // _EXCEPTIONS_EXCEPTIONS_H_
 
