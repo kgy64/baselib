@@ -29,13 +29,6 @@
         {                                   \
         }                                   \
                                             \
-        template <typename T>               \
-        inline NAME & operator<<(const T & value)  \
-        {                                   \
-            static_cast<BASE &>(*this) << value;   \
-            return *this;                   \
-        }                                   \
-                                            \
     };
 
 namespace EX
@@ -108,12 +101,16 @@ namespace EX
 
 #define __DO_ASSERT(type, cond, message)  \
     { \
-        throw type("assertion '" #cond "' failed in " __FILE__, __LINE__) << message; \
+        type _e("assertion '" #cond "' failed in " __FILE__, __LINE__); \
+        _e << message; \
+        throw _e; \
     }
 
 #define __DO_ASSERT_WITH_ERRNO(error, cond, message)  \
     { \
-        throw EX::AssertWithErrno("assertion '" #cond "' failed in " __FILE__, error, __LINE__) << message; \
+        EX::AssertWithErrno _e("assertion '" #cond "' failed in " __FILE__, error, __LINE__); \
+        _e << message; \
+        throw _e; \
     }
 
 #define ASSERT_T(type, cond, message)   { if (!(cond)) __DO_ASSERT(type, cond, message); }
