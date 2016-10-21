@@ -4,6 +4,9 @@
 export NAME                 =  Unix-specific
 export SRCDIR              ?=  .
 
+export CFLAGS      +=  -fPIC
+export CXXFLAGS    +=  -fPIC
+
 .PHONY: all
 all: _everything
 
