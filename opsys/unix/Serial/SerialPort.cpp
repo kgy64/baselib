@@ -1,5 +1,7 @@
 #include "SerialPort.h"
 
+#include <System/TimeElapsed.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -123,6 +125,40 @@ bool SerialPort::Open(const char * DeviceName, int baud)
  SYS_DEBUG(DL_INFO1, "Symbolic link is too deep (>100)");
 
  return false;
+}
+
+int SerialPort::ReadLine(char * buffer, int size, int usTimeout, bool removeCRLF)
+{
+ int status = 0;
+ int length = 0;
+ char * p = (char*)buffer;
+ SYS::TimeDelay start;
+
+ for (start.SetNow(); SYS::TimeElapsed(start).ToMicrosecond() < usTimeout; ) {
+    status = Read(p+length, size);
+    if (status < 0) {
+        return status;      // Error occured
+    }
+    if (status > 0) {       // Got new data
+        length += status;
+        size -= status;
+        if (size <= 0) {
+            break;          // The buffer is full
+        }
+        if (p[length-1] == '\r' || p[length-1] == '\n') {
+            break;
+        }
+        Sleep();
+        start.SetNow();
+    }
+ }
+ if (removeCRLF) {
+    while (length > 1 && (p[length-1] == '\r' || p[length-1] == '\n')) {
+        --length;
+    }
+    p[length] = '\0';
+ }
+ return length;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

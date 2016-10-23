@@ -14,7 +14,7 @@ namespace SYS
     {
      public:
         SerialPort(void);
-        ~SerialPort();
+        virtual ~SerialPort();
 
         bool Open(const char * DeviceName, int baud = 9600);
 
@@ -36,6 +36,8 @@ namespace SYS
             }
             return status;
         }
+
+        int ReadLine(char * buffer, int size, int usTimeout, bool removeCRLF = false);
 
         inline int Write(const void * Buffer, int Size)
         {
@@ -64,6 +66,10 @@ namespace SYS
         int fd;
 
         bool is_device;
+
+        virtual void Sleep(void)
+        {
+        }
 
      private:
         SYS_DEFINE_CLASS_NAME("SerialPort");
