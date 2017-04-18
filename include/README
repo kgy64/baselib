@@ -1,0 +1,8 @@
+Platform-specific header files
+------------------------------
+
+There are subdirectories for each supported platform here.
+
+All platforms must have the same subdirectories and files to keep
+them fully compatible. The same solutions can be linked.
+

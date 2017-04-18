@@ -1,0 +1,7 @@
+Source files for more platforms
+-------------------------------
+
+This directory is not compiled by the build system, but the sources
+can be linked into more platforms. Multiply used solutions can be
+placed here.
+

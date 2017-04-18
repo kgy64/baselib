@@ -1,0 +1,20 @@
+Basic Library
+-------------
+
+This library contains classes for handling files, threads, exceptions, and so on.
+
+Portability:
+
+It is easily portable, and currently has Unix and Android ports. Win32 port
+is theoretically possible, but not implemented yet.
+The porting is done in object-oriented mode, having different header file set
+and source directory tree for each platform. In my code it is not allowed to
+use #ifdef's for such purpose. This library is intended to do everything about
+porting, the projects will be platform-independent this way.
+
+Directory structure:
+
+It is created to be compatible with my build system (see https://github.com/kgy64/makesys
+for details). This library is added automatically by creating a new project with
+that build system.
+

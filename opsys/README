@@ -1,0 +1,8 @@
+Platform-specific source files
+------------------------------
+
+There are subdirectories for each supported platform here.
+
+The platforms can have different file/directory structures under
+their subdirectory. The same solutions can be linked.
+
