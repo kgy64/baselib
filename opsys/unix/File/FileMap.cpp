@@ -102,7 +102,10 @@ FileMap::~FileMap()
     if (myMode == Read_Write) {
         SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
         int result = msync(mapped, size, MS_ASYNC | MS_INVALIDATE);
-        ASSERT(result == 0, "msync() failed: " << strerror(errno));
+        if (result) {
+            // cannot throw here
+            SYS_DEBUG(DL_ERROR, "msync() failed: " << strerror(errno));
+        }
     }
     SYS_DEBUG(DL_VERBOSE, "Unmapping...");
     munmap(mapped, size);

@@ -129,7 +129,9 @@ namespace PTHREAD
 
             inline ~Attribute()
             {
-                ASSERT_THREAD(pthread_attr_destroy(&myAttrib)==0, "pthread_attr_destroy() failed");
+                if (pthread_attr_destroy(&myAttrib)) {
+                    std::cerr << "ERROR: pthread_attr_destroy() failed" << std::endl;
+                }
             }
 
             inline void SetJoinable(bool joinable)

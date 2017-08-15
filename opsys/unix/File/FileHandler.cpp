@@ -80,7 +80,10 @@ FileHandler::~FileHandler()
 
  if (fNo > 2) {
     SYS_DEBUG(DL_INFO3, "Closing file number=" << fNo);
-    ASSERT_STD(close(fNo) == 0);
+    if (close(fNo)) {
+        // Cannot throw here
+        SYS_DEBUG(DL_ERROR, "Could not close file number " << fNo);
+    }
  }
 }
 
