@@ -1,8 +1,9 @@
 #define _BSD_SOURCE
 
 #include "FileMap.h"
-#include "Exceptions/Exceptions.h"
-#include "International/International.h"
+#include <File/Decode.h>
+#include <Exceptions/Exceptions.h>
+#include <International/International.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -50,15 +51,16 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
     map_mode |= MAP_NONBLOCK;
  }
 
- fd = open(name, open_mode, 0644);
+ std::string decoded_name = FILES::DecodeName(name);
+ fd = open(decoded_name.c_str(), open_mode, 0644);
 
  if ((myMode & _OPEN_MASK) == Read_Unsafe) {
     if (fd < 0) {
-        SYS_DEBUG(DL_INFO1, "File '" << name << "' does not exist.");
+        SYS_DEBUG(DL_INFO1, "File '" << decoded_name << "' does not exist.");
         return;
     }
  } else {
-    ASSERT_STRERROR(fd >= 0, "File '" << name << "' could not be opened: ");
+    ASSERT_STRERROR(fd >= 0, "File '" << decoded_name << "' could not be opened: ");
  }
 
  if (p_size) {
@@ -73,9 +75,9 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
 
  if (size > 0) {
     mapped = mmap(NULL, size, map_prot, map_mode, fd, 0);
-    ASSERT_STRERROR(mapped != MAP_FAILED, "File '" << name << "' (fd=" << fd << ") could not be mapped: ");
+    ASSERT_STRERROR(mapped != MAP_FAILED, "File '" << decoded_name << "' (fd=" << fd << ") could not be mapped: ");
     ende = reinterpret_cast<char*>(mapped) + size;
-    SYS_DEBUG(DL_INFO2, "File mapped from " << mapped << " to " << ende);
+    SYS_DEBUG(DL_INFO2, "File '" << decoded_name << "' mapped from " << mapped << " to " << ende);
  }
 }
 

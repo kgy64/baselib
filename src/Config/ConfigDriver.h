@@ -52,11 +52,6 @@ class ConfigStore
         return default_root_directory_list;
     }
 
-    inline void SetDefaultRootDirecories(const char * dirs)
-    {
-        default_root_directory_list = dirs;
-    }
-
     inline void SetDefaultRootDirecories(const std::string & dirs)
     {
         default_root_directory_list = dirs;

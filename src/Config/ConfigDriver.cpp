@@ -510,14 +510,11 @@ void AssignmentSet::List(int level) const
  for (AssignContainer::const_iterator i = assigns.begin(); i != assigns.end(); ++i) {
     int position = sizeof(separators) - level - 1;
     if (position >= 0) {
-        DEBUG_OUT(separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";");
+        std::cout << separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";" << std::endl;
     }
  }
  for (ConfigContainer::const_iterator i = subConfigs.begin(); i != subConfigs.end(); ++i) {
     int position = sizeof(separators) - level - 1;
-    if (position >= 0) {
-        DEBUG_OUT(separators+position << "/* " << i->first << ": */");
-    }
     i->second->List(level);
  }
 }
@@ -539,13 +536,16 @@ const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 /// Prints the whole config (for debug purpose)
 void ConfigLevel::List(int level) const
 {
- for (int j = 0; j < level; ++j)
+ for (int j = 0; j < level; ++j) {
      std::cout << "  ";
+ }
  std::cout << levelName << " {" << std::endl;
- if (assignments.get())
+ if (assignments.get()) {
      assignments->List(level+1);
- for (int j = 0; j < level; ++j)
+ }
+ for (int j = 0; j < level; ++j) {
      std::cout << "  ";
+ }
  std::cout << "}" << std::endl;
 }
 
