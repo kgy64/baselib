@@ -68,11 +68,10 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
 
     if (p_size) {
         size = p_size;
-        ftruncate(fd, size);
+        ASSERT_STRERROR(!ftruncate(fd, size), "ftruncate('" << decoded_name << "', " << size << ") failed: ");
     } else {
         struct stat sb;
-        int result = fstat(fd, &sb);
-        ASSERT_STD_ERRNO(result == 0, errno);
+        ASSERT_STRERROR(!fstat(fd, &sb), "fstat('" << decoded_name << "') failed: ");
         size = sb.st_size;
     }
 
@@ -86,11 +85,11 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
     return; // Everything was OK.
 
  } catch (EX::BaseException & ex) {
-    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed because " << ex.what << std::endl;
+    std::cerr << "ERROR: Mapping '" << name << "' is failed because " << ex.what() << std::endl;
  } catch (std::exception & ex) {
-    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed: " << ex.what << std::endl;
+    std::cerr << "ERROR: Mapping '" << name << "' is failed: " << ex.what() << std::endl;
  } catch (...) {
-    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed due to unknown exception." << std::endl;
+    std::cerr << "ERROR: Mapping '" << name << "' is failed due to unknown exception." << std::endl;
  }
 
  // Unmap if necessary:
