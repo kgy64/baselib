@@ -17,68 +17,94 @@ SYS_DEFINE_MODULE(DM_FILE);
 using namespace FILES;
 
 FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
-    mapped(NULL),
-    ende(NULL),
+    fd(-1),
+    mapped(nullptr),
+    ende(nullptr),
     size(0)
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- myMode = mode;
+ try {
+    myMode = mode;
 
- int open_mode = O_RDONLY;
- int map_prot = PROT_READ;
- int map_mode = MAP_PRIVATE;
+    int open_mode = O_RDONLY;
+    int map_prot = PROT_READ;
+    int map_mode = MAP_PRIVATE;
 
- switch (myMode & _OPEN_MASK) {
-    case Read_Unsafe:
-    case Read_Only:
-        open_mode = O_RDONLY;
-        map_prot = PROT_READ;
-        SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read-only...");
-    break;
-    case Read_Write:
-        open_mode = O_RDWR | O_CREAT;
-        map_prot = PROT_READ | PROT_WRITE;
-        SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read/write...");
-    break;
-    default:
-        ASSERT(false, "File '" << name << "' is opened in invalid mode: " << (int)myMode);
-    break;
- }
-
- map_mode = myMode & Map_Shared ? MAP_PRIVATE : MAP_SHARED;
-
- if (myMode & Map_Nonblock) {
-    map_mode |= MAP_NONBLOCK;
- }
-
- std::string decoded_name = FILES::DecodeName(name);
- fd = open(decoded_name.c_str(), open_mode, 0644);
-
- if ((myMode & _OPEN_MASK) == Read_Unsafe) {
-    if (fd < 0) {
-        SYS_DEBUG(DL_INFO1, "File '" << decoded_name << "' does not exist.");
-        return;
+    switch (myMode & _OPEN_MASK) {
+        case Read_Unsafe:
+        case Read_Only:
+            open_mode = O_RDONLY;
+            map_prot = PROT_READ;
+            SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read-only...");
+        break;
+        case Read_Write:
+            open_mode = O_RDWR | O_CREAT;
+            map_prot = PROT_READ | PROT_WRITE;
+            SYS_DEBUG(DL_INFO1, "Opening '" << name << "' in read/write...");
+        break;
+        default:
+            ASSERT(false, "File '" << name << "' is opened in invalid mode: " << (int)myMode);
+        break;
     }
- } else {
-    ASSERT_STRERROR(fd >= 0, "File '" << decoded_name << "' could not be opened: ");
+
+    map_mode = myMode & Map_Shared ? MAP_PRIVATE : MAP_SHARED;
+
+    if (myMode & Map_Nonblock) {
+        map_mode |= MAP_NONBLOCK;
+    }
+
+    std::string decoded_name = FILES::DecodeName(name);
+    fd = open(decoded_name.c_str(), open_mode, 0644);
+
+    if ((myMode & _OPEN_MASK) == Read_Unsafe) {
+        if (fd < 0) {
+            SYS_DEBUG(DL_INFO1, "File '" << decoded_name << "' does not exist.");
+            return;
+        }
+    } else {
+        ASSERT_STRERROR(fd >= 0, "File '" << decoded_name << "' could not be opened: ");
+    }
+
+    if (p_size) {
+        size = p_size;
+        ftruncate(fd, size);
+    } else {
+        struct stat sb;
+        int result = fstat(fd, &sb);
+        ASSERT_STD_ERRNO(result == 0, errno);
+        size = sb.st_size;
+    }
+
+    if (size > 0) {
+        mapped = mmap(nullptr, size, map_prot, map_mode, fd, 0);
+        ASSERT_STRERROR(mapped != MAP_FAILED, "File '" << decoded_name << "' (fd=" << fd << ") could not be mapped: ");
+        ende = reinterpret_cast<char*>(mapped) + size;
+        SYS_DEBUG(DL_INFO2, "File '" << decoded_name << "' mapped from " << mapped << " to " << ende);
+    }
+
+    return; // Everything was OK.
+
+ } catch (EX::BaseException & ex) {
+    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed because " << ex.what << std::endl;
+ } catch (std::exception & ex) {
+    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed: " << ex.what << std::endl;
+ } catch (...) {
+    std::cerr << "ERROR: Mapping '" << decoded_name << "' is failed due to unknown exception." << std::endl;
  }
 
- if (p_size) {
-    size = p_size;
-    ftruncate(fd, size);
- } else {
-    struct stat sb;
-    int result = fstat(fd, &sb);
-    ASSERT_STD_ERRNO(result == 0, errno);
-    size = sb.st_size;
+ // Unmap if necessary:
+ if (mapped && mapped != MAP_FAILED) {
+    munmap(mapped, size);
+    mapped = nullptr;
  }
 
- if (size > 0) {
-    mapped = mmap(NULL, size, map_prot, map_mode, fd, 0);
-    ASSERT_STRERROR(mapped != MAP_FAILED, "File '" << decoded_name << "' (fd=" << fd << ") could not be mapped: ");
-    ende = reinterpret_cast<char*>(mapped) + size;
-    SYS_DEBUG(DL_INFO2, "File '" << decoded_name << "' mapped from " << mapped << " to " << ende);
+ size = 0;
+
+ // Close if necessary:
+ if (fd >= 0) {
+    close(fd);
+    fd = -1;
  }
 }
 
@@ -117,6 +143,7 @@ FileMap::~FileMap()
  if (fd >= 0) {
     SYS_DEBUG(DL_VERBOSE, "Closing fd=" << fd);
     close(fd);
+    fd = -1;
  }
 }
 

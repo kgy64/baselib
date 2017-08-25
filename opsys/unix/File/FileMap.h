@@ -65,6 +65,8 @@ namespace FILES
 
         inline size_t GetSize(void) const { return size; }
 
+        inline bool isOk(void) const { return mapped; }
+
         void Advise(AdviseMode mode);
         void Sync(bool wait = true);
         void Populate(void);
