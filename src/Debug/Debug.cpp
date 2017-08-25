@@ -14,6 +14,7 @@
 #include <Threads/Threads.h>
 #include <System/Generic.h>
 
+#include <stdlib.h>
 #include <iomanip>
 
 ::_Debug_Info_::_Debug_Module_ Debug::__builtin_debug_module(true);
@@ -29,7 +30,21 @@ AUTON_INTERFACE(I_DebugOut);
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+static _All_Modules_ _all_modules_instance;
+
+bool _All_Modules_::isExited;
+
 _Debug_Module_ * _All_Modules_::first = (_Debug_Module_*)0;
+
+_All_Modules_::_All_Modules_(void)
+{
+ atexit(&_All_Modules_::main_exited);
+}
+
+void _All_Modules_::main_exited(void)
+{
+ isExited = true;
+}
 
 void _All_Modules_::SetMode(bool mode)
 {
@@ -51,7 +66,7 @@ void _All_Modules_::SetDebuglevel(unsigned int level)
  *                                                                                       *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-MEM::scoped_ptr<Auton<I_DebugOut> > _Debug_Info_::DebugPrint::out_stream;
+Auton<I_DebugOut> _Debug_Info_::DebugPrint::out_stream;
 
 /*! */
 map<pthread_t, DebugPrint::TabInfo> INITIALIZE_PRIORITY_HIGH DebugPrint::levels;

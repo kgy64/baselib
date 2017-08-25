@@ -17,6 +17,8 @@
 #include <Memory/Auton.h>
 #include <Debug/Debug.h>
 
+#include <iostream>
+
 class ConfigData
 {
  public:
@@ -25,6 +27,7 @@ class ConfigData
     }
 
     virtual void ParseConfig(ConfigStore & conf) =0;
+    virtual void SaveConfig(ConfigStore & conf) =0;
 
  private:
     SYS_DEFINE_CLASS_NAME("ConfigData");
@@ -52,10 +55,9 @@ class MainConfig
         return *me;
     }
 
-    /// Prints the whole config (for debug purpose)
-    inline void List(void) const
+    void toStream(std::ostream & os) const
     {
-        theConfig.List();
+        os << theConfig;
     }
 
     /// Generic function, getting any kind of config entry
@@ -103,6 +105,8 @@ class MainConfig
         Get().theConfig.AddConfig(key, value);
     }
 
+    void SaveConfig(void);
+
  protected:
     MainConfig(void);
 
@@ -116,6 +120,8 @@ class MainConfig
     static Threads::Mutex myMutex;
 
 }; // class MainConfig
+
+OSTREAM_OPERATOR_4(MainConfig);
 
 #endif /* __SRC_CONFIG_MAINCONFIG_H_INCLUDED__ */
 

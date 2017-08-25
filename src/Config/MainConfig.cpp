@@ -23,8 +23,14 @@ MainConfig::MainConfig(void)
 {
  SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
 
- Auton<ConfigData> conf;
- conf->ParseConfig(theConfig);
+ Auton<ConfigData>()->ParseConfig(theConfig);
+}
+
+void MainConfig::SaveConfig(void)
+{
+ SYS_DEBUG_MEMBER(DM_MAIN_CONFIG);
+
+ Auton<ConfigData>()->SaveConfig(theConfig);
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

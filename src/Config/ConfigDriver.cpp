@@ -137,10 +137,10 @@ std::string ConfigStore::FullPathOf(const std::string & rel_path)
 }
 
 /// Prints the whole config (for debug purpose)
-void ConfigStore::List(void) const
+void ConfigStore::toStream(std::ostream & os) const
 {
  if (theConfig)
-    theConfig->List(0);
+    theConfig->toStream(os);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -503,19 +503,23 @@ const ConfPtr AssignmentSet::GetSubconfig(const std::string & name)
  return i->second;
 }
 
-/// Prints the whole config (for debug purpose)
-void AssignmentSet::List(int level) const
+/// Prints the whole config
+void AssignmentSet::toStream(std::ostream & os) const
+{
+ toStream(os, 0);
+}
+
+void AssignmentSet::toStream(std::ostream & os, int level) const
 {
  static const char separators[] = "                                                ";
  for (AssignContainer::const_iterator i = assigns.begin(); i != assigns.end(); ++i) {
     int position = sizeof(separators) - level - 1;
     if (position >= 0) {
-        std::cout << separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";" << std::endl;
+        os << separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";" << std::endl;
     }
  }
  for (ConfigContainer::const_iterator i = subConfigs.begin(); i != subConfigs.end(); ++i) {
-    int position = sizeof(separators) - level - 1;
-    i->second->List(level);
+    i->second->toStream(os, level);
  }
 }
 
@@ -534,19 +538,19 @@ const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 }
 
 /// Prints the whole config (for debug purpose)
-void ConfigLevel::List(int level) const
+void ConfigLevel::toStream(std::ostream & os, int level) const
 {
  for (int j = 0; j < level; ++j) {
-     std::cout << "  ";
+     os << "  ";
  }
- std::cout << levelName << " {" << std::endl;
+ os << levelName << " {" << std::endl;
  if (assignments.get()) {
-     assignments->List(level+1);
+     assignments->toStream(os, level+1);
  }
  for (int j = 0; j < level; ++j) {
-     std::cout << "  ";
+     os << "  ";
  }
- std::cout << "}" << std::endl;
+ os << "}" << std::endl;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

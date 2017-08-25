@@ -1,15 +1,16 @@
 #define _BSD_SOURCE
 
-#include "FileMap.h"
-#include <File/Decode.h>
-#include <Exceptions/Exceptions.h>
-#include <International/International.h>
-
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <File/Decode.h>
+#include <Exceptions/Exceptions.h>
+#include <International/International.h>
+
+#include "FileMap.h"
 
 SYS_DEFINE_MODULE(DM_FILE);
 

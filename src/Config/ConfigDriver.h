@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include <iostream>
 
 class ConfExpression;
 class AssignmentSet;
@@ -36,7 +37,7 @@ class ConfigStore
         theConfig = MEM::shared_ptr<AssignmentSet>(assigns);
     }
 
-    void List(void) const;
+    void toStream(std::ostream & os) const;
     const ConfigValue GetConfig(const std::string & key) const;
     const std::string & GetConfig(const std::string & key, const std::string & def_val) const;
     int GetConfig(const std::string & key, int def_val) const;
@@ -68,6 +69,8 @@ class ConfigStore
     std::string default_root_directory_list;
 
 }; // class ConfigStore
+
+OSTREAM_OPERATOR_4(ConfigStore);
 
 class ConfDriver
 {
@@ -248,7 +251,8 @@ typedef MEM::shared_ptr<ConfigLevel> ConfPtr;
 
 class AssignmentSet
 {
- friend std::ostream & operator<<(std::ostream & os, const AssignmentSet & body);
+    friend class ConfigLevel;
+    friend std::ostream & operator<<(std::ostream & os, const AssignmentSet & body);
 
  public:
     inline AssignmentSet(void):
@@ -270,7 +274,7 @@ class AssignmentSet
     AssignmentSet * AddConfig(const std::string & key, const std::string & value);
     const std::string * GetValue(const std::string & name);
     const ConfPtr GetSubconfig(const std::string & name);
-    void List(int level) const;
+    void toStream(std::ostream & os) const;
 
     inline void AppendValue(const std::string & key, ConfigValue value)
     {
@@ -312,6 +316,8 @@ class AssignmentSet
 
  private:
     SYS_DEFINE_CLASS_NAME("AssignmentSet");
+
+    void toStream(std::ostream & os, int level) const;
 
     typedef std::map<std::string, ConfigValue> AssignContainer;
 
@@ -368,7 +374,7 @@ class ConfigLevel
     }
 
     const ConfigValue GetConfig(const std::string & key) const;
-    void List(int level) const;
+    void toStream(std::ostream & os, int level) const;
 
     void reference(void)
     {
