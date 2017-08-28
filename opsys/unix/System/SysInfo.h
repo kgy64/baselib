@@ -37,8 +37,17 @@ namespace SYS
             return getpagesize();
         }
 
-        uint64_t getMemoryHugePageSize(void);
-        uint64_t getPhisicalMemorySize(void);
+        inline uint64_t getMemoryHugePageSize(void)
+        {
+            updateInfo();
+            return getGenericInfo("Hugepagesize");
+        }
+
+        inline uint64_t getPhisicalMemorySize(void)
+        {
+            updateInfo();
+            return getGenericInfo("MemTotal");
+        }
 
         inline double kbGetPhisicalMemorySize(void)
         {
@@ -59,6 +68,7 @@ namespace SYS
         SYS_DEFINE_CLASS_NAME("SYS::MemInfo");
 
         void updateInfo();
+        uint64_t getGenericInfo(const char * keyword);
 
         std::vector<std::string> info;
 

@@ -193,8 +193,6 @@ namespace FILES
 
             DIR * myDir;
 
-            dirent myEntry;
-
             dirent * actualEntry;
         };
 

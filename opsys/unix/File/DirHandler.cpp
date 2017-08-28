@@ -193,9 +193,10 @@ DirHandler::iterator & DirHandler::iterator::operator++()
  SYS_DEBUG_MEMBER(DM_FILE);
 
  do {
-    int result = readdir_r(myDir, &myEntry, &actualEntry);
-    ASSERT_DBG(!result, "Could not iterate on '" << myPath << "': " << strerror(result));
- } while (actualEntry && actualEntry->d_name[0] == '.'); // Skip '.' '..' and hidden files
+    errno = 0;
+    actualEntry = readdir(myDir);
+    ASSERT_DBG_ERRNO(!errno, "Could not iterate on '" << myPath << "': ");
+ } while (actualEntry && actualEntry->d_name[0] == '.'); // Skip '.', '..', and hidden files
 
  SYS_DEBUG(DL_INFO1, "Current entry: '" << (actualEntry ? actualEntry->d_name : "") << "'");
 

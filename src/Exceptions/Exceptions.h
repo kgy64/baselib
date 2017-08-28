@@ -127,6 +127,8 @@ namespace EX
         } \
     }
 
+#define ASSERT_DBG_ERRNO(cond, message)     ASSERT_DBG(cond, message << strerror(errno))
+
 #define ASSERT_STD(cond)                    { if (!(cond)) __DO_ASSERT_WITH_ERRNO(errno, cond, strerror(errno)); }
 
 #define ASSERT_STD_ERRNO(cond, error_code)  { if (!(cond)) __DO_ASSERT_WITH_ERRNO(error_code, cond, strerror(error_code)); }

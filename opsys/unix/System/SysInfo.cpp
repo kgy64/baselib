@@ -17,16 +17,16 @@
 
 using SYS::MemInfo;
 
-uint64_t MemInfo::getPhisicalMemorySize(void)
+uint64_t MemInfo::getGenericInfo(const char * keyword)
 {
  updateInfo();
 
  for (unsigned i = 0; i < info.size(); ++i) {
     Parser::Tokenizer tok(info[i].c_str(), ": \t");
-    if (tok.size() == 0) {
+    if (tok.size() < 2) {
         continue;
     }
-    if (strcmp(tok[0], "MemTotal")) {
+    if (strcmp(tok[0], keyword)) {
         continue;
     }
     int64_t result = Parser::StrtollSafe(tok[1]);
@@ -48,13 +48,6 @@ uint64_t MemInfo::getPhisicalMemorySize(void)
  }
 
  return 0;
-}
-
-uint64_t MemInfo::getMemoryHugePageSize(void)
-{
- updateInfo();
-
- // TODO!
 }
 
 void MemInfo::updateInfo(void)

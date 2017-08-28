@@ -1,5 +1,5 @@
-#ifndef __FILEMAP_H__
-#define __FILEMAP_H__
+#ifndef __OPSYS_UNIX_FILE_FILEMAP_H_INCLUDED__
+#define __OPSYS_UNIX_FILE_FILEMAP_H_INCLUDED__
 
 #include <string>
 #include <sys/types.h>
@@ -87,6 +87,6 @@ namespace FILES
 
 } // namespace FILES
 
-#endif /* __FILEMAP_H__ */
+#endif /* __OPSYS_UNIX_FILE_FILEMAP_H_INCLUDED__ */
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */

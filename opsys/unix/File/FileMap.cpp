@@ -1,4 +1,4 @@
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 
 #include <sys/mman.h>
 #include <sys/stat.h>
