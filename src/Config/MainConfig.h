@@ -67,12 +67,7 @@ class MainConfig
     }
 
     /// Gets a string entry from the config
-    /*! This is a specific case to prevent using temporary variables in a wrong way: the second argument
-     *  is intentionally not 'const' to prevent converting 'const char *' or 'char *' to 'std::string' and
-     *  returning its reference. So, if you got a "using temporary..." or "cannot convert const char *..."
-     *  error message during build, probably it means your code is wrong. Use 'std::string' parameter for
-     *  the default value. */
-    inline static const std::string & GetConfig(const std::string & key, std::string & def_val)
+    inline static const std::string & GetConfig(const std::string & key, const std::string & def_val)
     {
         return Get().theConfig.GetConfig(key, def_val);
     }
@@ -100,9 +95,10 @@ class MainConfig
         return Get().theConfig.GetPath(key);
     }
 
-    inline static void AddConfig(const std::string & key, const std::string & value)
+    /// Set or update config entry
+    inline static void SetConfig(const std::string & key, const std::string & value)
     {
-        Get().theConfig.AddConfig(key, value);
+        Get().theConfig.SetConfig(key, value);
     }
 
     void SaveConfig(void);

@@ -72,7 +72,7 @@ double ConfigStore::GetConfig(const std::string & key, double def_val) const
  return *dp;
 }
 
-void ConfigStore::AddConfig(const std::string & key, const std::string & value)
+void ConfigStore::SetConfig(const std::string & key, const std::string & value)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
@@ -80,7 +80,7 @@ void ConfigStore::AddConfig(const std::string & key, const std::string & value)
     theConfig.reset(new AssignmentSet());   // Add an empty set
  }
 
- theConfig->AddConfig(key, value);
+ theConfig->SetConfig(key, value);
 }
 
 std::string ConfigStore::GetPath(const std::string & key)
@@ -103,7 +103,7 @@ const std::string & ConfigStore::GetRootDir(void) const
         Parser::Tokenizer tok(root_dirs);
         for (int i = 0; i < tok.size(); ++i) {
             std::string super_config_path = std::string(tok[i]) + "/" + chain->GetString();
-            SYS_DEBUG(DL_INFO1, "Android Config: Trying to read Super Config from '" << super_config_path << "'");
+            SYS_DEBUG(DL_INFO1, "Trying to read Super Config from '" << super_config_path << "'");
             try {
                 FILES::FileMap_char configFile(super_config_path.c_str());
                 SYS_DEBUG(DL_INFO1, "Super Config file: size=" << configFile.GetSize());
@@ -453,21 +453,26 @@ AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
  return this;
 }
 
-AssignmentSet * AssignmentSet::AddConfig(const std::string & key, const std::string & value)
+void AssignmentSet::UpdateValue(const std::string & key, const std::string & value)
+{
+ AppendValue(key, ConfigValue(new ConfExpression(value)));   // Temporary!
+}
+
+AssignmentSet * AssignmentSet::SetConfig(const std::string & key, const std::string & value)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
  std::string::size_type pos = key.find('/');
  if (pos == std::string::npos) {
-    AppendValue(key, ConfigValue(new ConfExpression(value)));
+    UpdateValue(key, value);
  } else {
     std::string path = key.substr(0, pos);
     std::string subkey = key.substr(pos+1);
     ConfPtr subconfig = GetSubconfig(path);
     if (subconfig) {
-        subconfig->GetAssignments().AddConfig(subkey, value);
+        subconfig->GetAssignments().SetConfig(subkey, value);
     } else {
-        Append(new ConfigLevel(path, (new AssignmentSet())->AddConfig(subkey, value)));
+        Append(new ConfigLevel(path, (new AssignmentSet())->SetConfig(subkey, value)));
     }
  }
 

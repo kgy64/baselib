@@ -46,7 +46,7 @@ class ConfigStore
     std::string GetPath(const std::string & key);
     const std::string & GetRootDir(void) const;
     std::string FullPathOf(const std::string & rel_path);
-    void AddConfig(const std::string & key, const std::string & value);
+    void SetConfig(const std::string & key, const std::string & value);
 
     inline const std::string & GetDefaultRootDirecories(void) const
     {
@@ -271,10 +271,10 @@ class AssignmentSet
     AssignmentSet * Append(ConfAssign * assignment);
     AssignmentSet * Append(ConfigLevel * conf);
     AssignmentSet * Append(AssignmentSet * other);
-    AssignmentSet * AddConfig(const std::string & key, const std::string & value);
+    AssignmentSet * SetConfig(const std::string & key, const std::string & value);
     const std::string * GetValue(const std::string & name);
     const ConfPtr GetSubconfig(const std::string & name);
-    void toStream(std::ostream & os) const;
+    void UpdateValue(const std::string & key, const std::string & value);
 
     inline void AppendValue(const std::string & key, ConfigValue value)
     {
@@ -313,6 +313,8 @@ class AssignmentSet
         SYS_DEBUG(DL_INFO2, "To be deleted...");
         delete this;
     }
+
+    void toStream(std::ostream & os) const;
 
  private:
     SYS_DEFINE_CLASS_NAME("AssignmentSet");
