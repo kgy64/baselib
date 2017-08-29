@@ -25,7 +25,10 @@ namespace Threads
 
         inline ~Condition(void)
         {
-            ASSERT_THREAD_STD(pthread_cond_destroy(&myCond));
+            if (pthread_cond_destroy(&myCond)) {
+                // Cannot throw here
+                std::cerr << "ERROR: could not destroy condition" << std::endl;
+            }
         }
 
         /// Signals the Condition

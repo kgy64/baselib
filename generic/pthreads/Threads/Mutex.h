@@ -93,7 +93,11 @@ namespace Threads
 
         inline ~Lock()
         {
-            ASSERT_THREAD_STD(pthread_mutex_unlock(&myMutex.myMutex));
+            if (pthread_mutex_unlock(&myMutex.myMutex)) {
+                // Cannot throw here. Also cannot emit any debug message due to
+                // eldless loop possibility.
+                std::cerr << "ERROR: could not unlock mutex" << std::endl;
+            }
         }
 
      private:
@@ -113,7 +117,11 @@ namespace Threads
         inline ~TryLock()
         {
             if (IsLocked()) {
-                ASSERT_THREAD_STD(pthread_mutex_unlock(&myMutex.myMutex));
+                if (pthread_mutex_unlock(&myMutex.myMutex)) {
+                    // Cannot throw here. Also cannot emit any debug message due to
+                    // eldless loop possibility.
+                    std::cerr << "ERROR: could not unlock mutex" << std::endl;
+                }
             }
         }
 

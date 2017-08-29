@@ -61,10 +61,16 @@ namespace _Debug_Info_
         friend class _Debug_Module_;
 
      public:
+        _All_Modules_(void);
+
         static void SetMode(bool mode);
         static void SetDebuglevel(unsigned int level);
 
+        static bool isExited;
+
      private:
+        static void main_exited(void);
+
         static _Debug_Module_ * first;
     };
 
@@ -88,6 +94,14 @@ namespace _Debug_Info_
 
         bool IsOn(void)
         {
+            if (_All_Modules_::isExited) {
+                static bool is_printed;
+                if (!is_printed) {
+                    std::cerr << "WARNING: Debug messages in static destruction phase cannot be printed due to race conditions." << std::endl;
+                    is_printed = true;
+                }
+                return false;
+            }
             return is_on;
         }
 
@@ -244,14 +258,11 @@ namespace _Debug_Info_
         static const char fill_right[];
         static const char fill_left[];
 
-        static MEM::scoped_ptr<Auton<I_DebugOut> > out_stream;
+        static Auton<I_DebugOut> out_stream;
 
         inline static I_DebugOut & GetOutStream(void)
         {
-            if (!out_stream) {
-                out_stream.reset(new Auton<I_DebugOut>);
-            }
-            return **out_stream;
+            return *out_stream;
         }
 
     }; // class _Debug_Info_::DebugPrint

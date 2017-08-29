@@ -17,6 +17,8 @@
 #include <Memory/Auton.h>
 #include <Debug/Debug.h>
 
+#include <iostream>
+
 class ConfigData
 {
  public:
@@ -25,6 +27,7 @@ class ConfigData
     }
 
     virtual void ParseConfig(ConfigStore & conf) =0;
+    virtual void SaveConfig(ConfigStore & conf) =0;
 
  private:
     SYS_DEFINE_CLASS_NAME("ConfigData");
@@ -52,10 +55,9 @@ class MainConfig
         return *me;
     }
 
-    /// Prints the whole config (for debug purpose)
-    inline void List(void) const
+    void toStream(std::ostream & os) const
     {
-        theConfig.List();
+        os << theConfig;
     }
 
     /// Generic function, getting any kind of config entry
@@ -65,12 +67,7 @@ class MainConfig
     }
 
     /// Gets a string entry from the config
-    /*! This is a specific case to prevent using temporary variables in a wrong way: the second argument
-     *  is intentionally not 'const' to prevent converting 'const char *' or 'char *' to 'std::string' and
-     *  returning its reference. So, if you got a "using temporary..." or "cannot convert const char *..."
-     *  error message during build, probably it means your code is wrong. Use 'std::string' parameter for
-     *  the default value. */
-    inline static const std::string & GetConfig(const std::string & key, std::string & def_val)
+    inline static const std::string & GetConfig(const std::string & key, const std::string & def_val)
     {
         return Get().theConfig.GetConfig(key, def_val);
     }
@@ -98,10 +95,13 @@ class MainConfig
         return Get().theConfig.GetPath(key);
     }
 
-    inline static void AddConfig(const std::string & key, const std::string & value)
+    /// Set or update config entry
+    inline static void SetConfig(const std::string & key, const std::string & value)
     {
-        Get().theConfig.AddConfig(key, value);
+        Get().theConfig.SetConfig(key, value);
     }
+
+    void SaveConfig(void);
 
  protected:
     MainConfig(void);
@@ -116,6 +116,8 @@ class MainConfig
     static Threads::Mutex myMutex;
 
 }; // class MainConfig
+
+OSTREAM_OPERATOR_4(MainConfig);
 
 #endif /* __SRC_CONFIG_MAINCONFIG_H_INCLUDED__ */
 

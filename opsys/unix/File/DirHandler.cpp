@@ -159,8 +159,9 @@ DirHandler::iterator::~iterator()
  SYS_DEBUG_MEMBER(DM_FILE);
 
  if (myDir) {
-    if(closedir(myDir)) {
-        std::cerr << "ERROR: could not close directory iterator" << std::endl;
+    if (closedir(myDir)) {
+        // Cannot throw here
+        std::cerr << "ERROR: Could not close directory iterator" << std::endl;
     }
  }
 }
