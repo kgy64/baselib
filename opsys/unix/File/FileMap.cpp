@@ -98,14 +98,20 @@ FileMap::~FileMap()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- if (mapped && mapped != MAP_FAILED) {
-    if (myMode == Read_Write) {
-        SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
-        int result = msync(mapped, size, MS_ASYNC | MS_INVALIDATE);
-        ASSERT(result == 0, "msync() failed: " << strerror(errno));
+ try {
+    if (mapped && mapped != MAP_FAILED) {
+        if (myMode == Read_Write) {
+            SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
+            int result = msync(mapped, size, MS_ASYNC | MS_INVALIDATE);
+            ASSERT(result == 0, "msync() failed: " << strerror(errno));
+        }
+        SYS_DEBUG(DL_VERBOSE, "Unmapping...");
+        munmap(mapped, size);
     }
-    SYS_DEBUG(DL_VERBOSE, "Unmapping...");
-    munmap(mapped, size);
+ } catch(std::exception & ex) {
+    std::cerr << "ERROR: could not unmap memory: " << ex.what() << ", fd=" << fd << std::endl;
+ } catch (...) {
+    std::cerr << "ERROR: could not unmap memory due to unknown reason, fd=" << fd << std::endl;
  }
 
  if (fd >= 0) {
@@ -140,6 +146,11 @@ void FileMap::Advise(AdviseMode mode)
  }
 
  ASSERT_STRERROR(madvise(mapped, size, mAdvise) == 0, "madvise() failed");
+}
+
+bool FileMap::Ok(void) const
+{
+ return mapped && mapped != MAP_FAILED;
 }
 
 void FileMap::Sync(bool wait)
