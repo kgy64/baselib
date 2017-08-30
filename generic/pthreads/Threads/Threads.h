@@ -129,7 +129,9 @@ namespace PTHREAD
 
             inline ~Attribute()
             {
-                ASSERT_THREAD(pthread_attr_destroy(&myAttrib)==0, "pthread_attr_destroy() failed");
+                if (pthread_attr_destroy(&myAttrib)) {
+                    std::cerr << "ERROR: pthread_attr_destroy() failed" << std::endl;
+                }
             }
 
             inline void SetJoinable(bool joinable)
@@ -173,13 +175,13 @@ namespace PTHREAD
         /// Called when the thread has exited successfully
         /*! \param status   The return value of \ref Threads::main()
          *  \warning    This function is not called if the thread has exited with exception, see \ref Threads::error() */
-        virtual void exited(int status)
+        virtual void exited(int)
         {
         }
 
         /// Called when the thread has exited with exception
         /*! \param  ex  Pointer to the exception, or nullptr if it has an unknown type (other than std::exception). */
-        virtual void error(std::exception * ex)
+        virtual void error(std::exception *)
         {
         }
 

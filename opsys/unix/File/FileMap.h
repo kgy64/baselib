@@ -67,8 +67,7 @@ namespace FILES
 
         inline int getFile(void) const { return fd; }
 
-        bool Ok(void) const;
-        void Advise(AdviseMode mode);
+        bool isOk(void) const;
         void Sync(bool wait = true);
         void Populate(void);
 

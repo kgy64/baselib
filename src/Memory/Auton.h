@@ -325,7 +325,7 @@ namespace _AutonPrivate
     \note   This macro generates definitions.
  */
 #define AUTON_IMPLEMENT_PRIO(C, I, prio) \
-    template<> _AutonPrivate::AutonHandler<C,I> MAKE_REFERENCED _AutonPrivate::AutonHandler<C,I>::myStaticImplementation(#C, prio)
+    template<> _AutonPrivate::AutonHandler<C,I> _AutonPrivate::AutonHandler<C,I>::myStaticImplementation(#C, prio)
 
 /// Implements 'I' using class 'C' with default (0) priority
 /*! \see ::AUTON_IMPLEMENT_PRIO for details
@@ -477,9 +477,13 @@ namespace _AutonPrivate
     template <class I>
     inline I * AutonInterface<I>::GetImplementation(void)
     {
-        if (myInterface) return (I*)myInterface; // It is already created, nothing to do
+        if (myInterface) {
+            return (I*)myInterface; // It is already created, nothing to do
+        }
         Threads::Lock _l(myMutex);
-        if (myInterface) return (I*)myInterface; // Somebody else has just created it
+        if (myInterface) {
+            return (I*)myInterface; // Somebody else has just created it
+        }
         myInterface = CreateImplementation();
         return (I*)myInterface;
     }
