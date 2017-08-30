@@ -71,8 +71,8 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
         ASSERT_STRERROR(!fstat(fd, &sb), "fstat('" << decoded_name << "') failed: ");
         if (p_size) {
             size = p_size;
-            if (sb.st_mode & S_IFREG) {
-                // Use it only on regular files:
+            // Truncate only the regular files:
+            if (sb.st_mode & S_IFREG && mode & Map_Truncate) {
                 ASSERT_STRERROR(!ftruncate(fd, size), "ftruncate('" << decoded_name << "', " << size << ") failed: ");
             }
         } else {

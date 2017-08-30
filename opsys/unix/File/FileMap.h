@@ -18,6 +18,7 @@ namespace FILES
             Read_Write,
             Map_Shared      = 0x1000,
             Map_Nonblock    = 0x2000,
+            Map_Truncate    = 0x4000,
             _OPEN_MASK      = 0x0fff
         };
 
