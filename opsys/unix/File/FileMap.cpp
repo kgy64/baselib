@@ -188,12 +188,12 @@ bool FileMap::isOk(void) const
 
 void FileMap::Sync(bool wait)
 {
- ASSERT_STRERROR(msync(mapped, size, (wait ? MS_SYNC : MS_ASYNC) | MS_INVALIDATE) == 0, "msync() failed");
+ ASSERT_STRERROR(msync(mapped, size, (wait ? MS_SYNC : MS_ASYNC) | MS_INVALIDATE) == 0, "msync() failed: ");
 }
 
 void FileMap::Populate(void)
 {
- ASSERT_STRERROR(msync(mapped, size, MS_INVALIDATE) == 0, "msync() failed");
+ ASSERT_STRERROR(msync(mapped, size, MS_INVALIDATE) == 0, "msync() failed: ");
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
