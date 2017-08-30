@@ -135,8 +135,7 @@ FileMap::~FileMap()
     if (mapped && mapped != MAP_FAILED) {
         if (myMode == Read_Write) {
             SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
-            int result = msync(mapped, size, MS_ASYNC | MS_INVALIDATE);
-            ASSERT(result == 0, "msync() failed: " << strerror(errno));
+            Sync(false);
         }
         SYS_DEBUG(DL_VERBOSE, "Unmapping...");
         munmap(mapped, size);
@@ -189,7 +188,7 @@ bool FileMap::isOk(void) const
 
 void FileMap::Sync(bool wait)
 {
- ASSERT_STRERROR(msync(mapped, size, wait ? MS_SYNC : MS_ASYNC) == 0, "msync() failed");
+ ASSERT_STRERROR(msync(mapped, size, (wait ? MS_SYNC : MS_ASYNC) | MS_INVALIDATE) == 0, "msync() failed");
 }
 
 void FileMap::Populate(void)
