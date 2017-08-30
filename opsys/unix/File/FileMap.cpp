@@ -66,15 +66,18 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
         ASSERT_STRERROR(fd >= 0, "File '" << decoded_name << "' could not be opened: ");
     }
 
-    if (p_size) {
-        size = p_size;
-        if (ftruncate(fd, size)) {
-            std::cerr << "WARNING: ftruncate('" << decoded_name << "', " << size << ") failed: " << strerror(errno) << std::endl;
-        }
-    } else {
+    {
         struct stat sb;
         ASSERT_STRERROR(!fstat(fd, &sb), "fstat('" << decoded_name << "') failed: ");
-        size = sb.st_size;
+        if (p_size) {
+            size = p_size;
+            if (sb.st_mode & S_IFREG) {
+                // Use it only on regular files:
+                ASSERT_STRERROR(!ftruncate(fd, size), "ftruncate('" << decoded_name << "', " << size << ") failed: ");
+            }
+        } else {
+            size = sb.st_size;
+        }
     }
 
     if (size > 0) {
