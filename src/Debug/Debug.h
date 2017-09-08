@@ -47,6 +47,13 @@
 
 #define YESNO(value)    ((value) ? "yes" : "no")
 
+#define OSTREAM_OPERATOR_4(class_name) \
+static inline std::ostream & operator<<(std::ostream & os, const class_name & d) \
+{ \
+ d.toStream(os); \
+ return os; \
+}
+
 #endif // __SRC_DEBUG_DEBUG_H_INCLUDED__
 
 /* ------------------------- End - of - file --------------------------- */
