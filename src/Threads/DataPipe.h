@@ -72,6 +72,19 @@ namespace Threads
             }
         }
 
+        inline DataType pop_nowait(void)
+        {
+            Threads::Lock _l(myDataMutex);
+            if (myData.empty()) {
+                return DataType();
+            }
+            DataType result = myData.front();
+            myData.pop_front();
+            --currentSize;
+            myFreeCondition.Signal();
+            return result;
+        }
+
         inline bool busy(void) const
         {
             return currentSize > 0; // assuming it is atomic
