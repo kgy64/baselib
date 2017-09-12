@@ -36,6 +36,9 @@ namespace Threads
             Threads::Lock _l(myDataMutex);
             while (currentSize >= maxSize) {
                 myFreeCondition.Wait(myDataMutex);
+                if (isFinished) {
+                    return;
+                }
             }
             myData.push_back(p_data);
             ++currentSize;
@@ -44,6 +47,9 @@ namespace Threads
 
         inline void push_drop(const DataType & p_data)
         {
+            if (isFinished) {
+                return;
+            }
             Threads::Lock _l(myDataMutex);
             while (currentSize >= maxSize) {
                 myData.pop_front();
@@ -95,6 +101,7 @@ namespace Threads
             Threads::Lock _l(myDataMutex);
             isFinished = true;
             myUseCondition.Signal();
+            myFreeCondition.Signal();
         }
 
      protected:
