@@ -36,6 +36,9 @@ namespace Threads
             Threads::Lock _l(myDataMutex);
             while (currentSize >= maxSize) {
                 myFreeCondition.Wait(myDataMutex);
+                if (isFinished) {
+                    return;
+                }
             }
             myData.push_back(p_data);
             ++currentSize;
@@ -44,6 +47,9 @@ namespace Threads
 
         inline void push_drop(const DataType & p_data)
         {
+            if (isFinished) {
+                return;
+            }
             Threads::Lock _l(myDataMutex);
             while (currentSize >= maxSize) {
                 myData.pop_front();
@@ -72,9 +78,27 @@ namespace Threads
             }
         }
 
+        inline DataType pop_nowait(void)
+        {
+            Threads::Lock _l(myDataMutex);
+            if (myData.empty()) {
+                return DataType();
+            }
+            DataType result = myData.front();
+            myData.pop_front();
+            --currentSize;
+            myFreeCondition.Signal();
+            return result;
+        }
+
         inline bool busy(void) const
         {
             return currentSize > 0; // assuming it is atomic
+        }
+
+        inline size_t size(void) const
+        {
+            return currentSize;
         }
 
         inline void finish(void)
@@ -82,6 +106,7 @@ namespace Threads
             Threads::Lock _l(myDataMutex);
             isFinished = true;
             myUseCondition.Signal();
+            myFreeCondition.Signal();
         }
 
      protected:

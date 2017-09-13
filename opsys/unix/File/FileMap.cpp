@@ -66,13 +66,18 @@ FileMap::FileMap(const char * name, OpenMode mode, size_t p_size):
         ASSERT_STRERROR(fd >= 0, "File '" << decoded_name << "' could not be opened: ");
     }
 
-    if (p_size) {
-        size = p_size;
-        ASSERT_STRERROR(!ftruncate(fd, size), "ftruncate('" << decoded_name << "', " << size << ") failed: ");
-    } else {
+    {
         struct stat sb;
         ASSERT_STRERROR(!fstat(fd, &sb), "fstat('" << decoded_name << "') failed: ");
-        size = sb.st_size;
+        if (p_size) {
+            size = p_size;
+            // Truncate only the regular files:
+            if (sb.st_mode & S_IFREG && mode & Map_Truncate) {
+                ASSERT_STRERROR(!ftruncate(fd, size), "ftruncate('" << decoded_name << "', " << size << ") failed: ");
+            }
+        } else {
+            size = sb.st_size;
+        }
     }
 
     if (size > 0) {
@@ -126,17 +131,19 @@ FileMap::~FileMap()
 {
  SYS_DEBUG_MEMBER(DM_FILE);
 
- if (mapped && mapped != MAP_FAILED) {
-    if (myMode == Read_Write) {
-        SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
-        int result = msync(mapped, size, MS_ASYNC | MS_INVALIDATE);
-        if (result) {
-            // cannot throw here
-            SYS_DEBUG(DL_ERROR, "msync() failed: " << strerror(errno));
+ try {
+    if (mapped && mapped != MAP_FAILED) {
+        if (myMode == Read_Write) {
+            SYS_DEBUG(DL_VERBOSE, "Opened for R/W: syncing...");
+            Sync(false);
         }
+        SYS_DEBUG(DL_VERBOSE, "Unmapping...");
+        munmap(mapped, size);
     }
-    SYS_DEBUG(DL_VERBOSE, "Unmapping...");
-    munmap(mapped, size);
+ } catch(std::exception & ex) {
+    std::cerr << "ERROR: could not unmap memory: " << ex.what() << ", fd=" << fd << std::endl;
+ } catch (...) {
+    std::cerr << "ERROR: could not unmap memory due to unknown reason, fd=" << fd << std::endl;
  }
 
  if (fd >= 0) {
@@ -174,14 +181,19 @@ void FileMap::Advise(AdviseMode mode)
  ASSERT_STRERROR(madvise(mapped, size, mAdvise) == 0, "madvise() failed");
 }
 
+bool FileMap::isOk(void) const
+{
+ return mapped && mapped != MAP_FAILED;
+}
+
 void FileMap::Sync(bool wait)
 {
- ASSERT_STRERROR(msync(mapped, size, wait ? MS_SYNC : MS_ASYNC) == 0, "msync() failed");
+ ASSERT_STRERROR(msync(mapped, size, (wait ? MS_SYNC : MS_ASYNC) | MS_INVALIDATE) == 0, "msync() failed: ");
 }
 
 void FileMap::Populate(void)
 {
- ASSERT_STRERROR(msync(mapped, size, MS_INVALIDATE) == 0, "msync() failed");
+ ASSERT_STRERROR(msync(mapped, size, MS_INVALIDATE) == 0, "msync() failed: ");
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
