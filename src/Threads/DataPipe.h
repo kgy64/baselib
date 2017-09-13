@@ -96,6 +96,11 @@ namespace Threads
             return currentSize > 0; // assuming it is atomic
         }
 
+        inline size_t size(void) const
+        {
+            return currentSize;
+        }
+
         inline void finish(void)
         {
             Threads::Lock _l(myDataMutex);
