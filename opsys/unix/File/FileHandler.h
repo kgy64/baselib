@@ -2,7 +2,7 @@
  *
  * Project:     My Generic C++ Library
  * Purpose:     Generic file handler classes for read and write
- * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Author:      György Kövesdi (kgy@etiner.hu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

@@ -2,7 +2,7 @@
  *
  * Project:     My Generic C++ Library
  * Purpose:     Thread handler classes
- * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Author:      György Kövesdi (kgy@etiner.hu)
  * Modified by: KGy Removed debug code, because debug logger includes it
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    

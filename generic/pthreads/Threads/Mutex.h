@@ -2,7 +2,7 @@
  *
  * Project:     My Generic C++ Library
  * Purpose:     Mutex classes for my thread control
- * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Author:      György Kövesdi (kgy@etiner.hu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Project:     The project Refleks
- * Purpose:     Measurements on speakers
+ * Project:     My Generic C++ Library
+ * Purpose:     Extract environment variables in expression
  * Author:      Kövesdi György <kgy@etiner.hu>
  * License:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    

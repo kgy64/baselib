@@ -2,7 +2,7 @@
  *
  * Project:     Baselib - Basic System Access Library
  * Purpose:     class DirScanner: scans a given path recursively
- * Author:      György Kövesdi <kgy@teledigit.eu>
+ * Author:      György Kövesdi <kgy@etiner.hu>
  * License:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

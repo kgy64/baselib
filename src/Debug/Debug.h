@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Name:        Debug.h
  * Purpose:     Class for debugging
- * Author:      Kövesdi György  (kgy@teledigit.eu)
+ * Author:      Kövesdi György  (kgy@etiner.hu)
  * Modified by: KGy 2013-05-31: The stdc++-based version
  *              KGy 2013-10-20: Customizable output stream
  * Created:     2006-03-28

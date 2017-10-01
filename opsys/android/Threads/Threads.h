@@ -2,7 +2,7 @@
  *
  * Project:     Android Interface
  * Purpose:     Android-specific thread handler class
- * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@teledigit.eu>
+ * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@etiner.hu>
  * License:     GPLv2
  * Comments:    
  *

@@ -3,7 +3,7 @@
  * Project:     My Generic C++ Library
  * Purpose:     Class Auton is a smart pointer to instantiate a singleton
  *              using its interface
- * Author:      György Kövesdi <kgy@teledigit.eu>
+ * Author:      György Kövesdi <kgy@etiner.hu>
  * Modified by: KGy Removed debugging code because debug logger uses Auton
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    

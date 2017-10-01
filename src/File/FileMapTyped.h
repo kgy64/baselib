@@ -2,7 +2,7 @@
  *
  * Project:     Generic Library
  * Purpose:     File mappers for specific types
- * Author:      György Kövesdi <kgy@teledigit.eu>
+ * Author:      György Kövesdi <kgy@etiner.hu>
  * License:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

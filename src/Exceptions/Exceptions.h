@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Name:        Exceptions.h
  * Purpose:     General purpose exceptions
- * Author:      Kövesdi György  (kgy@teledigit.eu)
+ * Author:      Kövesdi György  (kgy@etiner.hu)
  * Modified by:
  * Created:     2012-06-10
  * Licence:     GPL

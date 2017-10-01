@@ -1,0 +1,14 @@
+#   This file contains some basic information about this project.
+#   All new source files opened by vim will be created having a header
+#   with these information.
+#   Install git://git.etiner.hu/devel/vimscripts.git to have this purpose.
+
+# A short description of this project:
+PROJECT="My Generic C++ Library"
+
+# A more detailed description:
+PURPOSE=""
+
+# The authors' name (email):
+AUTHOR="Kövesdi György <kgy@etiner.hu>"
+

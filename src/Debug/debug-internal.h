@@ -2,7 +2,7 @@
  *
  * Project:     OSM Database converter
  * Purpose:     Create my own binary database for Etiner Project out of OSM Database
- * Author:      Copyright (c) 2015-2016 - Gyorgy Kovesdi <kgy@teledigit.eu>
+ * Author:      Copyright (c) 2015-2016 - Gyorgy Kovesdi <kgy@etiner.hu>
  * License:     GPLv2
  * Comments:    
  *

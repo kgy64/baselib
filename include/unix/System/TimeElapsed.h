@@ -2,7 +2,7 @@
  *
  * Project:     My Generic C++ Library
  * Purpose:     Measuring short elapsed time using TimeDelay
- * Author:      György Kövesdi (kgy@teledigit.eu)
+ * Author:      György Kövesdi (kgy@etiner.hu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

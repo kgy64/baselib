@@ -2,7 +2,7 @@
  *
  * Project:     Baselib - Basic System Access Library
  * Purpose:     
- * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@teledigit.eu>
+ * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@etiner.hu>
  * License:     GPLv2
  * Comments:    
  *

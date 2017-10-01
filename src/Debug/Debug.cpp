@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Name:        debugprint.cpp
  * Purpose:     Class to help debug prints.
- * Author:      Kövesdi György  (kgy@teledigit.eu)
+ * Author:      Kövesdi György  (kgy@etiner.hu)
  * Modified by:
  * Created:     2006-03-28
  * Licence:     GPL

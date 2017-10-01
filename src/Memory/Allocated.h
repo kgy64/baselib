@@ -2,7 +2,7 @@
  *
  * Project:     Baselib - Basic System Access Library
  * Purpose:     Dynamically allocated byte buffer
- * Author:      Copyright (c) 2015 - Gyorgy Kovesdi <kgy@teledigit.eu>
+ * Author:      Copyright (c) 2015 - Gyorgy Kovesdi <kgy@etiner.hu>
  * License:     GPLv2
  * Comments:    
  *

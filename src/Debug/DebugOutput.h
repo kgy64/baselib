@@ -2,7 +2,7 @@
  *
  * Project:     My Generic Library
  * Purpose:     Default output stream for Debug Logger module
- * Author:      Kövesdi György  (kgy@teledigit.eu)
+ * Author:      Kövesdi György  (kgy@etiner.hu)
  * Licence:     GPL (see file 'COPYING' in the project root for more details)
  * Comments:    
  *

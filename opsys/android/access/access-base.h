@@ -4,7 +4,7 @@
  *              and native C++ code.
  * Purpose:     This project is going to be an easy to use interface between Java
  *              and native C++ code.
- * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@teledigit.eu>
+ * Author:      Copyright (c) 2014 - Gyorgy Kovesdi <kgy@etiner.hu>
  * License:     GPLv2
  * Comments:    
  *
