@@ -516,12 +516,13 @@ void AssignmentSet::toStream(std::ostream & os) const
 
 void AssignmentSet::toStream(std::ostream & os, int level) const
 {
- static const char separators[] = "                                                ";
+ static const char separators[] = "                                                                                                       ";
  for (AssignContainer::const_iterator i = assigns.begin(); i != assigns.end(); ++i) {
-    int position = sizeof(separators) - level - 1;
-    if (position >= 0) {
-        os << separators+position << "\"" << i->first << "\"=\"" << *i->second << "\";" << std::endl;
+    int position = (int)sizeof(separators) - 2*level - 1;
+    if (position < 0) {
+        position = 0;
     }
+    os << separators+position << '"' << i->first << "\"=\"" << *i->second << "\";" << std::endl;
  }
  for (ConfigContainer::const_iterator i = subConfigs.begin(); i != subConfigs.end(); ++i) {
     i->second->toStream(os, level);
@@ -545,17 +546,24 @@ const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 /// Prints the whole config (for debug purpose)
 void ConfigLevel::toStream(std::ostream & os, int level) const
 {
- for (int j = 0; j < level; ++j) {
-     os << "  ";
+ if (level) {
+    for (int j = 0; j < level; ++j) {
+         os << "  ";
+    }
+    os << levelName << " {" << std::endl;
+ } else {
+    os << '{' << std::endl;
  }
- os << levelName << " {" << std::endl;
+
  if (assignments.get()) {
      assignments->toStream(os, level+1);
  }
+
  for (int j = 0; j < level; ++j) {
      os << "  ";
  }
- os << "}" << std::endl;
+
+ os << '}' << std::endl;
 }
 
 /* * * * * * * * * * * * * End - of - File * * * * * * * * * * * * * * */
