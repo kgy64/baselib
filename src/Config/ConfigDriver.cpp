@@ -455,6 +455,10 @@ AssignmentSet * AssignmentSet::Append(AssignmentSet * other)
 
 void AssignmentSet::UpdateValue(const std::string & key, const std::string & value)
 {
+ SYS_DEBUG_MEMBER(DM_CONFIG);
+
+ SYS_DEBUG(DL_INFO2, "key='" << key << "', value='" << value << "'");
+
  AppendValue(key, ConfigValue(new ConfExpression(value)));   // Temporary!
 }
 
@@ -462,18 +466,35 @@ AssignmentSet * AssignmentSet::SetConfig(const std::string & key, const std::str
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
+ SYS_DEBUG(DL_INFO2, "key='" << key << "', value='" << value << '\'');
+
  std::string::size_type pos = key.find('/');
- if (pos == std::string::npos) {
-    UpdateValue(key, value);
- } else {
-    std::string path = key.substr(0, pos);
-    std::string subkey = key.substr(pos+1);
-    ConfPtr subconfig = GetSubconfig(path);
-    if (subconfig) {
-        subconfig->GetAssignments().SetConfig(subkey, value);
-    } else {
-        Append(new ConfigLevel(path, (new AssignmentSet())->SetConfig(subkey, value)));
+ switch (pos) {
+    case 0:
+        // The key starts with '/':
+        SetConfig(key.substr(1), value);
+    break;
+
+    case std::string::npos:
+        // No '/' found:
+        UpdateValue(key, value);
+    break;
+
+    default:
+    {
+        std::string path = key.substr(0, pos);
+        std::string subkey = key.substr(pos+1);
+        SYS_DEBUG(DL_INFO2, "key='" << path << "', subkey='" << subkey << '\'');
+        ConfPtr subconfig = GetSubconfig(path);
+        if (subconfig) {
+            SYS_DEBUG(DL_INFO2, "Updating existing config below '" << path << "'...");
+            subconfig->GetAssignments().SetConfig(subkey, value);
+        } else {
+            SYS_DEBUG(DL_INFO2, "Appending new config entry below '" << path << "'...");
+            Append(new ConfigLevel(path, (new AssignmentSet())->SetConfig(subkey, value)));
+        }
     }
+    break;
  }
 
  return this;
@@ -483,28 +504,53 @@ const ConfigValue AssignmentSet::GetConfig(const std::string & key) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
- size_t slash = key.find_first_of('/');
- if (slash != std::string::npos) {
-    // Split the string, find the next container level:
-    ConfigContainer::const_iterator i = subConfigs.find(key.substr(0, slash));
-    if (i == subConfigs.end())
-        return ConfigValue(); // NULL
-    return i->second->GetConfig(key.substr(slash+1));
+ SYS_DEBUG(DL_INFO1, "Finding key '" << key << "'...");
+
+ std::string::size_type pos = key.find('/');
+ switch (pos) {
+    case 0:
+        // The key starts with '/':
+        return GetConfig(key.substr(1));
+    break;
+
+    case std::string::npos:
+    {
+        // No '/' found:
+        AssignContainer::const_iterator i = assigns.find(key);
+        if (i != assigns.end()) {
+            SYS_DEBUG(DL_INFO1, "Found: '" << *i->second << '\'');
+            return i->second;
+        }
+    }
+    break;
+
+    default:
+    {
+        // Split the string, find the next container level:
+        ConfigContainer::const_iterator i = subConfigs.find(key.substr(0, pos));
+        if (i != subConfigs.end()) {
+            return i->second->GetConfig(key.substr(pos+1));
+        }
+    }
+    break;
  }
 
- AssignContainer::const_iterator i = assigns.find(key);
- if (i == assigns.end())
-    return ConfigValue(); // NULL
- return i->second;
+ SYS_DEBUG(DL_INFO1, "Not found.");
+
+ return ConfigValue(); // Not found: NULL
 }
 
 const ConfPtr AssignmentSet::GetSubconfig(const std::string & name)
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
 
+ SYS_DEBUG(DL_INFO2, "Searching for subconfig '" << name << "'...");
  ConfigContainer::iterator i = subConfigs.find(name);
- if (i == subConfigs.end())
+ if (i == subConfigs.end()) {
+    SYS_DEBUG(DL_INFO3, " - Not found in " << subConfigs);
     return ConfPtr();
+ }
+ SYS_DEBUG(DL_INFO3, " - Found: " << *i->second);
  return i->second;
 }
 
@@ -538,6 +584,7 @@ void AssignmentSet::toStream(std::ostream & os, int level) const
 const ConfigValue ConfigLevel::GetConfig(const std::string & key) const
 {
  SYS_DEBUG_MEMBER(DM_CONFIG);
+
  SYS_DEBUG(DL_INFO1, "Finding key '" << key << "' at " << levelName << " ...");
 
  return GetAssignments().GetConfig(key);
@@ -550,10 +597,9 @@ void ConfigLevel::toStream(std::ostream & os, int level) const
     for (int j = 0; j < level; ++j) {
          os << "  ";
     }
-    os << levelName << " {" << std::endl;
- } else {
-    os << '{' << std::endl;
  }
+
+ os << '"' << levelName << "\" {" << std::endl;
 
  if (assignments.get()) {
      assignments->toStream(os, level+1);

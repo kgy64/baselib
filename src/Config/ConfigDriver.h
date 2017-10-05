@@ -316,16 +316,16 @@ class AssignmentSet
 
     void toStream(std::ostream & os) const;
 
+    typedef std::map<std::string, ConfigValue> AssignContainer;
+
+    typedef std::map<std::string, ConfPtr> ConfigContainer;
+
  private:
     SYS_DEFINE_CLASS_NAME("AssignmentSet");
 
     void toStream(std::ostream & os, int level) const;
 
-    typedef std::map<std::string, ConfigValue> AssignContainer;
-
     AssignContainer assigns;
-
-    typedef std::map<std::string, ConfPtr> ConfigContainer;
 
     ConfigContainer subConfigs;
 
@@ -335,7 +335,7 @@ class AssignmentSet
 
 static inline std::ostream & operator<<(std::ostream & os, const AssignmentSet & body)
 {
- os << "AssignmentSet(" << body.assigns.size() << "/" << body.subConfigs.size() << ")";
+ body.toStream(os);
  return os;
 }
 
@@ -347,6 +347,8 @@ class ConfigLevel
         assignments(body),
         reference_counter(1)
     {
+        SYS_DEBUG_MEMBER(DM_CONFIG);
+        SYS_DEBUG(DL_INFO3, "New config: '" << name << "' = {" << *body << '}');
     }
 
     ConfigLevel(ConfigValue & name, AssignmentSet * body):
@@ -408,8 +410,17 @@ class ConfigLevel
 
 static inline std::ostream & operator<<(std::ostream & os, const ConfigLevel & conf)
 {
- os << conf.GetName() << "(" << conf.GetAssignments().noOfAssignments() << "/"
-                             << conf.GetAssignments().noOfSubconfigs() << ")";
+ conf.toStream(os, 0);
+ return os;
+}
+
+static inline std::ostream & operator<<(std::ostream & os, const AssignmentSet::ConfigContainer & conf)
+{
+ os << "{ ";
+ for (auto i = conf.begin(); i != conf.end(); ++i) {
+    os << '\'' << i->first << "' = " << *i->second << ' ';
+ }
+ os << '}';
  return os;
 }
 
