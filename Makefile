@@ -16,24 +16,24 @@ makesys/scripts/make.root:
 	git submodule update --init --recursive
 
 install:
-	install -d ${includedir}/baselib
-	install -d ${libdir}
+	install -d ${base_prefix}${includedir}/baselib
+	install -d ${base_prefix}${libdir}
 	cd bin; \
 	for file in *.a; \
 	do \
 		test -e $$file || continue; \
-		install -m 644 $$file ${libdir}/$$file; \
+		install -m 644 $$file ${base_prefix}${libdir}/$$file; \
 	done
 	cd bin; \
 	for file in *.so; \
 	do \
 		test -e $$file || continue; \
-		install -m 644 $$file ${libdir}/$$file; \
+		install -m 644 $$file ${base_prefix}${libdir}/$$file; \
 	done
 	cd include/$(OPERATING_SYSTEM); \
 	for file in `find -L . -name "*.h"`; \
 	do \
-		install -d "${includedir}/baselib/$$(dirname "$$file")"; \
-		cp "$$file" "${includedir}/baselib/$$(dirname "$$file")"; \
+		install -d "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
+		cp "$$file" "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
 	done
 
