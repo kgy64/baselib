@@ -22,13 +22,13 @@ install:
 	for file in *.a; \
 	do \
 		test -e $$file || continue; \
-		install -m 644 $$file ${base_prefix}${libdir}/$$file; \
+		install -m 644 $$file ${base_prefix}${libdir}/lib$$file; \
 	done
 	cd bin; \
 	for file in *.so; \
 	do \
 		test -e $$file || continue; \
-		install -m 644 $$file ${base_prefix}${libdir}/$$file; \
+		install -m 644 $$file ${base_prefix}${libdir}/lib$$file; \
 	done
 	cd include/$(OPERATING_SYSTEM); \
 	for file in `find -L . -name "*.h"`; \
