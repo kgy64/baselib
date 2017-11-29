@@ -36,4 +36,10 @@ install:
 		install -d "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
 		cp "$$file" "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
 	done
+	cd opsys/$(OPERATING_SYSTEM); \
+	for file in `find . -name "*.h"`; \
+	do \
+		install -d "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
+		cp "$$file" "${base_prefix}${includedir}/baselib/$$(dirname "$$file")"; \
+	done
 
