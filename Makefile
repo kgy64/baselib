@@ -28,7 +28,6 @@ install:
 	do \
 		cp -a $$file ${base_prefix}${libdir}/$$file; \
 	done
-	exit 1
 	cd include/$(OPERATING_SYSTEM); \
 	for file in `find -L . -name "*.h"`; \
 	do \
