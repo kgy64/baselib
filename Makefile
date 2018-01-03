@@ -21,15 +21,14 @@ install:
 	cd bin; \
 	for file in *.a; \
 	do \
-		test -e $$file || continue; \
-		install -m 644 $$file ${base_prefix}${libdir}/lib$$file; \
+		install -m 644 $$file ${base_prefix}${libdir}/$$file; \
 	done
 	cd bin; \
-	for file in *.so; \
+	for file in *.so*; \
 	do \
-		test -e $$file || continue; \
-		install -m 644 $$file ${base_prefix}${libdir}/lib$$file; \
+		cp -a $$file ${base_prefix}${libdir}/$$file; \
 	done
+	exit 1
 	cd include/$(OPERATING_SYSTEM); \
 	for file in `find -L . -name "*.h"`; \
 	do \

@@ -1,7 +1,7 @@
 # Makefile for my basic library
 #
 
-NAME                 =  base
+NAME                 =  libbase
 VERS_MAJOR           =  1
 VERS_MINOR           =  1
 
