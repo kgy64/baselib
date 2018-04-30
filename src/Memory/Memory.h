@@ -15,13 +15,65 @@
 
 namespace MEM
 {
-    template <typename T = void>
-    using shared_ptr = typename std::shared_ptr<T>;
-
-    template <typename T = void>
+    template <typename T>
     using weak_ptr = typename std::weak_ptr<T>;
 
-    template <typename T = void>
+    /// Smart pointer similar to std::shared_ptr
+    /*! This class is intended to be more thread-safe than std::shared_ptr.<br>
+     *  The only difference is that this pointer is in a well defined state when the desctuctor
+     *  of the referenced object is called. However, this problem of std::shared_ptr can appear
+     *  in single-theraded cases too. */
+    template <typename T>
+    class shared_ptr: public std::shared_ptr<T>
+    {
+     private:
+        using super = std::shared_ptr<T>;
+
+     public:
+        inline shared_ptr(void)
+        {
+        }
+
+        inline shared_ptr(T * ptr):
+            super(ptr)
+        {
+        }
+
+        inline shared_ptr(const super & other):
+            super(other)
+        {
+        }
+
+        inline shared_ptr(super && other):
+            super(other)
+        {
+        }
+
+        template <typename U>
+        inline shared_ptr(const U & other):
+            super(other)
+        {
+        }
+
+        template <typename U>
+        inline shared_ptr(U && other):
+            super(other)
+        {
+        }
+
+        inline ~shared_ptr()
+        {
+            std::atomic_store(this, super());
+        }
+
+        inline void reset(T * ptr = nullptr)
+        {
+            std::atomic_store(this, super(ptr));
+        }
+
+    }; // class MEM::shared_ptr
+
+    template <typename T>
     class scoped_ptr: public std::unique_ptr<T>
     {
      public:
@@ -132,7 +184,7 @@ namespace MEM
     }; // class MEM::shared_array
 
     template <typename T, typename U>
-    inline shared_ptr<T> static_pointer_cast(const shared_ptr<U> & p)
+    inline shared_ptr<T> static_pointer_cast(const std::shared_ptr<U> & p)
     {
         return std::static_pointer_cast<T>(p);
     }
