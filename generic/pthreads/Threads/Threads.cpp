@@ -88,26 +88,22 @@ void Thread::Kill(void)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
 
- // If it has already been stopped, do nothing:
- if (toBeFinished || !myThread) {
-    SYS_DEBUG(DL_INFO2, "Nothing to be done");
-    return;
+ if (myThread) {
+    if (!toBeFinished) {
+        toBeFinished = true;           // Flag it to be stopped
+        KillSignal();                  // Send the signal to the thread
+
+        // If it is called from the thread itself, then calling join() is not necessary at all.
+        if (pthread_equal(myThread, pthread_self())) {
+            SYS_DEBUG(DL_INFO2, "Self thread is not joined");
+            return;
+        }
+
+        SYS_DEBUG(DL_INFO2, "Joining thread...");
+        pthread_join(myThread, NULL);  // Wait until exited
+        SYS_DEBUG(DL_INFO2, "Joined, OK.");
+    }
  }
-
- toBeFinished = true;           // Flag it to be stopped
-
- KillSignal();                  // Send the signal to the thread
-
- // If it is called from the thread itself, then it is not necessary at all. Calling
- // the join() is a bad idea in this case.
- if (pthread_equal(myThread, pthread_self())) {
-    SYS_DEBUG(DL_INFO2, "Self thread is not joined");
-    return;
- }
-
- SYS_DEBUG(DL_INFO2, "Joining thread...");
- pthread_join(myThread, NULL);  // Wait until exited
- SYS_DEBUG(DL_INFO2, "Joined, OK.");
 }
 
 /// (re)start the thread (public version, static)
