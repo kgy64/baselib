@@ -54,7 +54,8 @@ namespace PTHREAD
             StartInternal(p, stack);
         }
 
-        void Kill(void);
+        void Kill(bool is_join = true);
+        void Join(void);
         bool SetPriority(int prio);
         int GetPriority(void) const;
 
@@ -64,6 +65,7 @@ namespace PTHREAD
         inline bool ToBeFinished(void) const
         {
             SYS_DEBUG_MEMBER(DM_THREAD);
+            SYS_DEBUG(DL_INFO3, (toBeFinished ? "Finished" : "Continue..."));
             return toBeFinished;
         }
 

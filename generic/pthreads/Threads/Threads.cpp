@@ -78,13 +78,14 @@ Thread::~Thread(void)
 
 /// Stop the thread
 /*! This function initiates the exit procedure.<br>
+ *  \param  is_join     If it is set to 'false', then this function will not wait for the thread to exit.<br>
+ *                      Its default value is 'true'.
  *  \note   This is a collaborative exit, the thread must poll the function \ref Threads::Finished() and/or
  *          the function \ref Threads::KillSignal() must be used.<br>
- *          If this function is called from another thread, then it does not return while the thread is running.
  *          It is recommended to call it only from the parent thread, because it returns immediately if called
  *          from more threads.
  */
-void Thread::Kill(void)
+void Thread::Kill(bool is_join)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
 
@@ -92,18 +93,27 @@ void Thread::Kill(void)
     if (!toBeFinished) {
         toBeFinished = true;           // Flag it to be stopped
         KillSignal();                  // Send the signal to the thread
-
-        // If it is called from the thread itself, then calling join() is not necessary at all.
-        if (pthread_equal(myThread, pthread_self())) {
-            SYS_DEBUG(DL_INFO2, "Self thread is not joined");
-            return;
-        }
-
-        SYS_DEBUG(DL_INFO2, "Joining thread...");
-        pthread_join(myThread, NULL);  // Wait until exited
-        SYS_DEBUG(DL_INFO2, "Joined, OK.");
+    }
+    if (is_join) {
+        Join();
     }
  }
+}
+
+/// Wait for the thread to exit
+void Thread::Join(void)
+{
+ SYS_DEBUG_MEMBER(DM_THREAD);
+
+ // If it is called from the thread itself, then calling join() is not necessary at all.
+ if (pthread_equal(myThread, pthread_self())) {
+    SYS_DEBUG(DL_INFO2, "Self thread is not joined");
+    return;
+ }
+
+ SYS_DEBUG(DL_INFO2, "Joining thread...");
+ pthread_join(myThread, NULL);  // Wait until exited
+ SYS_DEBUG(DL_INFO2, "Joined, OK.");
 }
 
 /// (re)start the thread (public version, static)
