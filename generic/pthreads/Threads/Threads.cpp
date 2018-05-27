@@ -165,14 +165,18 @@ void * Thread::_main(void * p_info)
 {
  SYS_DEBUG_STATIC(DM_THREAD);
 
- ThreadInfo & info = *reinterpret_cast<ThreadInfo *>(p_info);
+ ThreadPtr self;
 
- // Keep itself alive while main() is running:
- ThreadPtr self = info.thread;
- // Also store the self pointer:
- self->mySelf = self;
-
- info.Signal();         // Smart pointers have been updated, caller may continue
+ {
+    ThreadInfo & info = *reinterpret_cast<ThreadInfo *>(p_info);
+    // Keep itself alive while main() is running:
+    self = info.thread;
+    // Also store the self pointer:
+    self->mySelf = self;
+    // Smart pointers have been updated, caller may continue:
+    info.Signal();
+    // Note: the content of 'info' is not available from this point.
+ }
 
  int status = 0;
 
