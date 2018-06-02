@@ -15,6 +15,7 @@
 #include <Memory/Memory.h>
 #include <Debug/Debug.h>
 
+#include <iostream>
 #include <exception>
 #include <pthread.h>
 #include <sched.h>
@@ -176,7 +177,7 @@ namespace PTHREAD
 
         /// Called when the thread has exited successfully
         /*! \param status   The return value of \ref Threads::main()
-         *  \warning    This function is not called if the thread has exited with exception, see \ref Threads::error() */
+         *  \warning    This function is called with parameter -1 after \ref error() */
         virtual void exited(int)
         {
         }

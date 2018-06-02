@@ -73,7 +73,6 @@ Thread::Thread(const char * name):
 Thread::~Thread(void)
 {
  SYS_DEBUG_MEMBER(DM_THREAD);
- Kill();
 }
 
 /// Stop the thread
@@ -155,7 +154,7 @@ void Thread::StartInternal(ThreadInfo & info, size_t stack)
  // Wait until the thread copies its smart pointer
  info.Wait();
 
- SYS_DEBUG(DL_INFO1, "Thread '" << getThreadName() << "' has been started");
+ SYS_DEBUG(DL_INFO1, "Thread '" << getThreadName() << "' started");
 }
 
 /// The physical start of the thread
@@ -198,16 +197,18 @@ void * Thread::_main(void * p_info)
     DEBUG_OUT("Thread Execution Error in " << self->getThreadName() << "/main(): " << ex.what());
     try {
         self->error(&ex);
+        self->exited(-1);
     } catch (...) {
-        DEBUG_OUT("Thread '" << self->getThreadName() << "': error() got exception!");
+        DEBUG_OUT("Thread '" << self->getThreadName() << "': exception in exception handler!");
     }
 
  } catch (...) {
     DEBUG_OUT("Thread Execution Error in " << self->getThreadName() << "/main() (unknown exception)");
     try {
         self->error(nullptr);
+        self->exited(-1);
     } catch (...) {
-        DEBUG_OUT("Thread '" << self->getThreadName() << "': error() got exception!");
+        DEBUG_OUT("Thread '" << self->getThreadName() << "': exception in exception handler!");
     }
  }
 
