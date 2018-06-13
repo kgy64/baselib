@@ -17,6 +17,8 @@
 
 #else   //  SYS_DEBUG_ON
 
+#include <iostream>
+
 #define DEBUG_IS_ON     false
 #define DEBUG_IS_OFF    true
 
