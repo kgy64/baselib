@@ -15,6 +15,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <sstream>
+
 SYS_DEFINE_MODULE(DM_PARSER);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -41,11 +43,27 @@ long long Parser::StrtollSafe(const char * p_str, int base)
  return result;
 }
 
+static inline double my_strtod(const char * s, const char ** endptr)
+{
+ std::istringstream _is(s);
+ _is.imbue(std::locale::classic());
+ double result;
+ _is >> result;
+ if (_is.fail()) {
+    *endptr = s;
+ } else {
+    *endptr = s + _is.tellg();
+ }
+ return result;
+}
+
+/// Locale-independent conversion from ASCII to double
+/*! Expects dot (.) as decimal point. */
 double Parser::StrtodSafe(const char * p_str)
 {
  ASSERT(p_str && *p_str, "NULL string conversion");
- char * ende;
- double result = strtod(p_str, &ende);
+ const char * ende;
+ double result = my_strtod(p_str, &ende);
  ASSERT(!*ende, "strtod(): unconvertable string '" << ende << "'");
  return result;
 }
