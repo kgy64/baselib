@@ -37,6 +37,8 @@
 #define SYS_DEBUGLEVEL(level)                       { }
 #define SYS_DEBUGLEVEL_MODULE(name, level)          { }
 #define SYS_DEBUG_MODULE(name, onoff)               { }
+#define SYS_DEBUG_MODULE_ON(name)                   { }
+#define SYS_DEBUG_MODULE_OFF(name)                  { }
 #define SYS_DEFINE_CLASS_NAME(name)
 #define SYS_DEBUG_ALL_MODULES(onoff)
 #define SYS_DECLARE_MODULE(name)
